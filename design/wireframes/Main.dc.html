@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Choose a car</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;font-family:'Instrument Sans',system-ui,sans-serif;background:#F5F4F0;color:#1B1A17}
+a{color:#2548B8}a:hover{color:#1A3589}
+</style>
+</helmet>
+<div style="width: 1280px; height: 860px; box-sizing: border-box; background: #F5F4F0; font-family: 'Instrument Sans', system-ui, sans-serif; color: #1B1A17; display: flex; flex-direction: column">
+<header style="height: 64px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-bottom: 1px solid #D6D2C8; background: #FFFFFF">
+<a href="Main.dc.html" style="font-weight: 700; font-size: 18px; color: #1B1A17; text-decoration: none">Avtoskop</a>
+<nav style="display: flex; gap: 24px; font-size: 14px; align-items: center">
+<a href="Main.dc.html" style="color: #1B1A17; text-decoration: none; font-weight: 600">Search</a>
+<a href="#reports" style="color: #5F5B53; text-decoration: none">How reports work</a>
+<span style="color: #5F5B53">UA / EN</span>
+</nav>
+</header>
+<main style="flex-grow: 1; display: flex; gap: 40px; padding: 48px 40px">
+<section style="flex-grow: 1; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -0.01em">Find a car and check it before you buy</h1>
+<p style="margin: 0; font-size: 16px; color: #5F5B53">One search across auto.ria, OLX and official dealers. New and used cars in Ukraine.</p>
+</div>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; gap: 12px; font-size: 14px">
+<li style="padding: 6px 12px; border-radius: 999px; background: #1B1A17; color: #FFFFFF">1 · Type: Car</li>
+<li style="padding: 6px 12px; border-radius: 999px; background: #1B1A17; color: #FFFFFF">2 · Brand: Toyota</li>
+<li style="padding: 6px 12px; border-radius: 999px; border: 1px solid #1B1A17">3 · Model</li>
+</ol>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Vehicle type</h2>
+<div style="display: flex; gap: 12px">
+<button type="button" style="height: 44px; padding: 0 20px; border-radius: 8px; border: 2px solid #2548B8; background: #E4EAFA; color: #1B1A17; font: inherit; font-weight: 600">Cars and SUVs</button>
+<button type="button" disabled style="height: 44px; padding: 0 20px; border-radius: 8px; border: 1px solid #D6D2C8; background: #FFFFFF; color: #5F5B53; font: inherit">Motorcycles · later</button>
+<button type="button" disabled style="height: 44px; padding: 0 20px; border-radius: 8px; border: 1px solid #D6D2C8; background: #FFFFFF; color: #5F5B53; font: inherit">Vans and trucks · later</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: end">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Brand</h2>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #5F5B53">Search brand <input type="text" placeholder="e.g. Skoda" style="height: 36px; width: 200px; padding: 0 12px; border: 1px solid #D6D2C8; border-radius: 8px; font: inherit"></label>
+</div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{brands}}" as="b" hint-placeholder-count="12">
+<sc-if value="{{b.on}}" hint-placeholder-val="{{false}}">
+<button type="button" style="height: 48px; border-radius: 8px; border: 2px solid #2548B8; background: #E4EAFA; font: inherit; font-weight: 600; color: #1B1A17">{{b.name}}</button>
+</sc-if>
+<sc-if value="{{b.off}}" hint-placeholder-val="{{true}}">
+<button type="button" style="height: 48px; border-radius: 8px; border: 1px solid #D6D2C8; background: #FFFFFF; font: inherit; color: #1B1A17">{{b.name}}</button>
+</sc-if>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Toyota model</h2>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{models}}" as="m" hint-placeholder-count="6">
+<sc-if value="{{m.on}}" hint-placeholder-val="{{false}}">
+<button type="button" style="height: 48px; border-radius: 8px; border: 2px solid #2548B8; background: #E4EAFA; font: inherit; font-weight: 600; color: #1B1A17">{{m.name}}</button>
+</sc-if>
+<sc-if value="{{m.off}}" hint-placeholder-val="{{true}}">
+<button type="button" style="height: 48px; border-radius: 8px; border: 1px solid #D6D2C8; background: #FFFFFF; font: inherit; color: #1B1A17">{{m.name}}</button>
+</sc-if>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; gap: 16px; align-items: center">
+<a href="Results.dc.html" style="height: 52px; padding: 0 28px; display: flex; align-items: center; border-radius: 8px; background: #2548B8; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 16px">Show RAV4 offers</a>
+<span style="font-size: 14px; color: #5F5B53">[N] offers from 3 sources</span>
+</div>
+</section>
+<aside id="reports" style="width: 340px; flex-shrink: 0; align-self: start; background: #FFFFFF; border: 1px solid #D6D2C8; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600">What you get</h2>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-weight: 600; font-size: 14px">All sites in one list</div>
+<div style="font-size: 14px; color: #5F5B53">The same car on several sites shows once, when the VIN matches.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-weight: 600; font-size: 14px">Price label on every offer</div>
+<div style="font-size: 14px; color: #5F5B53">Cheap, fair or overpriced, compared with similar cars.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-weight: 600; font-size: 14px">What to check on this model</div>
+<div style="font-size: 14px; color: #5F5B53">Known weak spots for the model and generation. Free.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 16px; border-top: 1px solid #D6D2C8">
+<div style="font-weight: 600; font-size: 14px">History report · free</div>
+<div style="font-size: 14px; color: #5F5B53">Registry records, import history and AI advice for one car. Enter your email, no account. [N] reports per day.</div>
+</div>
+</aside>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+const mark = (list, pick) => list.map((name) => ({ name, on: name === pick, off: name !== pick }));
+return {
+brands: mark(['Toyota', 'Volkswagen', 'Skoda', 'Hyundai', 'Kia', 'Renault', 'BMW', 'Mercedes-Benz', 'Audi', 'Nissan', 'Tesla', 'All brands'], 'Toyota'),
+models: mark(['RAV4', 'Camry', 'Corolla', 'Land Cruiser Prado', 'C-HR', 'Highlander'], 'RAV4')
+};
+}
+}
+</script>
+</body>
+</html>

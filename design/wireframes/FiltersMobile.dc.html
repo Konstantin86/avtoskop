@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Filters, mobile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;font-family:'Instrument Sans',system-ui,sans-serif;background:#FFFFFF;color:#1B1A17}
+a{color:#2548B8}a:hover{color:#1A3589}
+</style>
+</helmet>
+<div style="width: 390px; height: 1180px; box-sizing: border-box; position: relative; background: #FFFFFF; font-family: 'Instrument Sans', system-ui, sans-serif; color: #1B1A17; display: flex; flex-direction: column">
+<header style="height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 4px 0 16px; border-bottom: 1px solid #D6D2C8">
+<h1 style="margin: 0; font-size: 18px; font-weight: 700">Filters</h1>
+<div style="display: flex; align-items: center">
+<button type="button" style="height: 44px; padding: 0 12px; border: 0; background: transparent; font: inherit; font-size: 15px; color: #2548B8">Clear all</button>
+<a href="ResultsMobile.dc.html" aria-label="Close filters" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B1A17" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+</div>
+</header>
+<form style="flex-grow: 1; padding: 20px 16px 120px; display: flex; flex-direction: column; gap: 22px; font-size: 15px">
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="font-weight: 600; padding: 0; margin-bottom: 8px">Year</legend>
+<div style="display: flex; gap: 8px"><input aria-label="Year from" placeholder="From" inputmode="numeric" style="width: 50%; height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid #D6D2C8; border-radius: 8px; font: inherit"><input aria-label="Year to" placeholder="To" inputmode="numeric" style="width: 50%; height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid #D6D2C8; border-radius: 8px; font: inherit"></div>
+</fieldset>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="font-weight: 600; padding: 0; margin-bottom: 8px">Price, USD</legend>
+<div style="display: flex; gap: 8px"><input aria-label="Price from" placeholder="From" inputmode="numeric" style="width: 50%; height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid #D6D2C8; border-radius: 8px; font: inherit"><input aria-label="Price to" placeholder="To" inputmode="numeric" style="width: 50%; height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid #D6D2C8; border-radius: 8px; font: inherit"></div>
+</fieldset>
+<label style="display: flex; flex-direction: column; gap: 8px; font-weight: 600">Mileage up to, km<input inputmode="numeric" placeholder="Any" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid #D6D2C8; border-radius: 8px; font: inherit; font-weight: 400"></label>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="font-weight: 600; padding: 0; margin-bottom: 8px">Fuel</legend>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #D6D2C8; background: #FFFFFF; font: inherit; font-size: 14px">Petrol</button>
+<button type="button" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #D6D2C8; background: #FFFFFF; font: inherit; font-size: 14px">Diesel</button>
+<button type="button" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 2px solid #2548B8; background: #E4EAFA; font: inherit; font-size: 14px; font-weight: 600">Hybrid</button>
+<button type="button" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #D6D2C8; background: #FFFFFF; font: inherit; font-size: 14px">Electric</button>
+</div>
+</fieldset>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="font-weight: 600; padding: 0; margin-bottom: 8px">Gearbox</legend>
+<div style="display: flex; gap: 8px">
+<button type="button" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 2px solid #2548B8; background: #E4EAFA; font: inherit; font-size: 14px; font-weight: 600">Any</button>
+<button type="button" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #D6D2C8; background: #FFFFFF; font: inherit; font-size: 14px">Automatic</button>
+<button type="button" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #D6D2C8; background: #FFFFFF; font: inherit; font-size: 14px">Manual</button>
+</div>
+</fieldset>
+<label style="display: flex; flex-direction: column; gap: 8px; font-weight: 600">Region<select style="height: 44px; padding: 0 10px; border: 1px solid #D6D2C8; border-radius: 8px; font: inherit; font-weight: 400; background: #FFFFFF"><option>All Ukraine</option><option>Kyiv</option><option>Lviv</option></select></label>
+<fieldset style="margin: 0; padding: 18px 0 0; border: 0; border-top: 1px solid #ECEAE4; display: flex; flex-direction: column; gap: 4px">
+<legend style="position: absolute; width: 1px; height: 1px; overflow: hidden">Origin and history</legend>
+<label style="min-height: 44px; display: flex; align-items: center; justify-content: space-between">Sold new in Ukraine<input type="checkbox" checked style="width: 20px; height: 20px"></label>
+<label style="min-height: 44px; display: flex; align-items: center; justify-content: space-between">Imported<input type="checkbox" checked style="width: 20px; height: 20px"></label>
+<label style="min-height: 44px; display: flex; align-items: center; justify-content: space-between">No accidents reported only<input type="checkbox" style="width: 20px; height: 20px"></label>
+<label style="min-height: 44px; display: flex; align-items: center; justify-content: space-between">Customs cleared only<input type="checkbox" checked style="width: 20px; height: 20px"></label>
+<label style="min-height: 44px; display: flex; align-items: center; justify-content: space-between">Show new cars<input type="checkbox" checked style="width: 20px; height: 20px"></label>
+</fieldset>
+</form>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 24px; background: #FFFFFF; border-top: 1px solid #D6D2C8">
+<a href="ResultsMobile.dc.html" style="height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #2548B8; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 16px">Show [N] offers</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
