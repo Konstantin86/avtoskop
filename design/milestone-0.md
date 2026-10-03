@@ -43,7 +43,7 @@ Decided 27 Sep 2026.
 
 ## Your actions
 
-- [ ] Register at developers.ria.com and get a free API key (put it in `.env` as `AUTO_RIA_API_KEY`).
+- [x] Register at developers.ria.com with the extended questions (100 requests/month without them, 1,000 with them). Submitted 27 Sep 2026; verification takes up to 3 working days. Then put the key in `.env` as `AUTO_RIA_API_KEY`.
 - [ ] Create an Anthropic account, add a card, set a monthly spend limit (for example $10 for local development).
 - [x] Start Colima (`colima start`), then run `pnpm db:up`. Done: PostgreSQL 18.6 runs locally.
 - [ ] Optional now: register avtoskop.com.ua. Hetzner can wait until launch.
@@ -56,3 +56,35 @@ Decided 27 Sep 2026.
 - [MVS registrations dataset](https://data.gov.ua/dataset/06779371-308f-42d7-895e-5a39833375f0)
 - [Stolen vehicles dataset](https://data.gov.ua/dataset/2cd12755-834b-4c43-9026-fe356ce93af5)
 - [NHTSA vPIC API](https://vpic.nhtsa.dot.gov/api/)
+
+## Real API measurements (3 Oct 2026)
+
+Account approved with 1,000 requests/month and 30/hour. Measured with about 20 requests:
+
+| Fact                                      | Value                                                                                                                                                                                                      |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Active passenger car listings on auto.ria | 324,697                                                                                                                                                                                                    |
+| Toyota RAV4 / Skoda Octavia / VW Passat   | 1,840 / 7,756 / 10,275                                                                                                                                                                                     |
+| Listings per search request               | 100 IDs, no other fields                                                                                                                                                                                   |
+| Listing details                           | One request per listing; full VIN, plate, prices in USD/UAH/EUR, mileage, generation, modification, fuel, gearbox, drive, region, photos, description, import/customs/damage flags. Seller phone is masked |
+
+Search filters that work (tested on RAV4):
+
+| Filter                    | Parameters                                                                |
+| ------------------------- | ------------------------------------------------------------------------- |
+| Year                      | `s_yers[0]`, `po_yers[0]`                                                 |
+| Price in USD              | `price_ot`, `price_do`, `currency=1`                                      |
+| Mileage, thousands of km  | `raceFrom`, `raceTo` (`raceInt` is ignored)                               |
+| Fuel, gearbox, region     | `type[0]`, `gearbox[0]`, `state[0]`                                       |
+| Added or updated recently | `top`: 1 = last hour, 2 = today, 3–5 = longer periods up to about a month |
+
+## Decision: collect with filtered searches
+
+There is no bulk details endpoint, so the collector learns most fields from filtered searches instead of one request per listing:
+
+- Year, price band (~5%), mileage band, fuel, gearbox and region for every listing, at roughly 15× fewer requests.
+- Full details only when someone opens a car; kept and refreshed after a few days.
+- `top=2` finds new and updated listings with one request per model per day.
+- Every response is cached on disk; the collector keeps under the hourly limit and backs off on HTTP 429.
+
+Estimate for 100 models with this approach: about 70,000 requests/month (Professional, 2,000 UAH) with prices refreshed every 2 weeks, or about 125,000 (Business, 6,000 UAH, ~$145) for daily freshness. The user accepted ~$145/month for the real SaaS.

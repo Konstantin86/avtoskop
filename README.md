@@ -40,4 +40,4 @@ docker compose up -d
 pnpm install
 ```
 
-PostgreSQL then runs on `localhost:5432`.
+PostgreSQL then runs on `localhost:5433` (5433, so it does not clash with a local PostgreSQL on 5432).

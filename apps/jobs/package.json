@@ -1,0 +1,15 @@
+{
+  "name": "@avtoskop/jobs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "autoria": "node --env-file=../../.env src/cli.ts"
+  },
+  "dependencies": {
+    "@avtoskop/db": "workspace:*",
+    "drizzle-orm": "^0.45.3",
+    "zod": "^4.6.5"
+  }
+}
