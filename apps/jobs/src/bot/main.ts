@@ -1,6 +1,6 @@
 import { contactKey } from '@avtoskop/core';
 import { createDb } from '@avtoskop/db';
-import { createLoginHandler } from './login.ts';
+import { createBotHandler } from './handler.ts';
 import { createTelegram } from './telegram.ts';
 
 function env(name: string): string {
@@ -12,11 +12,21 @@ function env(name: string): string {
 const log = (m: string) => console.log(`[${new Date().toISOString().slice(11, 19)}] ${m}`);
 const tg = createTelegram(env('TELEGRAM_BOT_TOKEN'));
 const { db, close } = createDb(env('DATABASE_URL'));
-const handle = createLoginHandler(db, tg, contactKey(process.env['REQUEST_CONTACT_KEY']));
+const handle = createBotHandler(db, tg, {
+  contactKey: contactKey(process.env['REQUEST_CONTACT_KEY']),
+  siteUrl: env('SITE_URL').replace(/\/$/, ''),
+});
 
 let running = true;
-process.on('SIGINT', () => (running = false));
-process.on('SIGTERM', () => (running = false));
+// Aborting the open long-poll request lets the bot exit at once, so a restarted
+// bot doesn't overlap with this one (Telegram allows one poller per bot).
+const shutdown = new AbortController();
+const stop = () => {
+  running = false;
+  shutdown.abort();
+};
+process.on('SIGINT', stop);
+process.on('SIGTERM', stop);
 
 const me = await tg.getMe();
 const expected = env('TELEGRAM_BOT_USERNAME').replace(/^@/, '');
@@ -31,7 +41,7 @@ log(`Bot @${me.username} is running (long polling)`);
 let offset = 0;
 while (running) {
   try {
-    const updates = await tg.getUpdates(offset, 25);
+    const updates = await tg.getUpdates(offset, 25, shutdown.signal);
     for (const u of updates) {
       offset = u.update_id + 1;
       if (!u.message) continue;
@@ -42,6 +52,7 @@ while (running) {
       }
     }
   } catch (error) {
+    if (!running) break;
     log(`Polling error: ${(error as Error).message}; retrying in 5 s`);
     await new Promise((r) => setTimeout(r, 5000));
   }

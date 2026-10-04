@@ -1,0 +1,45 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--blue-soft);
+}
+
+.done {
+  background: var(--good-soft);
+}
+
+.icon {
+  color: var(--blue);
+  display: flex;
+}
+
+.done .icon {
+  color: var(--good);
+}
+
+.text {
+  flex: 1;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.body {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+@media (max-width: 520px) {
+  .card {
+    flex-wrap: wrap;
+  }
+
+  .card :global(.btn) {
+    width: 100%;
+  }
+}

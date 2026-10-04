@@ -116,6 +116,8 @@ export async function addDemoRequests(db: Db): Promise<number> {
         notes: d.notes,
         phoneEncrypted: 'demo',
         phoneHash: `demo-${i}`,
+        phoneVerified: true,
+        status: 'active',
         notifyVia: 'telegram',
         locale: 'uk',
         createdAt: new Date(Date.now() - d.hoursAgo * 3_600_000),

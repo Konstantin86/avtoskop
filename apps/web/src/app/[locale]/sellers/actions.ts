@@ -1,6 +1,6 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { getLocale } from 'next-intl/server';
 import { offerInput, sellerProfileInput } from '@avtoskop/core';
 import { buyerRequests, offers, sellers } from '@avtoskop/db';
@@ -15,6 +15,7 @@ import {
   type LoginPoll,
 } from '@/server/auth';
 import { db } from '@/server/db';
+import { notifyBuyerOfOffer } from '@/server/notify';
 
 export interface FormState {
   errors: string[];
@@ -93,7 +94,7 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     .select({ id: buyerRequests.id, status: buyerRequests.status })
     .from(buyerRequests)
     .where(eq(buyerRequests.id, requestId));
-  if (!request || !['new', 'active'].includes(request.status)) {
+  if (!request || request.status !== 'active') {
     return { errors: [], formError: 'closed', values };
   }
 
@@ -117,13 +118,16 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     link: o.link ?? null,
     description: o.description,
   };
-  await db
+  const [saved] = await db
     .insert(offers)
     .values({ requestId, sellerId: user.seller.id, ...row })
     .onConflictDoUpdate({
       target: [offers.requestId, offers.sellerId],
       set: { ...row, updatedAt: new Date() },
-    });
+    })
+    // xmax is 0 only for a freshly inserted row, so edits don't notify the buyer again.
+    .returning({ isNew: sql<boolean>`(xmax = 0)` });
+  if (saved?.isNew) await notifyBuyerOfOffer(requestId, row);
 
   redirect({ href: { pathname: '/sellers/me', query: { sent: '1' } }, locale: await getLocale() });
   return { errors: [], values };

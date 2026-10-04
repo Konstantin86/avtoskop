@@ -2,8 +2,10 @@ import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { ConfirmButton } from '@/components/ConfirmButton';
 import { FlagEU, FlagUS } from '@/components/icons';
+import { TelegramConfirm } from '@/components/TelegramConfirm';
 import { formatNumber, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { getRequestByKey, listRequestOffers, markOffersShown } from '@/server/buyer';
+import { botStartLink } from '@/server/telegram';
 import {
   declineOfferAction,
   restoreOfferAction,
@@ -73,10 +75,21 @@ export default async function MyRequestPage({ params }: Props) {
           <span className={forms.summaryMeta}>{meta}</span>
         </div>
         {closed && <div className={forms.notice}>{t('closedNotice')}</div>}
+        {!closed && !request.phoneVerified && (
+          <TelegramConfirm
+            href={botStartLink(`req_${request.id}`)}
+            confirmed={false}
+            title={t('confirmTitle')}
+            text={t('confirmText')}
+            button={t('confirmButton')}
+          />
+        )}
 
         <section className={styles.offers}>
           <h2 className={styles.offersTitle}>{t('offersCount', { count: offerList.length })}</h2>
-          {offerList.length === 0 && <p className={forms.lead}>{t('empty')}</p>}
+          {offerList.length === 0 && (
+            <p className={forms.lead}>{request.phoneVerified ? t('empty') : t('emptyPending')}</p>
+          )}
           {offerList.map((offer) => {
             const declined = offer.status === 'declined';
             const shared = offer.status === 'contact_shared';

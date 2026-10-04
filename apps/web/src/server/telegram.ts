@@ -18,3 +18,12 @@ export async function sendTelegram(chatId: number, text: string): Promise<boolea
     return false;
   }
 }
+
+export function botStartLink(payload: string): string | null {
+  const bot = process.env['TELEGRAM_BOT_USERNAME'];
+  return bot ? `https://t.me/${bot.replace(/^@/, '')}?start=${payload}` : null;
+}
+
+export function siteUrl(): string {
+  return (process.env['SITE_URL'] ?? 'http://localhost:3000').replace(/\/$/, '');
+}

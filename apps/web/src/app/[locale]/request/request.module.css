@@ -150,3 +150,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+.notifyNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--blue-soft);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.notifyNote svg {
+  flex-shrink: 0;
+  color: var(--blue);
+}

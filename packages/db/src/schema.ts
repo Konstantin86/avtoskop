@@ -110,8 +110,13 @@ export const buyerRequests = pgTable(
     phoneEncrypted: text('phone_encrypted').notNull(),
     phoneHash: text('phone_hash').notNull(),
     phoneVerified: boolean('phone_verified').notNull().default(false),
-    // SHA-256 of the secret in the buyer's private link; null for demo rows.
+    // The private link's secret: hashed for lookup, encrypted so the bot can resend the link.
+    // Both are null for demo rows.
     accessHash: text('access_hash').unique(),
+    accessKeyEncrypted: text('access_key_encrypted'),
+    // Set when the buyer confirms the phone by sharing it with our Telegram bot.
+    telegramChatId: bigint('telegram_chat_id', { mode: 'number' }),
+    confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
     notifyVia: text('notify_via').notNull(),
     locale: text('locale').notNull(),
     status: text('status').notNull().default('new'),

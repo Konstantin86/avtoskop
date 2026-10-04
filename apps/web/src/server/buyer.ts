@@ -21,6 +21,7 @@ export async function getRequestByKey(key: string) {
       gearbox: buyerRequests.gearbox,
       region: buyerRequests.region,
       status: buyerRequests.status,
+      phoneVerified: buyerRequests.phoneVerified,
       createdAt: buyerRequests.createdAt,
     })
     .from(buyerRequests)

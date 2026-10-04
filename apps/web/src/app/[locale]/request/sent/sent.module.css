@@ -97,28 +97,6 @@
   color: var(--muted);
 }
 
-.telegram {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 20px;
-  border-radius: 16px;
-  background: var(--blue-soft);
-}
-
-.tgIcon {
-  color: var(--blue);
-  display: flex;
-}
-
-.tgText {
-  flex: 1;
-}
-
-.tgText .stepTitle {
-  padding-top: 0;
-}
-
 @media (max-width: 720px) {
   .page {
     padding-top: 32px;

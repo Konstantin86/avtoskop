@@ -79,6 +79,7 @@ export async function submitRequest(
         phoneEncrypted: encryptContact(input.phone),
         phoneHash,
         accessHash: hashSecret(key),
+        accessKeyEncrypted: encryptContact(key),
         notifyVia: input.notifyVia,
         locale,
       })

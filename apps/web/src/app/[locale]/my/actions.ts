@@ -92,7 +92,7 @@ export async function setRequestOpenAction(formData: FormData): Promise<void> {
   const open = field(formData, 'open') === '1';
   await db
     .update(buyerRequests)
-    .set({ status: open ? 'new' : 'closed' })
+    .set({ status: open ? (request.phoneVerified ? 'active' : 'new') : 'closed' })
     .where(eq(buyerRequests.id, request.id));
   refresh();
 }

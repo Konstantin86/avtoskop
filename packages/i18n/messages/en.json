@@ -76,12 +76,13 @@
     "notes": "Wishes",
     "notesPlaceholder": "Color, trim, anything else…",
     "phone": "Phone",
-    "phoneHint": "Sellers don't see your number. We'll confirm it before sending the request",
+    "phoneHint": "Sellers don't see your number. You'll confirm it in Telegram",
     "notify": "Offer notifications",
     "notify_telegram": "Telegram",
     "notify_sms": "SMS",
     "notify_email": "Email",
-    "consent": "I agree to the <terms>terms</terms> and <privacy>privacy policy</privacy>"
+    "consent": "I agree to the <terms>terms</terms> and <privacy>privacy policy</privacy>",
+    "notifyNote": "After posting, confirm your number in our Telegram bot: offers will arrive there too. Sellers don't see your number."
   },
   "request": {
     "back": "← Home",
@@ -115,24 +116,27 @@
     "error_wishes": "Check the selected wishes"
   },
   "sent": {
-    "title": "Request posted",
-    "step1": "Request posted",
-    "step2": "Sending to verified sellers",
-    "step2Text": "Importers, dealers, buyout firms",
+    "title": "Request published",
+    "step1": "Request created",
+    "step2": "Confirm your number in Telegram",
+    "step2Text": "Sellers won't see the request until you do",
     "step3": "Waiting for offers",
-    "step3Text": "We'll notify you as soon as the first one arrives",
+    "step3Text": "We'll send them to Telegram",
     "step4": "You choose who gets your number",
     "step4Text": "No calls from sellers you didn't choose",
-    "telegramTitle": "Connect Telegram",
-    "telegramText": "Offers will arrive instantly",
-    "telegramButton": "Connect",
+    "telegramTitle": "Confirm your number in Telegram",
+    "telegramText": "The bot asks you to share your number; it must match the one in the request",
+    "telegramButton": "Confirm in Telegram",
     "browse": "Browse listings meanwhile",
     "notFound": "Request not found.",
     "linkTitle": "Your private link",
     "linkText": "Use it to see offers and choose who gets your number. Save it and don't share it.",
     "copy": "Copy",
     "copied": "Copied",
-    "openOffers": "Go to offers"
+    "openOffers": "Go to offers",
+    "titlePending": "One step left",
+    "telegramDoneTitle": "Number confirmed",
+    "telegramDoneText": "Offers will arrive in Telegram"
   },
   "footer": {
     "copyright": "© Avtoskop, {year}",
@@ -328,7 +332,8 @@
     "buyerPhone": "Buyer's number:"
   },
   "notify": {
-    "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call the buyer soon."
+    "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call the buyer soon.",
+    "newOffer": "🚗 New offer for your request {request}:\n{offer}\n\nView it and decide who gets your number: {link}"
   },
   "my": {
     "title": "Your request",
@@ -356,6 +361,25 @@
     "closedNotice": "Request closed. No new offers arrive.",
     "keepLink": "This is your private link. Don't share it with other people.",
     "notFoundTitle": "Link not valid",
-    "notFound": "Check that you copied the whole link."
+    "notFound": "Check that you copied the whole link.",
+    "confirmTitle": "Request not published yet",
+    "confirmText": "Confirm your number in Telegram so sellers can see the request",
+    "confirmButton": "Confirm in Telegram",
+    "emptyPending": "Offers will appear after you confirm your number."
+  },
+  "bot": {
+    "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.",
+    "sharePhone": "Share my number",
+    "ownPhoneOnly": "Please share your own number with the button below.",
+    "noMatch": "We found no sign-in or request with this number. If you posted a request, check that you entered this exact number.",
+    "loginExpired": "The sign-in link has expired. Go back to the site and press \"Sign in with Telegram\" again.",
+    "loginAskPhone": "To sign in, share your phone number with the button below. We don't store the number itself, only a protected fingerprint.\n\nIf you didn't try to sign in to Avtoskop, ignore this message.",
+    "loginDone": "Done! Your number is confirmed. Go back to the site: sign-in finishes on its own.",
+    "loginDoneKnown": "Done! Go back to the site: sign-in finishes on its own.",
+    "requestNotFound": "Request not found or closed. Post a new request on the site.",
+    "requestAskPhone": "To publish your request \"{request}\", share your number with the button below. It must match the number in the request.\n\nSellers won't see the number until you decide to share it.",
+    "requestConfirmed": "✅ Number confirmed. Your request \"{request}\" is published, and sellers can see it now.\n\nNew offers will arrive here.",
+    "requestAlready": "Your request \"{request}\" is already confirmed. New offers will arrive here.",
+    "requestLink": "Your private link to the offers (don't forward it): {link}"
   }
 }

@@ -4,9 +4,11 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { hashSecret } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { CopyLink } from '@/components/CopyLink';
-import { CheckIcon, TelegramIcon } from '@/components/icons';
+import { CheckIcon } from '@/components/icons';
+import { TelegramConfirm } from '@/components/TelegramConfirm';
 import { Link } from '@/i18n/navigation';
 import { db } from '@/server/db';
+import { botStartLink } from '@/server/telegram';
 import styles from './sent.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -49,6 +51,7 @@ export default async function SentPage({
             wishes: buyerRequests.wishes,
             region: buyerRequests.region,
             accessHash: buyerRequests.accessHash,
+            phoneVerified: buyerRequests.phoneVerified,
           })
           .from(buyerRequests)
           .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
@@ -79,10 +82,11 @@ export default async function SentPage({
 
   const ownsLink = Boolean(key && req.accessHash && hashSecret(key) === req.accessHash);
 
+  const confirmed = req.phoneVerified;
   const steps = [
     { state: 'done', title: t('step1'), text: null },
-    { state: 'done', title: t('step2'), text: t('step2Text') },
-    { state: 'now', title: t('step3'), text: t('step3Text') },
+    { state: confirmed ? 'done' : 'now', title: t('step2'), text: t('step2Text') },
+    { state: confirmed ? 'now' : 'next', title: t('step3'), text: t('step3Text') },
     { state: 'next', title: t('step4'), text: t('step4Text') },
   ] as const;
 
@@ -93,9 +97,17 @@ export default async function SentPage({
           <span className={styles.badge}>
             <CheckIcon size={28} />
           </span>
-          <h1 className={styles.title}>{t('title')}</h1>
+          <h1 className={styles.title}>{confirmed ? t('title') : t('titlePending')}</h1>
           <p className={styles.summary}>{summary}</p>
         </div>
+
+        <TelegramConfirm
+          href={botStartLink(`req_${id}`)}
+          confirmed={confirmed}
+          title={confirmed ? t('telegramDoneTitle') : t('telegramTitle')}
+          text={confirmed ? t('telegramDoneText') : t('telegramText')}
+          button={t('telegramButton')}
+        />
 
         <ol className={`card ${styles.timeline}`}>
           {steps.map((s) => (
@@ -127,19 +139,6 @@ export default async function SentPage({
             </Link>
           </div>
         )}
-
-        <div className={styles.telegram}>
-          <span className={styles.tgIcon}>
-            <TelegramIcon />
-          </span>
-          <div className={styles.tgText}>
-            <div className={styles.stepTitle}>{t('telegramTitle')}</div>
-            <div className={styles.stepText}>{t('telegramText')}</div>
-          </div>
-          <span className="btn btn-blue btn-sm" aria-disabled="true">
-            {t('telegramButton')}
-          </span>
-        </div>
 
         <Link href="/" className="btn btn-secondary btn-lg">
           {t('browse')}

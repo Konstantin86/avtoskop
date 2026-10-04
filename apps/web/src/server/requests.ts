@@ -4,8 +4,8 @@ import { redactContacts } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { db } from './db';
 
-// Requests shown publicly. Once SMS confirmation exists, only confirmed requests become 'active'.
-const VISIBLE_STATUSES = ['new', 'active'];
+// Only requests whose phone the buyer confirmed in Telegram are shown publicly.
+const VISIBLE_STATUSES = ['active'];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Never select the phone columns here: these rows go to public pages.

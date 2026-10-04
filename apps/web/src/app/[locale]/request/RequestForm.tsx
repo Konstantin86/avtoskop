@@ -2,8 +2,9 @@
 
 import { useActionState } from 'react';
 import { useTranslations } from 'next-intl';
-import { FUELS, GEARBOXES, NOTIFY_CHANNELS, WISHES } from '@avtoskop/core';
+import { FUELS, GEARBOXES, WISHES } from '@avtoskop/core';
 import { BrandSelect } from '@/components/BrandSelect';
+import { TelegramIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import type { BrandOption } from '@/server/brands';
 import { submitRequest, type RequestFormState } from './actions';
@@ -238,22 +239,12 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
           />
           {err('phone') ?? <span className="hint">{f('phoneHint')}</span>}
         </label>
-        <div className="label">
-          <span id="notify-label">{f('notify')}</span>
-          <div className="segment" role="radiogroup" aria-labelledby="notify-label">
-            {NOTIFY_CHANNELS.map((c) => (
-              <label key={c}>
-                <input
-                  type="radio"
-                  name="notifyVia"
-                  value={c}
-                  defaultChecked={(v['notifyVia'] ?? 'telegram') === c}
-                />
-                <span>{f(`notify_${c}`)}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+        {/* Telegram is the only channel for now: the buyer confirms the phone through our bot. */}
+        <input type="hidden" name="notifyVia" value="telegram" />
+        <p className={styles.notifyNote}>
+          <TelegramIcon />
+          <span>{f('notifyNote')}</span>
+        </p>
         <label className={styles.consent}>
           <input
             type="checkbox"
