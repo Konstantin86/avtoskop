@@ -4,6 +4,7 @@ import { createDb, sourceRequests } from '@avtoskop/db';
 import { createAutoriaClient } from './autoria/client.ts';
 import { createCollector, DIMENSIONS, type Dimension } from './autoria/collector.ts';
 import { trackedModels } from './autoria/tracked-models.ts';
+import { addDemoRequests, clearDemoRequests } from './demo-requests.ts';
 
 const USAGE = `Usage: pnpm autoria <command> [options]
 
@@ -12,7 +13,8 @@ Commands:
   recent    [--model 715]          listings added or updated today
   details   --id <auto.ria id>     full details for one listing
   status    [--model 715]          coverage and quota use
-  brands                           import all auto.ria brands (1 request, cached 30 days)`;
+  brands                           import all auto.ria brands (1 request, cached 30 days)
+  demo-requests [--clear]          add (or remove) sample buyer requests for local development`;
 
 function env(name: string): string {
   const value = process.env[name];
@@ -26,6 +28,7 @@ const { positionals, values } = parseArgs({
     model: { type: 'string' },
     dims: { type: 'string' },
     id: { type: 'string' },
+    clear: { type: 'boolean' },
   },
 });
 
@@ -72,6 +75,9 @@ try {
     if (!values.id) throw new Error('--id is required');
     await collector.details(values.id);
     log(`Details saved for ${values.id}`);
+  } else if (command === 'demo-requests') {
+    if (values.clear) log(`Removed ${await clearDemoRequests(db)} demo requests`);
+    else log(`Added ${await addDemoRequests(db)} demo requests`);
   } else if (command === 'brands') {
     log(`Imported ${await collector.importBrands()} brands`);
   } else if (command === 'status') {

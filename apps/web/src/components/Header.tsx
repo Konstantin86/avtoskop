@@ -11,8 +11,8 @@ export async function Header() {
   const nav = (
     <>
       <Link href="/#how">{t('how')}</Link>
-      <Link href="/">{t('sellers')}</Link>
-      <Link href="/">{t('myRequests')}</Link>
+      <Link href="/requests">{t('requests')}</Link>
+      <Link href="/sellers">{t('sellers')}</Link>
     </>
   );
 

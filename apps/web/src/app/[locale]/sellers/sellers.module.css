@@ -1,0 +1,227 @@
+.hero {
+  padding: 72px 0 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 820px;
+}
+
+.title {
+  font-size: 52px;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.lead {
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--good);
+  box-shadow: 0 0 0 4px var(--good-soft);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 56px;
+  scroll-margin-top: 96px;
+}
+
+.sectionTitle {
+  font-size: 32px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.step,
+.whoItem {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 16px;
+}
+
+.stepNum {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--yellow-soft);
+  color: var(--yellow-ink);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepTitle {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.muted {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.who {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.whoIcon {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  color: var(--blue);
+}
+
+.flags {
+  display: flex;
+  gap: 6px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 24px;
+  padding-bottom: 72px;
+}
+
+.rules {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ruleList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.ruleList li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.check {
+  color: var(--blue);
+  padding-top: 2px;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.price {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--yellow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.telegram {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: var(--blue-soft);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.telegram > div {
+  flex: 1;
+}
+
+.tgIcon {
+  color: var(--blue);
+  padding-top: 2px;
+}
+
+.sideTitle {
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 1080px) {
+  .who {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero {
+    padding: 32px 0 40px;
+  }
+
+  .title {
+    font-size: 30px;
+    line-height: 1.15;
+  }
+
+  .lead {
+    font-size: 16px;
+  }
+
+  .ctas :global(.btn) {
+    width: 100%;
+  }
+
+  .steps,
+  .who {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionTitle {
+    font-size: 24px;
+  }
+
+  .rules {
+    padding: 20px;
+  }
+}

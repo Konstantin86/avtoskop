@@ -1,3 +1,4 @@
+export { redactContacts } from './redact.ts';
 export { slugify, transliterateUk } from './slug.ts';
 export {
   buyerRequestInput,

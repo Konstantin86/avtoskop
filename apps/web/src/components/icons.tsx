@@ -68,3 +68,77 @@ export function MenuIcon() {
     </svg>
   );
 }
+
+export function FlagUS() {
+  return (
+    <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+      <rect width="20" height="14" fill="#fff" />
+      <g fill="#B22234">
+        <rect width="20" height="2" />
+        <rect y="4" width="20" height="2" />
+        <rect y="8" width="20" height="2" />
+        <rect y="12" width="20" height="2" />
+      </g>
+      <rect width="9" height="8" fill="#3C3B6E" />
+      <rect
+        x="0.5"
+        y="0.5"
+        width="19"
+        height="13"
+        rx="1.5"
+        fill="none"
+        stroke="#16181D"
+        strokeOpacity="0.15"
+      />
+    </svg>
+  );
+}
+
+export function FlagEU() {
+  const stars = Array.from({ length: 12 }, (_, i) => {
+    const a = (i * Math.PI) / 6;
+    return (
+      <circle
+        key={i}
+        cx={10 + 4.2 * Math.cos(a)}
+        cy={7 + 4.2 * Math.sin(a)}
+        r="0.75"
+        fill="#FFCC00"
+      />
+    );
+  });
+  return (
+    <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+      <rect width="20" height="14" fill="#003399" />
+      {stars}
+    </svg>
+  );
+}
+
+export function StoreIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...stroke}>
+      <path d="M3 10l2-6h14l2 6" />
+      <path d="M4 10v10h16V10" />
+      <path d="M10 20v-5h4v5" />
+    </svg>
+  );
+}
+
+export function PersonIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...stroke}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+    </svg>
+  );
+}
+
+export function KeyIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...stroke}>
+      <circle cx="8" cy="15" r="4" />
+      <path d="M11 12l9-9M17 6l3 3M15 8l2 2" />
+    </svg>
+  );
+}
