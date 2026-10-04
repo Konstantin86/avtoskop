@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, inArray, ne, sql } from 'drizzle-orm';
 import { decryptContact, hashContact, hashSecret } from '@avtoskop/core';
 import { brands, buyerRequests, loginTokens, users, type Db } from '@avtoskop/db';
 import type { ReplyMarkup, Telegram, TelegramMessage } from './telegram.ts';
@@ -134,11 +134,14 @@ export function createBotHandler(db: Db, tg: Telegram, { contactKey, siteUrl }: 
       return;
     }
 
+    // A phone proven earlier (as a seller, or by confirming a buyer request) needs no new share.
     const [known] = await db.select().from(users).where(eq(users.telegramId, m.from!.id));
-    if (known?.phoneHash) {
+    const provenHash = known?.phoneHash ?? (await knownPhoneHashes(m.from!.id))[0];
+    if (provenHash) {
+      const userId = known?.id ?? (await upsertUser(m, provenHash));
       await db
         .update(loginTokens)
-        .set({ status: 'confirmed', telegramId: m.from!.id, userId: known.id })
+        .set({ status: 'confirmed', telegramId: m.from!.id, userId })
         .where(eq(loginTokens.id, token.id));
       await tg.sendMessage(chatId, botText(SELLER_LOCALE, 'loginDoneKnown'), removeKeyboard);
       return;
@@ -195,6 +198,51 @@ export function createBotHandler(db: Db, tg: Telegram, { contactKey, siteUrl }: 
     );
   }
 
+  async function upsertUser(m: TelegramMessage, phoneHash: string): Promise<string> {
+    const from = m.from!;
+    const [user] = await db
+      .insert(users)
+      .values({
+        telegramId: from.id,
+        telegramUsername: from.username ?? null,
+        name: displayName(m),
+        phoneHash,
+      })
+      .onConflictDoUpdate({
+        target: users.telegramId,
+        set: { telegramUsername: from.username ?? null, phoneHash },
+      })
+      .returning({ id: users.id });
+    return user!.id;
+  }
+
+  async function listRequests(m: TelegramMessage): Promise<void> {
+    const rows = await db
+      .select(requestColumns)
+      .from(buyerRequests)
+      .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
+      .where(
+        and(
+          eq(buyerRequests.telegramChatId, m.from!.id),
+          eq(buyerRequests.phoneVerified, true),
+          ne(buyerRequests.status, 'closed'),
+        ),
+      )
+      .orderBy(desc(buyerRequests.createdAt))
+      .limit(10);
+    const locale = rows[0]?.locale ?? 'uk';
+    if (rows.length === 0) {
+      await tg.sendMessage(m.chat.id, botText(locale, 'noRequests'));
+      return;
+    }
+    const lines = rows.map((r) =>
+      r.accessKeyEncrypted
+        ? `• ${requestLabel(r)}\n${siteUrl}/${r.locale}/my/${decryptContact(r.accessKeyEncrypted, contactKey)}`
+        : `• ${requestLabel(r)}`,
+    );
+    await tg.sendMessage(m.chat.id, [botText(locale, 'myRequests'), ...lines].join('\n\n'));
+  }
+
   async function completeLogin(m: TelegramMessage, phoneHash: string): Promise<boolean> {
     const from = m.from!;
     const [token] = await db
@@ -211,22 +259,10 @@ export function createBotHandler(db: Db, tg: Telegram, { contactKey, siteUrl }: 
       .limit(1);
     if (!token) return false;
 
-    const [user] = await db
-      .insert(users)
-      .values({
-        telegramId: from.id,
-        telegramUsername: from.username ?? null,
-        name: displayName(m),
-        phoneHash,
-      })
-      .onConflictDoUpdate({
-        target: users.telegramId,
-        set: { telegramUsername: from.username ?? null, phoneHash },
-      })
-      .returning({ id: users.id });
+    const userId = await upsertUser(m, phoneHash);
     await db
       .update(loginTokens)
-      .set({ status: 'confirmed', userId: user!.id })
+      .set({ status: 'confirmed', userId })
       .where(eq(loginTokens.id, token.id));
     return true;
   }
@@ -260,6 +296,7 @@ export function createBotHandler(db: Db, tg: Telegram, { contactKey, siteUrl }: 
       if (payload.startsWith('login_')) return onStartLogin(m, payload.slice('login_'.length));
       if (payload.startsWith('req_')) return onStartRequest(m, payload.slice('req_'.length));
     }
+    if (text.startsWith('/requests')) return listRequests(m);
     await tg.sendMessage(m.chat.id, botText('uk', 'welcome'));
   };
 }

@@ -2,9 +2,9 @@ import { getLocale, getTranslations, setRequestLocale } from 'next-intl/server';
 import { LockIcon, TelegramIcon } from '@/components/icons';
 import { Link, redirect } from '@/i18n/navigation';
 import { devLoginEnabled, getCurrentUser, getPendingLoginCode, safeReturnTo } from '@/server/auth';
-import { devLoginAction, startLoginAction } from '../actions';
+import { devLoginAction, startLoginAction } from './actions';
 import { LoginPoller } from './LoginPoller';
-import styles from '../forms.module.css';
+import styles from '../sellers/forms.module.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +13,7 @@ type Props = {
   searchParams: Promise<Record<string, string | undefined>>;
 };
 
-export default async function JoinPage({ params, searchParams }: Props) {
+export default async function LoginPage({ params, searchParams }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('auth');
@@ -22,10 +22,8 @@ export default async function JoinPage({ params, searchParams }: Props) {
 
   const user = await getCurrentUser();
   if (user) {
-    redirect({
-      href: user.seller ? returnTo : { pathname: '/sellers/profile', query: { return: returnTo } },
-      locale: await getLocale(),
-    });
+    // Pages that need a seller profile (like the offer form) ask for it themselves.
+    redirect({ href: returnTo, locale: await getLocale() });
   }
 
   const bot = process.env['TELEGRAM_BOT_USERNAME'];
@@ -57,7 +55,7 @@ export default async function JoinPage({ params, searchParams }: Props) {
             </a>
             <LoginPoller returnTo={returnTo} />
             <Link
-              href={{ pathname: '/sellers/join', query: { return: returnTo } }}
+              href={{ pathname: '/login', query: { return: returnTo } }}
               className={styles.secondaryLink}
             >
               {t('retry')}

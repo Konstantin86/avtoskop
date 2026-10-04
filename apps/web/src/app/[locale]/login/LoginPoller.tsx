@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { pollLoginAction } from '../actions';
+import { pollLoginAction } from './actions';
 
 export function LoginPoller({ returnTo }: { returnTo: string }) {
   const t = useTranslations('auth');
@@ -17,7 +17,7 @@ export function LoginPoller({ returnTo }: { returnTo: string }) {
       if (!active) return;
       if (result.status === 'done') {
         clearInterval(timer);
-        router.replace({ pathname: '/sellers/join', query: { return: result.next || returnTo } });
+        router.replace({ pathname: '/login', query: { return: result.next || returnTo } });
       } else if (result.status === 'expired') {
         clearInterval(timer);
         setExpired(true);

@@ -2,6 +2,7 @@ import { contactKey } from '@avtoskop/core';
 import { createDb } from '@avtoskop/db';
 import { createBotHandler } from './handler.ts';
 import { createTelegram } from './telegram.ts';
+import { botText } from './texts.ts';
 
 function env(name: string): string {
   const value = process.env[name];
@@ -35,6 +36,12 @@ if (me.username.toLowerCase() !== expected.toLowerCase()) {
     `TELEGRAM_BOT_USERNAME is @${expected}, but the token belongs to @${me.username}`,
   );
 }
+// The command menu next to the message box; English for English Telegram, Ukrainian otherwise.
+await tg.setMyCommands([{ command: 'requests', description: botText('uk', 'commandRequests') }]);
+await tg.setMyCommands(
+  [{ command: 'requests', description: botText('en', 'commandRequests') }],
+  'en',
+);
 log(`Bot @${me.username} is running (long polling)`);
 
 // Long polling needs no public URL, so the bot also runs on a laptop.

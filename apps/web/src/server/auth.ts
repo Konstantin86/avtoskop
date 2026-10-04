@@ -24,6 +24,7 @@ export const getCurrentUser = cache(async () => {
   const [row] = await db
     .select({
       userId: users.id,
+      telegramId: users.telegramId,
       name: users.name,
       telegramUsername: users.telegramUsername,
       seller: {
@@ -93,7 +94,7 @@ export async function pollLogin(): Promise<LoginPoll> {
   await db.update(loginTokens).set({ status: 'used' }).where(eq(loginTokens.id, token.id));
   await createSession(token.userId);
   jar.delete(LOGIN_COOKIE);
-  return { status: 'done', next: token.returnTo ?? '/sellers/me' };
+  return { status: 'done', next: token.returnTo ?? '/account' };
 }
 
 export function devLoginEnabled(): boolean {
@@ -112,6 +113,6 @@ export async function devLogin(): Promise<void> {
 }
 
 // Only same-site paths are allowed as a destination after sign-in.
-export function safeReturnTo(value: unknown, fallback = '/sellers/me'): string {
+export function safeReturnTo(value: unknown, fallback = '/account'): string {
   return typeof value === 'string' && /^\/(?!\/)[\w\-/?=&%.]*$/.test(value) ? value : fallback;
 }

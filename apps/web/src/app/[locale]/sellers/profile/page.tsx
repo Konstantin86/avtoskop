@@ -19,7 +19,7 @@ export default async function ProfilePage({ params, searchParams }: Props) {
   const user = await getCurrentUser();
   if (!user) {
     redirect({
-      href: { pathname: '/sellers/join', query: { return: '/sellers/profile' } },
+      href: { pathname: '/login', query: { return: '/sellers/profile' } },
       locale: await getLocale(),
     });
     return null;

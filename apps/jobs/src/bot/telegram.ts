@@ -69,6 +69,15 @@ export function createTelegram(token: string, fetchFn: typeof fetch = fetch) {
         ...(replyMarkup && { reply_markup: replyMarkup }),
       });
     },
+    setMyCommands(
+      commands: Array<{ command: string; description: string }>,
+      languageCode?: string,
+    ) {
+      return call('setMyCommands', {
+        commands,
+        ...(languageCode && { language_code: languageCode }),
+      });
+    },
     getMe() {
       return call<{ username: string }>('getMe', {});
     },

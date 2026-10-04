@@ -62,7 +62,7 @@ export default async function SellersPage({ params }: Props) {
             {t('ctaHow')}
           </a>
         </div>
-        <Link href="/sellers/join" className={styles.signIn}>
+        <Link href="/login" className={styles.signIn}>
           {t('signInLink')} →
         </Link>
         <span className={styles.live}>

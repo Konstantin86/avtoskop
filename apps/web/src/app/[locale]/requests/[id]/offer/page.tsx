@@ -24,7 +24,7 @@ export default async function OfferPage({ params }: Props) {
     redirect({
       href: user
         ? { pathname: '/sellers/profile', query: { return: here } }
-        : { pathname: '/sellers/join', query: { return: here } },
+        : { pathname: '/login', query: { return: here } },
       locale: await getLocale(),
     });
     return null;

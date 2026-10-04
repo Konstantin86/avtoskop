@@ -5,15 +5,7 @@ import { getLocale } from 'next-intl/server';
 import { offerInput, sellerProfileInput } from '@avtoskop/core';
 import { buyerRequests, offers, sellers } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
-import {
-  devLogin,
-  destroySession,
-  getCurrentUser,
-  pollLogin,
-  safeReturnTo,
-  startLogin,
-  type LoginPoll,
-} from '@/server/auth';
+import { getCurrentUser, safeReturnTo } from '@/server/auth';
 import { db } from '@/server/db';
 import { notifyBuyerOfOffer } from '@/server/notify';
 
@@ -34,32 +26,6 @@ function formValues(formData: FormData, multi: string[] = []): Record<string, st
       .join(',');
   }
   return values;
-}
-
-export async function startLoginAction(formData: FormData): Promise<void> {
-  const returnTo = safeReturnTo(formData.get('return'));
-  await startLogin(returnTo);
-  redirect({
-    href: { pathname: '/sellers/join', query: { step: 'telegram', return: returnTo } },
-    locale: await getLocale(),
-  });
-}
-
-export async function pollLoginAction(): Promise<LoginPoll> {
-  return pollLogin();
-}
-
-export async function devLoginAction(formData: FormData): Promise<void> {
-  await devLogin();
-  redirect({
-    href: { pathname: '/sellers/join', query: { return: safeReturnTo(formData.get('return')) } },
-    locale: await getLocale(),
-  });
-}
-
-export async function signOutAction(): Promise<void> {
-  await destroySession();
-  redirect({ href: '/', locale: await getLocale() });
 }
 
 export async function saveProfileAction(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -129,6 +95,6 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     .returning({ isNew: sql<boolean>`(xmax = 0)` });
   if (saved?.isNew) await notifyBuyerOfOffer(requestId, row);
 
-  redirect({ href: { pathname: '/sellers/me', query: { sent: '1' } }, locale: await getLocale() });
+  redirect({ href: { pathname: '/account', query: { sent: '1' } }, locale: await getLocale() });
   return { errors: [], values };
 }

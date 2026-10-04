@@ -16,9 +16,9 @@ export async function Header() {
       <Link href="/requests">{t('requests')}</Link>
       <Link href="/sellers">{t('sellers')}</Link>
       {user ? (
-        <Link href="/sellers/me">{t('account')}</Link>
+        <Link href="/account">{t('account')}</Link>
       ) : (
-        <Link href="/sellers/join">{t('signIn')}</Link>
+        <Link href="/login">{t('signIn')}</Link>
       )}
     </>
   );

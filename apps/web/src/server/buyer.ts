@@ -1,7 +1,8 @@
 import 'server-only';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, count, desc, eq, sql } from 'drizzle-orm';
 import { hashSecret } from '@avtoskop/core';
 import { brands, buyerRequests, offers, sellers } from '@avtoskop/db';
+import { decryptContact } from './contact';
 import { db } from './db';
 
 const KEY = /^[A-Za-z0-9_-]{20,64}$/;
@@ -67,4 +68,33 @@ export async function markOffersShown(requestId: string): Promise<void> {
     .update(offers)
     .set({ status: 'shown' })
     .where(and(eq(offers.requestId, requestId), eq(offers.status, 'sent')));
+}
+
+// Requests the person confirmed in Telegram, which is how they are tied to an account.
+export async function listUserRequests(telegramId: number) {
+  const rows = await db
+    .select({
+      id: buyerRequests.id,
+      brand: brands.name,
+      model: buyerRequests.model,
+      yearFrom: buyerRequests.yearFrom,
+      yearTo: buyerRequests.yearTo,
+      budgetUsd: buyerRequests.budgetUsd,
+      region: buyerRequests.region,
+      status: buyerRequests.status,
+      createdAt: buyerRequests.createdAt,
+      accessKeyEncrypted: buyerRequests.accessKeyEncrypted,
+      offerCount: count(offers.id),
+      newOfferCount: sql<number>`count(*) filter (where ${offers.status} = 'sent')`.mapWith(Number),
+    })
+    .from(buyerRequests)
+    .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
+    .leftJoin(offers, eq(offers.requestId, buyerRequests.id))
+    .where(and(eq(buyerRequests.telegramChatId, telegramId), eq(buyerRequests.phoneVerified, true)))
+    .groupBy(buyerRequests.id, brands.name)
+    .orderBy(desc(buyerRequests.createdAt));
+  return rows.map(({ accessKeyEncrypted, ...r }) => ({
+    ...r,
+    key: accessKeyEncrypted ? decryptContact(accessKeyEncrypted) : null,
+  }));
 }

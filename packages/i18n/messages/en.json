@@ -239,8 +239,8 @@
     "sellerRules": "Rules for sellers"
   },
   "auth": {
-    "title": "Seller sign-in",
-    "lead": "Sign in with Telegram to send offers to buyers. Telegram confirms your phone number — no SMS, no passwords.",
+    "title": "Sign in to Avtoskop",
+    "lead": "Sign in with Telegram, no SMS or passwords. Buyers see their requests and offers; sellers send offers.",
     "start": "Sign in with Telegram",
     "step1": "Open the Avtoskop bot in Telegram",
     "step2": "Tap Start, then Share my number",
@@ -249,7 +249,7 @@
     "waiting": "Waiting for confirmation in Telegram…",
     "expired": "The link has expired. Please try again.",
     "retry": "Start again",
-    "privacy": "We don't store your number, only a protected fingerprint of it to prevent duplicate accounts. Buyers reach you through Telegram.",
+    "privacy": "We don't store your number, only a protected fingerprint of it. Other people don't see it until you decide.",
     "notConfigured": "Telegram sign-in isn't set up yet: add TELEGRAM_BOT_TOKEN and TELEGRAM_BOT_USERNAME to .env and start the bot (pnpm bot).",
     "devLogin": "Sign in as a test seller (local only)",
     "signOut": "Sign out"
@@ -316,7 +316,7 @@
     "error_closed": "This request is already closed."
   },
   "account": {
-    "title": "Seller account",
+    "title": "Account",
     "status_pending": "Under review",
     "status_verified": "Verified seller",
     "editProfile": "Edit profile",
@@ -329,7 +329,20 @@
     "offerStatus_contact_shared": "Buyer shared their number",
     "offerStatus_declined": "Declined",
     "edit": "Edit",
-    "buyerPhone": "Buyer's number:"
+    "buyerPhone": "Buyer's number:",
+    "requestsTitle": "My requests",
+    "noRequests": "Your requests appear here once you confirm them in Telegram.",
+    "newRequest": "Post a request",
+    "requestsHint": "Missing a request? Confirm it in Telegram with this same account.",
+    "offerCount": "{count, plural, =0 {No offers yet} one {# offer} other {# offers}}",
+    "newOffers": "{count} new",
+    "viewOffers": "View offers",
+    "requestStatus_active": "Published",
+    "requestStatus_new": "Not confirmed",
+    "requestStatus_closed": "Closed",
+    "becomeSellerTitle": "Selling cars?",
+    "becomeSellerText": "Create a seller profile to send offers to buyers.",
+    "becomeSeller": "Create a seller profile"
   },
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call the buyer soon.",
@@ -368,7 +381,7 @@
     "emptyPending": "Offers will appear after you confirm your number."
   },
   "bot": {
-    "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.",
+    "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
     "sharePhone": "Share my number",
     "ownPhoneOnly": "Please share your own number with the button below.",
     "noMatch": "We found no sign-in or request with this number. If you posted a request, check that you entered this exact number.",
@@ -380,6 +393,9 @@
     "requestAskPhone": "To publish your request \"{request}\", share your number with the button below. It must match the number in the request.\n\nSellers won't see the number until you decide to share it.",
     "requestConfirmed": "✅ Number confirmed. Your request \"{request}\" is published, and sellers can see it now.\n\nNew offers will arrive here.",
     "requestAlready": "Your request \"{request}\" is already confirmed. New offers will arrive here.",
-    "requestLink": "Your private link to the offers (don't forward it): {link}"
+    "requestLink": "Your private link to the offers (don't forward it): {link}",
+    "myRequests": "Your requests:",
+    "noRequests": "You have no confirmed requests yet. Post a request on the site and confirm it here.",
+    "commandRequests": "My requests and links to offers"
   }
 }
