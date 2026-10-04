@@ -1,13 +1,15 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { ConfirmButton } from '@/components/ConfirmButton';
-import { FlagEU, FlagUS } from '@/components/icons';
+import { REPORT_REASONS } from '@avtoskop/core';
+import { FlagEU, FlagUS, ShieldIcon } from '@/components/icons';
 import { TelegramConfirm } from '@/components/TelegramConfirm';
 import { formatNumber, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { getRequestByKey, listRequestOffers, markOffersShown } from '@/server/buyer';
 import { botStartLink } from '@/server/telegram';
 import {
   declineOfferAction,
+  reportOfferAction,
   restoreOfferAction,
   setRequestOpenAction,
   shareContactAction,
@@ -87,6 +89,19 @@ export default async function MyRequestPage({ params }: Props) {
 
         <section className={styles.offers}>
           <h2 className={styles.offersTitle}>{t('offersCount', { count: offerList.length })}</h2>
+          {offerList.length > 0 && (
+            <div className={styles.warning}>
+              <ShieldIcon />
+              <div>
+                <strong>{t('safetyTitle')}</strong>
+                <ul>
+                  <li>{t('safety1')}</li>
+                  <li>{t('safety2')}</li>
+                  <li>{t('safety3')}</li>
+                </ul>
+              </div>
+            </div>
+          )}
           {offerList.length === 0 && (
             <p className={forms.lead}>{request.phoneVerified ? t('empty') : t('emptyPending')}</p>
           )}
@@ -155,6 +170,8 @@ export default async function MyRequestPage({ params }: Props) {
                 <div className={styles.actions}>
                   {shared ? (
                     <div className={forms.success}>{t('shared')}</div>
+                  ) : offer.reported ? (
+                    <span className={styles.facts}>{t('reported')}</span>
                   ) : declined ? (
                     <form action={restoreOfferAction} className={styles.inline}>
                       <span className={styles.facts}>{t('declined')}</span>
@@ -183,6 +200,32 @@ export default async function MyRequestPage({ params }: Props) {
                     </>
                   )}
                 </div>
+                {!offer.reported && (
+                  <details className={styles.report}>
+                    <summary>{t('report')}</summary>
+                    <form action={reportOfferAction} className={styles.reportForm}>
+                      <input type="hidden" name="key" value={key} />
+                      <input type="hidden" name="offerId" value={offer.id} />
+                      <div className="choices">
+                        {REPORT_REASONS.map((r, i) => (
+                          <label key={r}>
+                            <input type="radio" name="reason" value={r} defaultChecked={i === 0} />
+                            <span>{t(`reason_${r}`)}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <textarea
+                        name="comment"
+                        className="field"
+                        maxLength={500}
+                        placeholder={t('reportComment')}
+                      />
+                      <button type="submit" className="btn btn-secondary btn-sm">
+                        {t('reportSend')}
+                      </button>
+                    </form>
+                  </details>
+                )}
               </article>
             );
           })}

@@ -3,7 +3,8 @@
 import { and, eq, inArray, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { getTranslations } from 'next-intl/server';
-import { buyerRequests, offers, sellers, users } from '@avtoskop/db';
+import { reportInput } from '@avtoskop/core';
+import { buyerRequests, offers, reports, sellers, users } from '@avtoskop/db';
 import { formatNumber, yearsLabel } from '@/components/requestFormat';
 import { getRequestByKey } from '@/server/buyer';
 import { decryptContact } from '@/server/contact';
@@ -94,5 +95,24 @@ export async function setRequestOpenAction(formData: FormData): Promise<void> {
     .update(buyerRequests)
     .set({ status: open ? (request.phoneVerified ? 'active' : 'new') : 'closed' })
     .where(eq(buyerRequests.id, request.id));
+  refresh();
+}
+
+// A complaint also declines the offer, so the buyer no longer sees it as open.
+export async function reportOfferAction(formData: FormData): Promise<void> {
+  const found = await ownOffer(formData);
+  const parsed = reportInput.safeParse({
+    reason: field(formData, 'reason'),
+    comment: field(formData, 'comment'),
+  });
+  if (!found || !parsed.success) return;
+  await db
+    .insert(reports)
+    .values({ offerId: found.offer.id, ...parsed.data })
+    .onConflictDoNothing();
+  await db
+    .update(offers)
+    .set({ status: 'declined' })
+    .where(and(eq(offers.id, found.offer.id), inArray(offers.status, ['sent', 'shown'])));
   refresh();
 }

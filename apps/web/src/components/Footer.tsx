@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import { Link } from '@/i18n/navigation';
 
 export async function Footer() {
   const t = await getTranslations('footer');
@@ -17,7 +18,15 @@ export async function Footer() {
         }}
       >
         <span>{t('copyright', { year: new Date().getFullYear() })}</span>
-        <span>{t('data')}</span>
+        <span style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          <Link href="/terms" style={{ color: 'inherit' }}>
+            {t('terms')}
+          </Link>
+          <Link href="/privacy" style={{ color: 'inherit' }}>
+            {t('privacy')}
+          </Link>
+          <span>{t('data')}</span>
+        </span>
       </div>
     </footer>
   );

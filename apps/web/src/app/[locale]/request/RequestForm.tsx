@@ -254,8 +254,16 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
           />
           <span>
             {f.rich('consent', {
-              terms: (c) => <a href="#">{c}</a>,
-              privacy: (c) => <a href="#">{c}</a>,
+              terms: (c) => (
+                <a href={`/${locale}/terms`} target="_blank" rel="noopener">
+                  {c}
+                </a>
+              ),
+              privacy: (c) => (
+                <a href={`/${locale}/privacy`} target="_blank" rel="noopener">
+                  {c}
+                </a>
+              ),
             })}
           </span>
         </label>

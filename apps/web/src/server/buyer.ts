@@ -1,7 +1,7 @@
 import 'server-only';
-import { and, asc, count, desc, eq, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNotNull, ne, sql } from 'drizzle-orm';
 import { hashSecret } from '@avtoskop/core';
-import { brands, buyerRequests, offers, sellers } from '@avtoskop/db';
+import { brands, buyerRequests, offers, reports, sellers } from '@avtoskop/db';
 import { decryptContact } from './contact';
 import { db } from './db';
 
@@ -34,33 +34,38 @@ export async function getRequestByKey(key: string) {
 export type OwnRequest = NonNullable<Awaited<ReturnType<typeof getRequestByKey>>>;
 
 export async function listRequestOffers(requestId: string) {
-  return db
-    .select({
-      id: offers.id,
-      car: offers.car,
-      year: offers.year,
-      mileageKm: offers.mileageKm,
-      priceUsd: offers.priceUsd,
-      availability: offers.availability,
-      etaWeeks: offers.etaWeeks,
-      originCountry: offers.originCountry,
-      link: offers.link,
-      description: offers.description,
-      status: offers.status,
-      createdAt: offers.createdAt,
-      seller: {
-        name: sellers.name,
-        type: sellers.type,
-        region: sellers.region,
-        countries: sellers.countries,
-        about: sellers.about,
-        status: sellers.status,
-      },
-    })
-    .from(offers)
-    .innerJoin(sellers, eq(offers.sellerId, sellers.id))
-    .where(eq(offers.requestId, requestId))
-    .orderBy(asc(offers.createdAt));
+  return (
+    db
+      .select({
+        id: offers.id,
+        car: offers.car,
+        year: offers.year,
+        mileageKm: offers.mileageKm,
+        priceUsd: offers.priceUsd,
+        availability: offers.availability,
+        etaWeeks: offers.etaWeeks,
+        originCountry: offers.originCountry,
+        link: offers.link,
+        description: offers.description,
+        status: offers.status,
+        createdAt: offers.createdAt,
+        reported: isNotNull(reports.id).mapWith(Boolean),
+        seller: {
+          name: sellers.name,
+          type: sellers.type,
+          region: sellers.region,
+          countries: sellers.countries,
+          about: sellers.about,
+          status: sellers.status,
+        },
+      })
+      .from(offers)
+      .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+      .leftJoin(reports, eq(reports.offerId, offers.id))
+      // Offers from banned sellers disappear for buyers.
+      .where(and(eq(offers.requestId, requestId), ne(sellers.status, 'banned')))
+      .orderBy(asc(offers.createdAt))
+  );
 }
 
 export async function markOffersShown(requestId: string): Promise<void> {

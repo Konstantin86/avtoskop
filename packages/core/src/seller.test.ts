@@ -7,7 +7,7 @@ import {
   hashSecret,
   newSecret,
 } from './contact-crypto.ts';
-import { offerInput, sellerProfileInput } from './seller.ts';
+import { offerInput, offerLimitPerDay, reportInput, sellerProfileInput } from './seller.ts';
 
 describe('sellerProfileInput', () => {
   it('keeps countries only for importers', () => {
@@ -92,5 +92,23 @@ describe('contact crypto', () => {
     const a = newSecret();
     expect(a).not.toBe(newSecret());
     expect(hashSecret(a)).toMatch(/^[0-9a-f]{64}$/);
+  });
+});
+
+describe('offerLimitPerDay', () => {
+  it('gives new sellers a small allowance and banned sellers none', () => {
+    expect(offerLimitPerDay('pending')).toBe(5);
+    expect(offerLimitPerDay('verified')).toBe(50);
+    expect(offerLimitPerDay('banned')).toBe(0);
+  });
+});
+
+describe('reportInput', () => {
+  it('accepts a known reason and trims the comment', () => {
+    expect(reportInput.parse({ reason: 'deposit', comment: '  asked $500 upfront ' })).toEqual({
+      reason: 'deposit',
+      comment: 'asked $500 upfront',
+    });
+    expect(reportInput.safeParse({ reason: 'boring' }).success).toBe(false);
   });
 });

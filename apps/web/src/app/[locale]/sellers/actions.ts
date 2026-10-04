@@ -1,8 +1,8 @@
 'use server';
 
-import { eq, sql } from 'drizzle-orm';
+import { and, count, eq, gt, sql } from 'drizzle-orm';
 import { getLocale } from 'next-intl/server';
-import { offerInput, sellerProfileInput } from '@avtoskop/core';
+import { offerInput, offerLimitPerDay, sellerProfileInput } from '@avtoskop/core';
 import { buyerRequests, offers, sellers } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
 import { getCurrentUser, safeReturnTo } from '@/server/auth';
@@ -73,6 +73,28 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     };
   }
   const o = parsed.data;
+
+  const seller = user.seller;
+  if (seller.status === 'banned') return { errors: [], formError: 'banned', values };
+  const [existing] = await db
+    .select({ id: offers.id })
+    .from(offers)
+    .where(and(eq(offers.requestId, requestId), eq(offers.sellerId, seller.id)));
+  if (!existing) {
+    const [today] = await db
+      .select({ n: count() })
+      .from(offers)
+      .where(
+        and(
+          eq(offers.sellerId, seller.id),
+          gt(offers.createdAt, new Date(Date.now() - 86_400_000)),
+        ),
+      );
+    if ((today?.n ?? 0) >= offerLimitPerDay(seller.status)) {
+      return { errors: [], formError: 'limit', values };
+    }
+  }
+
   const row = {
     car: o.car,
     year: o.year,
@@ -86,7 +108,7 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
   };
   const [saved] = await db
     .insert(offers)
-    .values({ requestId, sellerId: user.seller.id, ...row })
+    .values({ requestId, sellerId: seller.id, ...row })
     .onConflictDoUpdate({
       target: [offers.requestId, offers.sellerId],
       set: { ...row, updatedAt: new Date() },

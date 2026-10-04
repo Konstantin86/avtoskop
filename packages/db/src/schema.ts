@@ -176,6 +176,7 @@ export const sellers = pgTable('sellers', {
   region: text('region').notNull(),
   countries: text('countries').array().notNull().default([]),
   about: text('about').notNull().default(''),
+  // pending -> verified by an admin; banned sellers can't send offers and their offers are hidden.
   status: text('status').notNull().default('pending'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -209,6 +210,25 @@ export const offers = pgTable(
   (t) => [
     uniqueIndex('offers_request_seller_idx').on(t.requestId, t.sellerId),
     index('offers_seller_idx').on(t.sellerId, t.createdAt),
+  ],
+);
+
+// A buyer's complaint about an offer, reviewed on the admin page.
+export const reports = pgTable(
+  'reports',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    offerId: uuid('offer_id')
+      .notNull()
+      .references(() => offers.id, { onDelete: 'cascade' }),
+    reason: text('reason').notNull(),
+    comment: text('comment').notNull().default(''),
+    status: text('status').notNull().default('open'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex('reports_offer_idx').on(t.offerId),
+    index('reports_status_idx').on(t.status, t.createdAt),
   ],
 );
 

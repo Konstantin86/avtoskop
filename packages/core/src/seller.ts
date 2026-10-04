@@ -60,3 +60,21 @@ export const offerInput = z
   });
 
 export type OfferInput = z.infer<typeof offerInput>;
+
+export const REPORT_REASONS = ['deposit', 'price', 'not_real', 'spam', 'rude', 'other'] as const;
+
+export const reportInput = z.object({
+  reason: z.enum(REPORT_REASONS),
+  comment: z.string().trim().max(500).optional().default(''),
+});
+
+// New sellers get a small daily allowance until an admin verifies them.
+export const OFFER_LIMITS_PER_DAY = { pending: 5, verified: 50 } as const;
+
+export function offerLimitPerDay(status: string): number {
+  return status === 'verified'
+    ? OFFER_LIMITS_PER_DAY.verified
+    : status === 'pending'
+      ? OFFER_LIMITS_PER_DAY.pending
+      : 0;
+}
