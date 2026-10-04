@@ -92,3 +92,9 @@
     align-items: flex-start;
   }
 }
+
+.phone {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 600;
+}

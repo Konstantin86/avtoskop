@@ -1,0 +1,141 @@
+.offers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.offersTitle {
+  font-size: 22px;
+}
+
+.offer {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.declined {
+  opacity: 0.6;
+}
+
+.offerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.car {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.price {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.price span {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.description,
+.about {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.about {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.link {
+  align-self: flex-start;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.seller {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.sellerName {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actions > div {
+  flex: 1;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.closeCard {
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.closeTitle {
+  font-size: 18px;
+}
+
+.keep {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .offerTop,
+  .closeCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .price {
+    text-align: left;
+  }
+
+  .actions form,
+  .actions button {
+    flex: 1;
+    width: 100%;
+  }
+}

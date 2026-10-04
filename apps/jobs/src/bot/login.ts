@@ -1,5 +1,5 @@
 import { and, desc, eq, gt, inArray } from 'drizzle-orm';
-import { encryptContact, hashContact, hashSecret } from '@avtoskop/core';
+import { hashContact, hashSecret } from '@avtoskop/core';
 import { loginTokens, users, type Db } from '@avtoskop/db';
 import type { Telegram, TelegramMessage } from './telegram.ts';
 
@@ -9,12 +9,12 @@ const TEXT = {
   expired:
     'Посилання для входу застаріло. Поверніться на сайт і натисніть «Увійти через Telegram» ще раз.',
   askPhone:
-    'Щоб увійти, поділіться своїм номером телефону кнопкою нижче. Покупці його не бачать, доки ви самі не домовитеся.\n\nЯкщо ви не входили на Автоскоп, просто проігноруйте це повідомлення.',
+    'Щоб увійти, поділіться своїм номером телефону кнопкою нижче. Ми не зберігаємо сам номер — лише його захищений відбиток.\n\nЯкщо ви не входили на Автоскоп, просто проігноруйте це повідомлення.',
   sharePhone: 'Поділитися номером',
   ownPhoneOnly: 'Будь ласка, поділіться власним номером — кнопкою нижче.',
   done: 'Готово! Номер підтверджено. Поверніться на сайт — вхід завершиться автоматично.',
   doneKnown: 'Готово! Поверніться на сайт — вхід завершиться автоматично.',
-  noLogin: 'Номер збережено. Щоб увійти, натисніть «Увійти через Telegram» на сайті.',
+  noLogin: 'Номер підтверджено. Щоб увійти, натисніть «Увійти через Telegram» на сайті.',
 };
 
 const askPhoneKeyboard = {
@@ -51,7 +51,7 @@ export function createLoginHandler(db: Db, tg: Telegram, contactKey: Buffer) {
     }
 
     const [known] = await db.select().from(users).where(eq(users.telegramId, m.from!.id));
-    if (known?.phoneEncrypted) {
+    if (known?.phoneHash) {
       await db
         .update(loginTokens)
         .set({ status: 'confirmed', telegramId: m.from!.id, userId: known.id })
@@ -82,14 +82,12 @@ export function createLoginHandler(db: Db, tg: Telegram, contactKey: Buffer) {
         telegramId: from.id,
         telegramUsername: from.username ?? null,
         name: displayName(m),
-        phoneEncrypted: encryptContact(phone, contactKey),
         phoneHash: hashContact(phone, contactKey),
       })
       .onConflictDoUpdate({
         target: users.telegramId,
         set: {
           telegramUsername: from.username ?? null,
-          phoneEncrypted: encryptContact(phone, contactKey),
           phoneHash: hashContact(phone, contactKey),
         },
       })

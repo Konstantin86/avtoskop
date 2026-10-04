@@ -1,6 +1,7 @@
 import 'server-only';
 import { and, desc, eq } from 'drizzle-orm';
 import { brands, buyerRequests, offers } from '@avtoskop/db';
+import { decryptContact } from './contact';
 import { db } from './db';
 
 export async function getOwnOffer(requestId: string, sellerId: string) {
@@ -11,8 +12,9 @@ export async function getOwnOffer(requestId: string, sellerId: string) {
   return row ?? null;
 }
 
+// The buyer's phone is decrypted only for offers where the buyer chose to share it.
 export async function listOwnOffers(sellerId: string) {
-  return db
+  const rows = await db
     .select({
       id: offers.id,
       requestId: offers.requestId,
@@ -23,10 +25,15 @@ export async function listOwnOffers(sellerId: string) {
       updatedAt: offers.updatedAt,
       requestBrand: brands.name,
       requestModel: buyerRequests.model,
+      phoneEncrypted: buyerRequests.phoneEncrypted,
     })
     .from(offers)
     .innerJoin(buyerRequests, eq(offers.requestId, buyerRequests.id))
     .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
     .where(eq(offers.sellerId, sellerId))
     .orderBy(desc(offers.updatedAt));
+  return rows.map(({ phoneEncrypted, ...row }) => ({
+    ...row,
+    buyerPhone: row.status === 'contact_shared' ? decryptContact(phoneEncrypted) : null,
+  }));
 }

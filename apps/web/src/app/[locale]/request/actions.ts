@@ -1,7 +1,7 @@
 'use server';
 
 import { and, count, eq, gt } from 'drizzle-orm';
-import { buyerRequestInput } from '@avtoskop/core';
+import { buyerRequestInput, hashSecret, newSecret } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
@@ -40,6 +40,7 @@ export async function submitRequest(
   const input = parsed.data;
 
   let id: string;
+  const key = newSecret(24);
   try {
     const [brand] = await db
       .select({ id: brands.id })
@@ -77,6 +78,7 @@ export async function submitRequest(
         notes: input.notes,
         phoneEncrypted: encryptContact(input.phone),
         phoneHash,
+        accessHash: hashSecret(key),
         notifyVia: input.notifyVia,
         locale,
       })
@@ -87,6 +89,6 @@ export async function submitRequest(
     return { errors: [], formError: 'server', values };
   }
 
-  redirect({ href: { pathname: '/request/sent', query: { id } }, locale });
+  redirect({ href: { pathname: '/request/sent', query: { id, key } }, locale });
   return { errors: [], values };
 }

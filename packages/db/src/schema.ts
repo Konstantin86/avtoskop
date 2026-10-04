@@ -110,6 +110,8 @@ export const buyerRequests = pgTable(
     phoneEncrypted: text('phone_encrypted').notNull(),
     phoneHash: text('phone_hash').notNull(),
     phoneVerified: boolean('phone_verified').notNull().default(false),
+    // SHA-256 of the secret in the buyer's private link; null for demo rows.
+    accessHash: text('access_hash').unique(),
     notifyVia: text('notify_via').notNull(),
     locale: text('locale').notNull(),
     status: text('status').notNull().default('new'),
@@ -122,13 +124,13 @@ export const buyerRequests = pgTable(
 );
 
 // A person signed in through the Telegram bot. The phone comes from Telegram's
-// contact sharing, so it is verified; it is stored only encrypted.
+// contact sharing, so it is verified. Only its keyed hash is kept, to spot
+// duplicate or banned accounts; we reach sellers through their Telegram chat.
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   telegramId: bigint('telegram_id', { mode: 'number' }).notNull().unique(),
   telegramUsername: text('telegram_username'),
   name: text('name').notNull(),
-  phoneEncrypted: text('phone_encrypted'),
   phoneHash: text('phone_hash'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -195,6 +197,7 @@ export const offers = pgTable(
     link: text('link'),
     description: text('description').notNull().default(''),
     status: text('status').notNull().default('sent'),
+    contactSharedAt: timestamp('contact_shared_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

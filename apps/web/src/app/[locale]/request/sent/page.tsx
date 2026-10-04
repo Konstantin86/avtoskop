@@ -1,12 +1,21 @@
+import type { Metadata } from 'next';
 import { eq } from 'drizzle-orm';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { hashSecret } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
+import { CopyLink } from '@/components/CopyLink';
 import { CheckIcon, TelegramIcon } from '@/components/icons';
 import { Link } from '@/i18n/navigation';
 import { db } from '@/server/db';
 import styles from './sent.module.css';
 
 export const dynamic = 'force-dynamic';
+
+// The URL may hold the buyer's private key.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+  referrer: 'no-referrer',
+};
 
 const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1);
 
@@ -17,14 +26,14 @@ export default async function SentPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ id?: string }>;
+  searchParams: Promise<{ id?: string; key?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('sent');
   const f = await getTranslations('fields');
   const messages = await getMessages();
-  const { id } = await searchParams;
+  const { id, key } = await searchParams;
 
   const [req] =
     id && UUID.test(id)
@@ -39,6 +48,7 @@ export default async function SentPage({
             gearbox: buyerRequests.gearbox,
             wishes: buyerRequests.wishes,
             region: buyerRequests.region,
+            accessHash: buyerRequests.accessHash,
           })
           .from(buyerRequests)
           .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
@@ -66,6 +76,8 @@ export default async function SentPage({
   ]
     .filter(Boolean)
     .join(' · ');
+
+  const ownsLink = Boolean(key && req.accessHash && hashSecret(key) === req.accessHash);
 
   const steps = [
     { state: 'done', title: t('step1'), text: null },
@@ -98,6 +110,23 @@ export default async function SentPage({
             </li>
           ))}
         </ol>
+
+        {ownsLink && (
+          <div className={`card ${styles.link}`}>
+            <div>
+              <div className={styles.stepTitle}>{t('linkTitle')}</div>
+              <div className={styles.stepText}>{t('linkText')}</div>
+            </div>
+            <CopyLink
+              path={`/${locale}/my/${key}`}
+              copyLabel={t('copy')}
+              copiedLabel={t('copied')}
+            />
+            <Link href={`/my/${key}`} className="btn btn-yellow">
+              {t('openOffers')}
+            </Link>
+          </div>
+        )}
 
         <div className={styles.telegram}>
           <span className={styles.tgIcon}>
