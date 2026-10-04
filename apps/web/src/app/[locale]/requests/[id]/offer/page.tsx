@@ -1,0 +1,90 @@
+import { getLocale, getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { formatNumber, yearsLabel } from '@/components/requestFormat';
+import { Link, redirect } from '@/i18n/navigation';
+import { getCurrentUser } from '@/server/auth';
+import { getOwnOffer } from '@/server/offers';
+import { getPublicRequest } from '@/server/requests';
+import { OfferForm } from './OfferForm';
+import styles from '../../../sellers/forms.module.css';
+
+export const dynamic = 'force-dynamic';
+
+type Props = { params: Promise<{ locale: string; id: string }> };
+
+export default async function OfferPage({ params }: Props) {
+  const { locale, id } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations('offer');
+  const b = await getTranslations('board');
+  const f = await getTranslations('fields');
+  const here = `/requests/${id}/offer`;
+
+  const user = await getCurrentUser();
+  if (!user || !user.seller) {
+    redirect({
+      href: user
+        ? { pathname: '/sellers/profile', query: { return: here } }
+        : { pathname: '/sellers/join', query: { return: here } },
+      locale: await getLocale(),
+    });
+    return null;
+  }
+
+  const request = await getPublicRequest(id);
+  if (!request) {
+    return (
+      <div className={`container ${styles.page}`}>
+        <p>{b('notFound')}</p>
+      </div>
+    );
+  }
+
+  const existing = await getOwnOffer(id, user.seller.id);
+  const defaults: Record<string, string> = existing
+    ? {
+        car: existing.car,
+        year: String(existing.year),
+        mileageKm: String(existing.mileageKm),
+        priceUsd: String(existing.priceUsd),
+        availability: existing.availability,
+        etaWeeks: existing.etaWeeks ? String(existing.etaWeeks) : '',
+        originCountry: existing.originCountry ?? '',
+        link: existing.link ?? '',
+        description: existing.description,
+      }
+    : { car: `${request.brand} ${request.model}`, availability: 'in_ukraine' };
+
+  const regions = (await getMessages()).regions as Record<string, string>;
+  const meta = [
+    yearsLabel(request),
+    request.fuel !== 'any' ? f(`fuel_${request.fuel}` as 'fuel_any') : null,
+    request.gearbox !== 'any' ? f(`gearbox_${request.gearbox}` as 'gearbox_any') : null,
+    b('budget', { amount: formatNumber(locale, request.budgetUsd) }),
+    regions[request.region],
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  return (
+    <div className={`container ${styles.page}`}>
+      <div className={styles.wide}>
+        <Link
+          href={`/requests/${id}`}
+          style={{ fontSize: 14, color: 'var(--muted)', textDecoration: 'none' }}
+        >
+          {b('back')}
+        </Link>
+        <h1 className={styles.title}>{t('title')}</h1>
+        <div className={styles.summary}>
+          <span className={styles.summaryLabel}>{t('forRequest')}</span>
+          <span className={styles.summaryTitle}>
+            {request.brand} {request.model}
+          </span>
+          <span className={styles.summaryMeta}>{meta}</span>
+        </div>
+        {existing && <div className={styles.success}>{t('existing')}</div>}
+        <OfferForm requestId={id} defaults={defaults} isUpdate={Boolean(existing)} />
+      </div>
+    </div>
+  );
+}

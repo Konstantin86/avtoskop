@@ -100,8 +100,11 @@ export default async function RequestDetailPage({ params }: Props) {
           )}
           <h2 className={styles.offerTitle}>{t('offerTitle')}</h2>
           <p className={styles.offerText}>{t('offerText')}</p>
-          <Link href="/sellers" className="btn btn-yellow btn-block">
+          <Link href={`/requests/${r.id}/offer`} className="btn btn-yellow btn-block">
             {t('offerCta')}
+          </Link>
+          <Link href="/sellers" className={styles.offerRules}>
+            {t('sellerRules')}
           </Link>
         </aside>
       </div>

@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
+import { getCurrentUser } from '@/server/auth';
 import { LogoMark, MenuIcon } from './icons';
 import styles from './Header.module.css';
 
@@ -7,12 +8,18 @@ export async function Header() {
   const t = await getTranslations('header');
   const locale = await getLocale();
   const otherLocale = locale === 'uk' ? 'en' : 'uk';
+  const user = await getCurrentUser();
 
   const nav = (
     <>
       <Link href="/#how">{t('how')}</Link>
       <Link href="/requests">{t('requests')}</Link>
       <Link href="/sellers">{t('sellers')}</Link>
+      {user ? (
+        <Link href="/sellers/me">{t('account')}</Link>
+      ) : (
+        <Link href="/sellers/join">{t('signIn')}</Link>
+      )}
     </>
   );
 

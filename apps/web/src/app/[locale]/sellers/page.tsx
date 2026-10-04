@@ -62,6 +62,9 @@ export default async function SellersPage({ params }: Props) {
             {t('ctaHow')}
           </a>
         </div>
+        <Link href="/sellers/join" className={styles.signIn}>
+          {t('signInLink')} →
+        </Link>
         <span className={styles.live}>
           <span className={styles.dot} aria-hidden="true" />
           {t('activeCount', { count: active })}

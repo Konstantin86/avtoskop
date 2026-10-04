@@ -5,7 +5,8 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
-    "autoria": "node --env-file=../../.env src/cli.ts"
+    "autoria": "node --env-file=../../.env src/cli.ts",
+    "bot": "node --env-file=../../.env src/bot/main.ts"
   },
   "dependencies": {
     "@avtoskop/core": "workspace:*",

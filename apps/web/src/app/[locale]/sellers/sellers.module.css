@@ -225,3 +225,10 @@
     padding: 20px;
   }
 }
+
+.signIn {
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  align-self: flex-start;
+}

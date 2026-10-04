@@ -121,6 +121,89 @@ export const buyerRequests = pgTable(
   ],
 );
 
+// A person signed in through the Telegram bot. The phone comes from Telegram's
+// contact sharing, so it is verified; it is stored only encrypted.
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  telegramId: bigint('telegram_id', { mode: 'number' }).notNull().unique(),
+  telegramUsername: text('telegram_username'),
+  name: text('name').notNull(),
+  phoneEncrypted: text('phone_encrypted'),
+  phoneHash: text('phone_hash'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Only SHA-256 hashes of session and sign-in secrets are stored.
+export const sessions = pgTable(
+  'sessions',
+  {
+    id: text('id').primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('sessions_user_idx').on(t.userId)],
+);
+
+// pending -> awaiting_phone (bot saw /start) -> confirmed (phone shared) -> used (session created)
+export const loginTokens = pgTable('login_tokens', {
+  id: text('id').primaryKey(),
+  status: text('status').notNull().default('pending'),
+  telegramId: bigint('telegram_id', { mode: 'number' }),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  returnTo: text('return_to'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});
+
+export const sellers = pgTable('sellers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(),
+  name: text('name').notNull(),
+  region: text('region').notNull(),
+  countries: text('countries').array().notNull().default([]),
+  about: text('about').notNull().default(''),
+  status: text('status').notNull().default('pending'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// One offer per seller per request; sending again updates it.
+export const offers = pgTable(
+  'offers',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => buyerRequests.id, { onDelete: 'cascade' }),
+    sellerId: uuid('seller_id')
+      .notNull()
+      .references(() => sellers.id, { onDelete: 'cascade' }),
+    car: text('car').notNull(),
+    year: integer('year').notNull(),
+    mileageKm: integer('mileage_km').notNull(),
+    priceUsd: integer('price_usd').notNull(),
+    availability: text('availability').notNull(),
+    etaWeeks: integer('eta_weeks'),
+    originCountry: text('origin_country'),
+    link: text('link'),
+    description: text('description').notNull().default(''),
+    status: text('status').notNull().default('sent'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex('offers_request_seller_idx').on(t.requestId, t.sellerId),
+    index('offers_seller_idx').on(t.sellerId, t.createdAt),
+  ],
+);
+
 // Every call to an outside API, cached or not, so we can see quota use.
 export const sourceRequests = pgTable(
   'source_requests',
