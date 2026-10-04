@@ -11,7 +11,8 @@ Commands:
   partition [--model 715] [--dims year,price,mileage,fuel,gearbox,region]
   recent    [--model 715]          listings added or updated today
   details   --id <auto.ria id>     full details for one listing
-  status    [--model 715]          coverage and quota use`;
+  status    [--model 715]          coverage and quota use
+  brands                           import all auto.ria brands (1 request, cached 30 days)`;
 
 function env(name: string): string {
   const value = process.env[name];
@@ -71,6 +72,8 @@ try {
     if (!values.id) throw new Error('--id is required');
     await collector.details(values.id);
     log(`Details saved for ${values.id}`);
+  } else if (command === 'brands') {
+    log(`Imported ${await collector.importBrands()} brands`);
   } else if (command === 'status') {
     const hourAgo = Date.now() - 60 * 60 * 1000;
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();

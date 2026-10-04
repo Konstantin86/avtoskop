@@ -1,0 +1,9 @@
+{
+  "name": "@avtoskop/i18n",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./messages/uk.json": "./messages/uk.json",
+    "./messages/en.json": "./messages/en.json"
+  }
+}

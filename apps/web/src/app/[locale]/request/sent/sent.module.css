@@ -1,0 +1,139 @@
+.page {
+  padding-top: 64px;
+  padding-bottom: 72px;
+}
+
+.inner {
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 44px;
+}
+
+.summary {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.dot {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.done {
+  background: var(--blue);
+  color: #fff;
+}
+
+.now {
+  border: 2px solid var(--blue);
+}
+
+.now::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--blue);
+}
+
+.next {
+  border: 2px solid var(--line);
+}
+
+.stepTitle {
+  font-size: 16px;
+  font-weight: 600;
+  padding-top: 3px;
+}
+
+.stepText {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.telegram {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--blue-soft);
+}
+
+.tgIcon {
+  color: var(--blue);
+  display: flex;
+}
+
+.tgText {
+  flex: 1;
+}
+
+.tgText .stepTitle {
+  padding-top: 0;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding-top: 32px;
+  }
+
+  .head {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .inner :global(.btn-lg) {
+    width: 100%;
+  }
+}

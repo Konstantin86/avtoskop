@@ -1,0 +1,94 @@
+import { describe, expect, it } from 'vitest';
+import { buyerRequestInput, normalizeUaPhone, slugify } from './index.ts';
+
+describe('slugify', () => {
+  it.each([
+    ['Toyota', 'toyota'],
+    ['Mercedes-Benz', 'mercedes-benz'],
+    ['ВАЗ / Lada', 'vaz-lada'],
+    ['ЗАЗ', 'zaz'],
+    ['Богдан', 'bohdan'],
+    ['ЄРАЗ', 'yeraz'],
+    ['Житомир', 'zhytomyr'],
+  ])('%s → %s', (input, expected) => {
+    expect(slugify(input)).toBe(expected);
+  });
+});
+
+describe('normalizeUaPhone', () => {
+  it.each([
+    ['+380 50 123 45 67', '+380501234567'],
+    ['0501234567', '+380501234567'],
+    ['380501234567', '+380501234567'],
+    ['(050) 123-45-67', '+380501234567'],
+    ['501234567', '+380501234567'],
+  ])('%s → %s', (input, expected) => {
+    expect(normalizeUaPhone(input)).toBe(expected);
+  });
+
+  it.each(['12345', '+48 501 234 567', '0001234567', ''])('rejects %s', (input) => {
+    expect(normalizeUaPhone(input)).toBeNull();
+  });
+});
+
+describe('buyerRequestInput', () => {
+  const valid = {
+    brandId: '79',
+    model: ' RAV4 ',
+    yearFrom: '2019',
+    yearTo: '',
+    budgetUsd: '28000',
+    mileageMaxKm: '',
+    fuel: 'hybrid',
+    gearbox: 'automatic',
+    wishes: ['no_accidents', 'one_owner', 'no_accidents'],
+    importOk: 'on',
+    region: 'kyiv',
+    notes: '',
+    phone: '050 123 45 67',
+    notifyVia: 'telegram',
+    consent: 'on',
+  };
+
+  it('accepts form data and normalizes it', () => {
+    const r = buyerRequestInput.parse(valid);
+    expect(r).toMatchObject({
+      brandId: 79,
+      model: 'RAV4',
+      yearFrom: 2019,
+      budgetUsd: 28000,
+      importOk: true,
+    });
+    expect(r.yearTo).toBeUndefined();
+    expect(r.phone).toBe('+380501234567');
+    expect(r.gearbox).toBe('automatic');
+    expect(r.wishes).toEqual(['no_accidents', 'one_owner']);
+  });
+
+  it('rejects a bad phone, missing consent and reversed years', () => {
+    const r = buyerRequestInput.safeParse({
+      ...valid,
+      phone: '123',
+      consent: undefined,
+      yearTo: '2015',
+    });
+    expect(r.success).toBe(false);
+    const paths = r.error!.issues.map((i) => i.path.join('.'));
+    expect(paths).toEqual(expect.arrayContaining(['phone', 'consent']));
+  });
+
+  it('accepts wishes as a comma-separated string and defaults gearbox', () => {
+    const { gearbox, ...rest } = valid;
+    const r = buyerRequestInput.parse({ ...rest, wishes: 'awd,service_history' });
+    expect(r.gearbox).toBe('any');
+    expect(r.wishes).toEqual(['awd', 'service_history']);
+  });
+
+  it('rejects unknown wishes', () => {
+    expect(buyerRequestInput.safeParse({ ...valid, wishes: ['cheap'] }).success).toBe(false);
+  });
+
+  it('rejects reversed years', () => {
+    expect(buyerRequestInput.safeParse({ ...valid, yearTo: '2015' }).success).toBe(false);
+  });
+});

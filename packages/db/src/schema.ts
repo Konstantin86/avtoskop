@@ -10,6 +10,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from 'drizzle-orm/pg-core';
 
 export const brands = pgTable('brands', {
@@ -85,6 +86,39 @@ export const listingSnapshots = pgTable(
     mileageKmMax: integer('mileage_km_max'),
   },
   (t) => [index('listing_snapshots_listing_idx').on(t.listingId, t.seenAt)],
+);
+
+// The phone is stored only encrypted; phone_hash lets us apply limits without decrypting.
+export const buyerRequests = pgTable(
+  'buyer_requests',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    brandId: integer('brand_id')
+      .notNull()
+      .references(() => brands.id),
+    model: text('model').notNull(),
+    yearFrom: integer('year_from').notNull(),
+    yearTo: integer('year_to'),
+    budgetUsd: integer('budget_usd').notNull(),
+    mileageMaxKm: integer('mileage_max_km'),
+    fuel: text('fuel').notNull(),
+    gearbox: text('gearbox').notNull().default('any'),
+    wishes: text('wishes').array().notNull().default([]),
+    importOk: boolean('import_ok').notNull(),
+    region: text('region').notNull(),
+    notes: text('notes').notNull().default(''),
+    phoneEncrypted: text('phone_encrypted').notNull(),
+    phoneHash: text('phone_hash').notNull(),
+    phoneVerified: boolean('phone_verified').notNull().default(false),
+    notifyVia: text('notify_via').notNull(),
+    locale: text('locale').notNull(),
+    status: text('status').notNull().default('new'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('buyer_requests_phone_idx').on(t.phoneHash, t.createdAt),
+    index('buyer_requests_status_idx').on(t.status, t.createdAt),
+  ],
 );
 
 // Every call to an outside API, cached or not, so we can see quota use.

@@ -8,6 +8,7 @@
     "autoria": "node --env-file=../../.env src/cli.ts"
   },
   "dependencies": {
+    "@avtoskop/core": "workspace:*",
     "@avtoskop/db": "workspace:*",
     "drizzle-orm": "^0.45.3",
     "zod": "^4.6.5"

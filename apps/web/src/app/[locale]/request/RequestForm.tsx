@@ -1,0 +1,279 @@
+'use client';
+
+import { useActionState } from 'react';
+import { useTranslations } from 'next-intl';
+import { FUELS, GEARBOXES, NOTIFY_CHANNELS, WISHES } from '@avtoskop/core';
+import { BrandSelect } from '@/components/BrandSelect';
+import { RegionSelect } from '@/components/RegionSelect';
+import type { BrandOption } from '@/server/brands';
+import { submitRequest, type RequestFormState } from './actions';
+import styles from './request.module.css';
+
+interface Props {
+  locale: string;
+  brands: { popular: BrandOption[]; all: BrandOption[] };
+  regionNames: Record<string, string>;
+  defaults: Record<string, string>;
+}
+
+export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
+  const f = useTranslations('fields');
+  const t = useTranslations('request');
+  const [state, action, pending] = useActionState<RequestFormState, FormData>(submitRequest, {
+    errors: [],
+    values: defaults,
+  });
+
+  const v = state.values;
+  const bad = (name: string) => state.errors.includes(name);
+  const err = (name: string) =>
+    bad(name) ? (
+      <span className="error-text" id={`${name}-error`}>
+        {t(`error_${name}` as 'error_phone')}
+      </span>
+    ) : null;
+  const invalid = (name: string) =>
+    bad(name) ? { 'aria-invalid': true as const, 'aria-describedby': `${name}-error` } : {};
+
+  return (
+    <form action={action} className={`card ${styles.form}`} key={JSON.stringify(v)} noValidate>
+      <input type="hidden" name="locale" value={locale} />
+      {state.formError && (
+        <div className={styles.alert} role="alert">
+          {t(`error_${state.formError}`)}
+        </div>
+      )}
+
+      <fieldset className={styles.section}>
+        <legend className="section-label">{t('sectionCar')}</legend>
+        <div className={styles.pair}>
+          <label className="label" htmlFor="brandId">
+            {f('brand')}
+            <BrandSelect
+              id="brandId"
+              brands={brands}
+              labels={{
+                placeholder: f('brandPlaceholder'),
+                popular: f('popularBrands'),
+                all: f('allBrands'),
+              }}
+              defaultValue={v['brandId']}
+              invalid={bad('brandId')}
+            />
+            {err('brandId')}
+          </label>
+          <label className="label">
+            {f('model')}
+            <input
+              name="model"
+              className="field"
+              defaultValue={v['model']}
+              placeholder={f('modelPlaceholder')}
+              maxLength={60}
+              {...invalid('model')}
+            />
+            {err('model')}
+          </label>
+        </div>
+        <div className={styles.pair}>
+          <label className="label">
+            {f('yearFrom')}
+            <input
+              name="yearFrom"
+              className="field"
+              inputMode="numeric"
+              defaultValue={v['yearFrom']}
+              {...invalid('yearFrom')}
+            />
+            {err('yearFrom')}
+          </label>
+          <label className="label">
+            {f('yearTo')}
+            <input
+              name="yearTo"
+              className="field"
+              inputMode="numeric"
+              defaultValue={v['yearTo']}
+              placeholder={f('any')}
+              {...invalid('yearTo')}
+            />
+            {err('yearTo')}
+          </label>
+        </div>
+        <div className="label">
+          <span id="fuel-label">{f('fuel')}</span>
+          <div className="segment" role="radiogroup" aria-labelledby="fuel-label">
+            {FUELS.map((fuel) => (
+              <label key={fuel}>
+                <input
+                  type="radio"
+                  name="fuel"
+                  value={fuel}
+                  defaultChecked={(v['fuel'] ?? 'any') === fuel}
+                />
+                <span>{f(`fuel_${fuel}`)}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="label">
+          <span id="gearbox-label">{f('gearbox')}</span>
+          <div className="segment" role="radiogroup" aria-labelledby="gearbox-label">
+            {GEARBOXES.map((g) => (
+              <label key={g}>
+                <input
+                  type="radio"
+                  name="gearbox"
+                  value={g}
+                  defaultChecked={(v['gearbox'] ?? 'any') === g}
+                />
+                <span>{f(`gearbox_${g}`)}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset className={styles.section}>
+        <legend className="section-label">{t('sectionBudget')}</legend>
+        <div className={styles.pair}>
+          <label className="label">
+            {f('budget')}
+            <input
+              name="budgetUsd"
+              className="field"
+              inputMode="numeric"
+              defaultValue={v['budgetUsd']}
+              placeholder="28000"
+              {...invalid('budgetUsd')}
+            />
+            {err('budgetUsd')}
+          </label>
+          <label className="label">
+            {f('mileageMax')}
+            <input
+              name="mileageMaxKm"
+              className="field"
+              inputMode="numeric"
+              defaultValue={v['mileageMaxKm']}
+              placeholder="100000"
+              {...invalid('mileageMaxKm')}
+            />
+            {err('mileageMaxKm')}
+          </label>
+        </div>
+        <label className="label" htmlFor="region">
+          {f('region')}
+          <RegionSelect
+            id="region"
+            names={regionNames}
+            defaultValue={v['region']}
+            invalid={bad('region')}
+          />
+          {err('region')}
+        </label>
+        <div className="label">
+          <span id="import-label">{f('import')}</span>
+          <div className="segment" role="radiogroup" aria-labelledby="import-label">
+            <label>
+              <input
+                type="radio"
+                name="importOk"
+                value="true"
+                defaultChecked={v['importOk'] !== 'false'}
+              />
+              <span>{f('importYes')}</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="importOk"
+                value="false"
+                defaultChecked={v['importOk'] === 'false'}
+              />
+              <span>{f('importNo')}</span>
+            </label>
+          </div>
+        </div>
+        <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
+          <legend style={{ padding: 0, marginBottom: 6 }}>{f('wishes')}</legend>
+          <div className="choices">
+            {WISHES.map((w) => (
+              <label key={w}>
+                <input
+                  type="checkbox"
+                  name="wishes"
+                  value={w}
+                  defaultChecked={(v['wishes'] ?? '').split(',').includes(w)}
+                />
+                <span>{f(`wish_${w}`)}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <label className="label">
+          {f('notes')}
+          <textarea
+            name="notes"
+            className="field"
+            defaultValue={v['notes']}
+            placeholder={f('notesPlaceholder')}
+            maxLength={500}
+          />
+        </label>
+      </fieldset>
+
+      <fieldset className={styles.section}>
+        <legend className="section-label">{t('sectionContact')}</legend>
+        <label className="label">
+          {f('phone')}
+          <input
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            className="field"
+            defaultValue={v['phone']}
+            placeholder="+380 50 123 45 67"
+            {...invalid('phone')}
+          />
+          {err('phone') ?? <span className="hint">{f('phoneHint')}</span>}
+        </label>
+        <div className="label">
+          <span id="notify-label">{f('notify')}</span>
+          <div className="segment" role="radiogroup" aria-labelledby="notify-label">
+            {NOTIFY_CHANNELS.map((c) => (
+              <label key={c}>
+                <input
+                  type="radio"
+                  name="notifyVia"
+                  value={c}
+                  defaultChecked={(v['notifyVia'] ?? 'telegram') === c}
+                />
+                <span>{f(`notify_${c}`)}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <label className={styles.consent}>
+          <input
+            type="checkbox"
+            name="consent"
+            defaultChecked={v['consent'] === 'on'}
+            {...invalid('consent')}
+          />
+          <span>
+            {f.rich('consent', {
+              terms: (c) => <a href="#">{c}</a>,
+              privacy: (c) => <a href="#">{c}</a>,
+            })}
+          </span>
+        </label>
+        {err('consent')}
+      </fieldset>
+
+      <button type="submit" className="btn btn-yellow btn-lg btn-block" disabled={pending}>
+        {pending ? t('submitting') : t('submit')}
+      </button>
+    </form>
+  );
+}

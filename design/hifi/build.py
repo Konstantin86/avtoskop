@@ -251,6 +251,20 @@ def field(label: str, value: str, placeholder: bool = False, hint: str = "") -> 
 <span style="height: 50px; padding: 0 14px; display: flex; align-items: center; border: 1px solid {LINE}; border-radius: 12px; background: {SURFACE}; font-size: 16px; font-weight: 500; color: {color}">{value}</span>{hint_html}</label>"""
 
 
+def choices(options: list[str], selected: set[int]) -> str:
+    def one(i: int, o: str) -> str:
+        on = i in selected
+        style = (
+            f"border: 1px solid {ACCENT}; background: {ACCENT_SOFT}; color: {ACCENT_DARK}"
+            if on
+            else f"border: 1px solid {LINE}; background: {SURFACE}; color: {INK}"
+        )
+        mark = "✓ " if on else ""
+        return f'<span style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px; {style}; font-size: 14px; font-weight: 600">{mark}{o}</span>'
+
+    return f'<div style="display: flex; flex-wrap: wrap; gap: 8px">{"".join(one(i, o) for i, o in enumerate(options))}</div>'
+
+
 def segmented(options: list[str], selected: int) -> str:
     items = "".join(
         f'<span style="flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 14px; font-weight: 600; '
@@ -411,13 +425,15 @@ def request_form_fields() -> str:
 {field("Марка і модель", "Toyota RAV4", hint="Можна додати ще моделі, наприклад Honda CR-V")}
 <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">{field("Рік від", "2019")}{field("Рік до", "Будь-який", True)}</div>
 <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 600">Паливо</span>{segmented(["Будь-яке", "Гібрид", "Бензин", "Дизель"], 1)}</div>
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 600">Коробка передач</span>{segmented(["Будь-яка", "Автомат", "Механіка"], 1)}</div>
 </div>
 <div style="display: flex; flex-direction: column; gap: 14px">
 <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: {MUTED}">Бюджет і місце</span>
 <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">{field("Бюджет до", "$28 000")}{field("Пробіг до", "100 тис. км")}</div>
 {field("Регіон", "Київ і область")}
 <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 600">Імпорт з-за кордону</span>{segmented(["Підходить", "Лише в Україні"], 0)}</div>
-{field("Побажання", "Біла або сіра, без ДТП, з повною історією обслуговування", True)}
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 14px; font-weight: 600">Що для вас важливо</span>{choices(["Без ДТП", "Один власник", "Сервісна історія", "Не з аукціону", "Повний привід"], {0, 2})}</div>
+{field("Побажання", "Колір, комплектація, інше…", True)}
 </div>
 <div style="display: flex; flex-direction: column; gap: 14px">
 <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: {MUTED}">Як з вами зв'язатися</span>
@@ -429,7 +445,7 @@ def request_form_fields() -> str:
 def request_summary() -> str:
     rows = "".join(
         f'<div style="display: flex; justify-content: space-between; font-size: 15px"><span style="color: {MUTED}">{k}</span><span style="font-weight: 600">{v}</span></div>'
-        for k, v in [("Модель", "Toyota RAV4"), ("Роки", "2019 і новіші"), ("Паливо", "Гібрид"), ("Бюджет", "до $28 000"), ("Регіон", "Київ і область")]
+        for k, v in [("Модель", "Toyota RAV4"), ("Роки", "2019 і новіші"), ("Паливо", "Гібрид"), ("Коробка", "Автомат"), ("Бюджет", "до $28 000"), ("Регіон", "Київ і область"), ("Важливо", "Без ДТП, сервісна історія")]
     )
     return f"""<aside style="display: flex; flex-direction: column; gap: 16px; padding: 24px; background: {SURFACE}; border: 1px solid {LINE}; border-radius: 20px">
 <span style="font-size: 18px; font-weight: 700">Ваш запит</span>{rows}
@@ -453,7 +469,7 @@ def request_desktop() -> str:
 {request_summary()}
 </div>
 </main>"""
-    return page("Автоскоп — новий запит", 1280, 1500, body)
+    return page("Автоскоп — новий запит", 1280, 1680, body)
 
 
 def request_mobile() -> str:
@@ -464,7 +480,7 @@ def request_mobile() -> str:
 <span style="display: flex; gap: 8px; font-size: 14px; color: {MUTED}; line-height: 1.5">{LOCK}Номер прихований. Ви відкриєте його лише обраним продавцям.</span>
 </main>
 <div style="position: sticky; bottom: 0; margin-top: auto; padding: 12px 16px 24px; background: {BG}; border-top: 1px solid {LINE}">{btn("Опублікувати запит", "HiRequestSentMobile.dc.html", "lg", full=True)}</div>"""
-    return page("Автоскоп — новий запит, мобільна", 390, 1480, body)
+    return page("Автоскоп — новий запит, мобільна", 390, 1760, body)
 
 
 # ---------- Request sent ----------
@@ -489,7 +505,7 @@ def sent_content(mobile: bool) -> str:
     return f"""<div style="display: flex; flex-direction: column; align-items: {'flex-start' if mobile else 'center'}; gap: 14px; text-align: {'left' if mobile else 'center'}">
 <span style="width: 56px; height: 56px; border-radius: 16px; background: {ACCENT_SOFT}; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="{ACCENT}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
 <h1 style="margin: 0; font-size: {title_size}px; font-weight: 700; letter-spacing: -0.02em">Запит опубліковано</h1>
-<p style="margin: 0; font-size: 17px; color: {MUTED}; max-width: 520px; line-height: 1.5">Toyota RAV4 · 2019+ · гібрид · до $28 000 · Київ</p>
+<p style="margin: 0; font-size: 17px; color: {MUTED}; max-width: 520px; line-height: 1.5">Toyota RAV4 · 2019+ · гібрид · автомат · до $28 000 · Київ · без ДТП · сервісна історія</p>
 </div>
 <div style="display: flex; flex-direction: column; gap: 20px; padding: 28px; background: {SURFACE}; border: 1px solid {LINE}; border-radius: 20px">{rows}</div>
 <div style="display: flex; align-items: center; gap: 14px; padding: 20px; border-radius: 16px; background: {ACCENT_SOFT}">{TELEGRAM}<div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 15px; font-weight: 600">Підключіть Telegram</span><span style="font-size: 14px; color: {MUTED}">Пропозиції приходитимуть одразу</span></div>{btn("Підключити", "#", "sm", "blue")}</div>
@@ -499,7 +515,7 @@ def sent_content(mobile: bool) -> str:
 def sent_desktop() -> str:
     body = f"""{header_desktop()}
 <main style="padding: 72px 48px; display: flex; justify-content: center"><div style="width: 620px; display: flex; flex-direction: column; gap: 28px">{sent_content(False)}</div></main>"""
-    return page("Автоскоп — запит опубліковано", 1280, 920, body)
+    return page("Автоскоп — запит опубліковано", 1280, 940, body)
 
 
 def sent_mobile() -> str:
@@ -540,7 +556,7 @@ def request_status_card(mobile: bool) -> str:
     return f"""<div style="display: flex; flex-direction: column; gap: 12px; padding: 20px; background: {SURFACE}; border: 1px solid {LINE}; border-radius: 20px">
 <div style="display: flex; align-items: center; justify-content: space-between">{chip("Активний", "good")}<a href="#" style="font-size: 14px; font-weight: 600; text-decoration: none">Змінити</a></div>
 <span style="font-size: 20px; font-weight: 700">Toyota RAV4</span>
-<span style="font-size: 15px; color: {MUTED}; line-height: 1.5">2019+ · гібрид · до $28 000 · Київ і область · імпорт підходить</span>
+<span style="font-size: 15px; color: {MUTED}; line-height: 1.5">2019+ · гібрид · автомат · до $28 000 · Київ і область · без ДТП · сервісна історія</span>
 <div style="height: 1px; background: {LINE}"></div>
 <div style="display: flex; justify-content: space-between; font-size: 15px"><span style="color: {MUTED}">Пропозицій</span><span style="font-weight: 600">3</span></div>
 <div style="display: flex; justify-content: space-between; font-size: 15px"><span style="color: {MUTED}">Номер відкрито</span><span style="font-weight: 600">0 продавцям</span></div>

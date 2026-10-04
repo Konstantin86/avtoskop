@@ -8,6 +8,20 @@
       "when": 1791050047031,
       "tag": "0000_loud_wild_child",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791059869344,
+      "tag": "0001_sparkling_wilson_fisk",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791103523283,
+      "tag": "0002_futuristic_franklin_richards",
+      "breakpoints": true
     }
   ]
 }

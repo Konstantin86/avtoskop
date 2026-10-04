@@ -1,4 +1,5 @@
 import { and, eq, inArray, notInArray, sql } from 'drizzle-orm';
+import { slugify } from '@avtoskop/core';
 import { brands, listings, listingSnapshots, models, type Db } from '@avtoskop/db';
 import type { AutoriaClient, Params } from './client.ts';
 import {
@@ -26,13 +27,6 @@ const TTL = {
 
 export const DIMENSIONS = ['year', 'price', 'mileage', 'fuel', 'gearbox', 'region'] as const;
 export type Dimension = (typeof DIMENSIONS)[number];
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
 
 export function createCollector(client: AutoriaClient, db: Db, log: (m: string) => void) {
   const searchFor =
@@ -264,5 +258,27 @@ export function createCollector(client: AutoriaClient, db: Db, log: (m: string) 
     return row;
   }
 
-  return { partition, recent, details, summary };
+  // Imports every auto.ria brand so buyers can pick any of them in a request.
+  async function importBrands(): Promise<number> {
+    const marks = namedValueList.parse(
+      await client.get('/auto/categories/1/marks', {}, TTL.reference),
+    );
+    const used = new Set<string>();
+    const rows = marks.map((m) => {
+      let slug = slugify(m.name) || `brand-${m.value}`;
+      if (used.has(slug)) slug = `${slug}-${m.value}`;
+      used.add(slug);
+      return { name: m.name, slug, autoriaId: m.value };
+    });
+    await db
+      .insert(brands)
+      .values(rows)
+      .onConflictDoUpdate({
+        target: brands.autoriaId,
+        set: { name: sql`excluded.name`, slug: sql`excluded.slug` },
+      });
+    return rows.length;
+  }
+
+  return { partition, recent, details, summary, importBrands };
 }
