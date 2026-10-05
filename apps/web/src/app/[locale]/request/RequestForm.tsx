@@ -74,6 +74,7 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
               placeholder={f('modelPlaceholder')}
               invalid={bad('model') || bad('modelUnknown')}
               unknownLabel={t('error_modelUnknown')}
+              noMatchesLabel={f('modelNoMatches')}
             />
             {err('model') ?? err('modelUnknown')}
           </label>

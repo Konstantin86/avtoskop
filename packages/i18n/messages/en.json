@@ -82,7 +82,8 @@
     "notify_sms": "SMS",
     "notify_email": "Email",
     "consent": "I agree to the <terms>terms</terms> and <privacy>privacy policy</privacy>",
-    "notifyNote": "After posting, confirm your number in our Telegram bot: offers will arrive there too. Sellers don't see your number."
+    "notifyNote": "After posting, confirm your number in our Telegram bot: offers will arrive there too. Sellers don't see your number.",
+    "modelNoMatches": "No such model in the list"
   },
   "request": {
     "back": "← Home",

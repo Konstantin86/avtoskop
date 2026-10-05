@@ -62,6 +62,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 model: f('model'),
                 brandPlaceholder: f('brandPlaceholder'),
                 modelPlaceholder: f('modelPlaceholder'),
+                noMatches: f('modelNoMatches'),
                 popular: f('popularBrands'),
                 all: f('allBrands'),
               }}
