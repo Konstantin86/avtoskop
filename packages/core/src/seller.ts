@@ -1,9 +1,12 @@
 import { z } from 'zod';
-import { REGION_CODES } from './request.ts';
+import { REGION_CODES, WISHES } from './request.ts';
 
 export const SELLER_TYPES = ['importer', 'dealer', 'buyout', 'owner'] as const;
 export const SOURCE_COUNTRIES = ['us', 'eu', 'kr', 'cn', 'jp', 'ca'] as const;
 export const AVAILABILITY = ['in_ukraine', 'in_transit', 'to_order'] as const;
+// Features a seller can claim for an offer: the buyer wishes first, then offer-only ones.
+export const OFFER_EXTRAS = ['customs_cleared', 'inspection_ok', 'warranty', 'negotiable'] as const;
+export const OFFER_FEATURES = [...WISHES, ...OFFER_EXTRAS] as const;
 
 const asArray = (v: unknown) => (typeof v === 'string' ? v.split(',').filter(Boolean) : (v ?? []));
 const optionalInt = (min: number, max: number) =>
@@ -59,6 +62,10 @@ export const offerInput = z
         .optional(),
     ),
     description: z.string().trim().max(1000).optional().default(''),
+    features: z.preprocess(
+      (v) => [...new Set(asArray(v) as unknown[])],
+      z.array(z.enum(OFFER_FEATURES)),
+    ),
   })
   .refine((o) => o.availability === 'in_ukraine' || o.etaWeeks !== undefined, {
     path: ['etaWeeks'],
@@ -107,4 +114,9 @@ export function requestMatchesSeller(request: AlertRequest, seller: AlertSeller)
   // A buyer who accepts any region can be served from anywhere.
   if (request.region === 'all' || seller.serviceRegions.length === 0) return true;
   return seller.serviceRegions.includes(request.region);
+}
+
+// The buyer's wishes that the seller says this offer meets.
+export function matchedWishes(wishes: readonly string[], features: readonly string[]): string[] {
+  return wishes.filter((w) => features.includes(w));
 }

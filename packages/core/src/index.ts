@@ -13,6 +13,9 @@ export {
 } from './request.ts';
 export {
   AVAILABILITY,
+  matchedWishes,
+  OFFER_EXTRAS,
+  OFFER_FEATURES,
   OFFER_LIMITS_PER_DAY,
   offerInput,
   offerLimitPerDay,

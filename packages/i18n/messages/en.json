@@ -326,7 +326,14 @@
     "error_closed": "This request is already closed.",
     "error_limit": "You reached the daily offer limit. New sellers can send 5 a day until we review the profile.",
     "error_banned": "Your account is blocked for breaking the rules.",
-    "originNone": "Not specified"
+    "originNone": "Not specified",
+    "features": "What this car has",
+    "featuresHint": "\"Buyer asked\" marks show what matters to this buyer. Only tick what is true.",
+    "buyerAsked": "buyer asked",
+    "feature_customs_cleared": "Customs cleared",
+    "feature_inspection_ok": "Can be checked at a garage",
+    "feature_warranty": "Comes with a warranty",
+    "feature_negotiable": "Price negotiable"
   },
   "account": {
     "title": "Account",
@@ -410,7 +417,9 @@
     "reason_not_real": "Car doesn't exist / false info",
     "reason_spam": "Spam",
     "reason_rude": "Rude",
-    "reason_other": "Other"
+    "reason_other": "Other",
+    "wishMatch": "{matched} of your {total} wishes",
+    "sellerClaims": "According to the seller"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",

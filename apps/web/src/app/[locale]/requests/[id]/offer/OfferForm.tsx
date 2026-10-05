@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { AVAILABILITY, SOURCE_COUNTRIES } from '@avtoskop/core';
+import { AVAILABILITY, OFFER_FEATURES, SOURCE_COUNTRIES, WISHES } from '@avtoskop/core';
 import { saveOfferAction, type FormState } from '../../../sellers/actions';
 import styles from '../../../sellers/forms.module.css';
 
@@ -10,11 +10,13 @@ interface Props {
   requestId: string;
   defaults: Record<string, string>;
   isUpdate: boolean;
+  buyerWishes: string[];
 }
 
-export function OfferForm({ requestId, defaults, isUpdate }: Props) {
+export function OfferForm({ requestId, defaults, isUpdate, buyerWishes }: Props) {
   const t = useTranslations('offer');
   const p = useTranslations('profile');
+  const fields = useTranslations('fields');
   const [state, action, pending] = useActionState<FormState, FormData>(saveOfferAction, {
     errors: [],
     values: defaults,
@@ -140,6 +142,30 @@ export function OfferForm({ requestId, defaults, isUpdate }: Props) {
         />
         {err('link') ?? <span className="hint">{t('linkHint')}</span>}
       </label>
+      <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
+        <legend style={{ padding: 0, marginBottom: 6 }}>{t('features')}</legend>
+        <div className="choices">
+          {OFFER_FEATURES.map((feature) => (
+            <label key={feature}>
+              <input
+                type="checkbox"
+                name="features"
+                value={feature}
+                defaultChecked={(v['features'] ?? '').split(',').includes(feature)}
+              />
+              <span>
+                {(WISHES as readonly string[]).includes(feature)
+                  ? fields(`wish_${feature}` as 'wish_awd')
+                  : t(`feature_${feature}` as 'feature_warranty')}
+                {buyerWishes.includes(feature) && (
+                  <small className={styles.asked}>{t('buyerAsked')}</small>
+                )}
+              </span>
+            </label>
+          ))}
+        </div>
+        <span className="hint">{t('featuresHint')}</span>
+      </fieldset>
       <label className="label">
         {t('description')}
         <textarea

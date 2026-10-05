@@ -179,3 +179,29 @@
   width: 100%;
   min-height: 70px;
 }
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--good);
+}
+
+.featureList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.claim {
+  font-size: 12px;
+  color: var(--muted);
+}

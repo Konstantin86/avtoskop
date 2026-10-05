@@ -8,6 +8,7 @@ import {
   newSecret,
 } from './contact-crypto.ts';
 import {
+  matchedWishes,
   offerInput,
   offerLimitPerDay,
   reportInput,
@@ -175,5 +176,28 @@ describe('requestMatchesSeller', () => {
   it('never alerts banned sellers or sellers who turned alerts off', () => {
     expect(requestMatchesSeller(request, { ...seller, status: 'banned' })).toBe(false);
     expect(requestMatchesSeller(request, { ...seller, alerts: false })).toBe(false);
+  });
+});
+
+describe('offer features', () => {
+  const base = {
+    car: 'Toyota RAV4',
+    year: '2021',
+    mileageKm: '40000',
+    priceUsd: '25000',
+    availability: 'in_ukraine',
+  };
+
+  it('reads checkbox values, drops duplicates and rejects unknown ones', () => {
+    expect(
+      offerInput.parse({ ...base, features: 'no_accidents,warranty,warranty' }).features,
+    ).toEqual(['no_accidents', 'warranty']);
+    expect(offerInput.parse(base).features).toEqual([]);
+    expect(offerInput.safeParse({ ...base, features: 'like_new' }).success).toBe(false);
+  });
+
+  it('counts which buyer wishes the offer meets', () => {
+    expect(matchedWishes(['no_accidents', 'awd'], ['awd', 'warranty'])).toEqual(['awd']);
+    expect(matchedWishes([], ['awd'])).toEqual([]);
   });
 });

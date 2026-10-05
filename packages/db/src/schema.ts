@@ -206,6 +206,8 @@ export const offers = pgTable(
     originCountry: text('origin_country'),
     link: text('link'),
     description: text('description').notNull().default(''),
+    // Seller's claims about the car: buyer wishes it meets plus offer extras (OFFER_FEATURES).
+    features: text('features').array().notNull().default([]),
     status: text('status').notNull().default('sent'),
     // Lowest price the buyer was told about; a price-drop message needs a new low.
     notifiedPriceUsd: integer('notified_price_usd'),

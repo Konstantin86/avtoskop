@@ -51,6 +51,7 @@ export default async function OfferPage({ params }: Props) {
         originCountry: existing.originCountry ?? '',
         link: existing.link ?? '',
         description: existing.description,
+        features: existing.features.join(','),
       }
     : { car: `${request.brand} ${request.model}`, availability: 'in_ukraine' };
 
@@ -83,7 +84,12 @@ export default async function OfferPage({ params }: Props) {
           <span className={styles.summaryMeta}>{meta}</span>
         </div>
         {existing && <div className={styles.success}>{t('existing')}</div>}
-        <OfferForm requestId={id} defaults={defaults} isUpdate={Boolean(existing)} />
+        <OfferForm
+          requestId={id}
+          defaults={defaults}
+          isUpdate={Boolean(existing)}
+          buyerWishes={request.wishes}
+        />
       </div>
     </div>
   );

@@ -51,7 +51,7 @@ export async function saveProfileAction(_prev: FormState, formData: FormData): P
 }
 
 export async function saveOfferAction(_prev: FormState, formData: FormData): Promise<FormState> {
-  const values = formValues(formData);
+  const values = formValues(formData, ['features']);
   const user = await getCurrentUser();
   if (!user?.seller) return { errors: [], formError: 'generic', values };
 
@@ -110,6 +110,7 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     originCountry: o.originCountry ?? null,
     link: o.link ?? null,
     description: o.description,
+    features: o.features,
   };
   const [saved] = await db
     .insert(offers)

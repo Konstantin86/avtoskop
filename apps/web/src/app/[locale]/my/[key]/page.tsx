@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { ConfirmButton } from '@/components/ConfirmButton';
-import { REPORT_REASONS } from '@avtoskop/core';
+import { matchedWishes, REPORT_REASONS, WISHES } from '@avtoskop/core';
 import { FlagEU, FlagUS, ShieldIcon } from '@/components/icons';
 import { TelegramConfirm } from '@/components/TelegramConfirm';
 import { formatNumber, timeAgo, yearsLabel } from '@/components/requestFormat';
@@ -61,6 +61,10 @@ export default async function MyRequestPage({ params }: Props) {
   ]
     .filter(Boolean)
     .join(' · ');
+  const featureLabel = (feature: string) =>
+    (WISHES as readonly string[]).includes(feature)
+      ? f(`wish_${feature}` as 'wish_awd')
+      : o(`feature_${feature}` as 'feature_warranty');
   const country = (c: string) => (c === 'ua' ? o('origin_ua') : p(`country_${c}` as 'country_us'));
 
   return (
@@ -138,6 +142,30 @@ export default async function MyRequestPage({ params }: Props) {
                     <span>{t('turnkey')}</span>
                   </div>
                 </div>
+                {offer.features.length > 0 && (
+                  <div className={styles.features}>
+                    {request.wishes.length > 0 && (
+                      <span className={styles.match}>
+                        ✓{' '}
+                        {t('wishMatch', {
+                          matched: matchedWishes(request.wishes, offer.features).length,
+                          total: request.wishes.length,
+                        })}
+                      </span>
+                    )}
+                    <ul className={styles.featureList}>
+                      {offer.features.map((feature) => (
+                        <li
+                          key={feature}
+                          className={`chip ${request.wishes.includes(feature) ? 'chip-blue' : ''}`}
+                        >
+                          {featureLabel(feature)}
+                        </li>
+                      ))}
+                    </ul>
+                    <span className={styles.claim}>{t('sellerClaims')}</span>
+                  </div>
+                )}
                 {offer.description && <p className={styles.description}>{offer.description}</p>}
                 {offer.link && (
                   <a
