@@ -1,5 +1,5 @@
 import { getLocale, getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { formatNumber, yearsLabel } from '@/components/requestFormat';
+import { formatNumber, fuelsLabel, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
 import { getOwnOffer } from '@/server/offers';
@@ -59,7 +59,7 @@ export default async function OfferPage({ params }: Props) {
   const regions = (await getMessages()).regions as Record<string, string>;
   const meta = [
     yearsLabel(request),
-    request.fuel !== 'any' ? f(`fuel_${request.fuel}` as 'fuel_any') : null,
+    fuelsLabel(request.fuels, (x) => f(`fuel_${x}` as 'fuel_hybrid')),
     request.gearbox !== 'any' ? f(`gearbox_${request.gearbox}` as 'gearbox_any') : null,
     b('budget', { amount: formatNumber(locale, request.budgetUsd) }),
     regions[request.region],

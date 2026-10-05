@@ -101,7 +101,8 @@ export const buyerRequests = pgTable(
     yearTo: integer('year_to'),
     budgetUsd: integer('budget_usd').notNull(),
     mileageMaxKm: integer('mileage_max_km'),
-    fuel: text('fuel').notNull(),
+    // Empty means any fuel.
+    fuels: text('fuels').array().notNull().default([]),
     gearbox: text('gearbox').notNull().default('any'),
     wishes: text('wishes').array().notNull().default([]),
     importOk: boolean('import_ok').notNull(),

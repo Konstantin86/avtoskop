@@ -13,7 +13,7 @@ const SEND_GAP_MS = 60;
 export interface RequestDetails {
   budgetUsd: number;
   region: string;
-  fuel: string;
+  fuels: string[];
   gearbox: string;
   importOk: boolean;
 }
@@ -26,7 +26,7 @@ export function requestDetails(locale: string, r: RequestDetails): string {
   return [
     botText(locale, 'alertBudget', { amount: budget }),
     regions[r.region],
-    r.fuel !== 'any' ? fields[`fuel_${r.fuel}`] : null,
+    r.fuels.length > 0 ? r.fuels.map((x) => fields[`fuel_${x}`]).join(', ') : null,
     r.gearbox !== 'any' ? fields[`gearbox_${r.gearbox}`] : null,
     botText(locale, r.importOk ? 'alertImportOk' : 'alertImportNo'),
   ]
@@ -53,7 +53,7 @@ export function createSellerAlerts(
         yearTo: buyerRequests.yearTo,
         budgetUsd: buyerRequests.budgetUsd,
         region: buyerRequests.region,
-        fuel: buyerRequests.fuel,
+        fuels: buyerRequests.fuels,
         gearbox: buyerRequests.gearbox,
         importOk: buyerRequests.importOk,
         buyerChatId: buyerRequests.telegramChatId,

@@ -25,10 +25,12 @@ export async function submitRequest(
     [...formData.entries()].filter(([k, v]) => !k.startsWith('$') && typeof v === 'string'),
   ) as Record<string, string>;
   // Checkboxes repeat the same name; keep all of them, as one comma-separated value.
-  values['wishes'] = formData
-    .getAll('wishes')
-    .filter((v) => typeof v === 'string')
-    .join(',');
+  for (const key of ['wishes', 'fuels']) {
+    values[key] = formData
+      .getAll(key)
+      .filter((v) => typeof v === 'string')
+      .join(',');
+  }
   const locale: Locale = (routing.locales as readonly string[]).includes(values['locale'] ?? '')
     ? (values['locale'] as Locale)
     : routing.defaultLocale;
@@ -82,7 +84,7 @@ export async function submitRequest(
         yearTo: input.yearTo ?? null,
         budgetUsd: input.budgetUsd,
         mileageMaxKm: input.mileageMaxKm ?? null,
-        fuel: input.fuel,
+        fuels: input.fuels,
         gearbox: input.gearbox,
         wishes: input.wishes,
         importOk: input.importOk,

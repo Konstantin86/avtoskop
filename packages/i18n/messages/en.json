@@ -81,7 +81,8 @@
     "notify_email": "Email",
     "consent": "I agree to the <terms>terms</terms> and <privacy>privacy policy</privacy>",
     "notifyNote": "After posting, confirm your number in our Telegram bot: offers will arrive there too. Sellers don't see your number.",
-    "modelNoMatches": "No such model in the list"
+    "modelNoMatches": "No such model in the list",
+    "fuelsHint": "You can choose several. If none is chosen, any fuel is fine."
   },
   "request": {
     "back": "← Home",
@@ -113,7 +114,8 @@
     "error_server": "Could not save the request. Please try again.",
     "error_gearbox": "Choose a gearbox",
     "error_wishes": "Check the selected wishes",
-    "error_modelUnknown": "Choose a model from the list"
+    "error_modelUnknown": "Choose a model from the list",
+    "error_fuels": "Check the chosen fuels"
   },
   "sent": {
     "title": "Request published",

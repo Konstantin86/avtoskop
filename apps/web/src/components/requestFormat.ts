@@ -4,6 +4,14 @@ export function yearsLabel(r: Pick<PublicRequest, 'yearFrom' | 'yearTo'>): strin
   return r.yearTo ? `${r.yearFrom}–${r.yearTo}` : `${r.yearFrom}+`;
 }
 
+// Accepted fuels as one phrase, or null when any fuel is fine.
+export function fuelsLabel(
+  fuels: readonly string[],
+  label: (fuel: string) => string,
+): string | null {
+  return fuels.length > 0 ? fuels.map(label).join(', ') : null;
+}
+
 export function formatNumber(locale: string, amount: number): string {
   return new Intl.NumberFormat(locale === 'uk' ? 'uk-UA' : 'en-US').format(amount);
 }

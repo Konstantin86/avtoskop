@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { hashSecret, localePath } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { CopyLink } from '@/components/CopyLink';
+import { fuelsLabel } from '@/components/requestFormat';
 import { CheckIcon } from '@/components/icons';
 import { TelegramConfirm } from '@/components/TelegramConfirm';
 import { Link } from '@/i18n/navigation';
@@ -46,7 +47,7 @@ export default async function SentPage({
             yearFrom: buyerRequests.yearFrom,
             yearTo: buyerRequests.yearTo,
             budgetUsd: buyerRequests.budgetUsd,
-            fuel: buyerRequests.fuel,
+            fuels: buyerRequests.fuels,
             gearbox: buyerRequests.gearbox,
             wishes: buyerRequests.wishes,
             region: buyerRequests.region,
@@ -71,7 +72,7 @@ export default async function SentPage({
   const summary = [
     `${req.brand} ${req.model}`,
     years,
-    req.fuel !== 'any' ? f(`fuel_${req.fuel}` as 'fuel_any').toLowerCase() : null,
+    fuelsLabel(req.fuels, (x) => f(`fuel_${x}` as 'fuel_hybrid').toLowerCase()),
     req.gearbox !== 'any' ? f(`gearbox_${req.gearbox}` as 'gearbox_any').toLowerCase() : null,
     `≤ $${usd.format(req.budgetUsd)}`,
     (messages.regions as Record<string, string>)[req.region],

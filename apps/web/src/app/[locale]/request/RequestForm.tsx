@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { FUELS, GEARBOXES, localePath, WISHES } from '@avtoskop/core';
 import { BrandSelect } from '@/components/BrandSelect';
 import { ModelInput } from '@/components/ModelInput';
+import { PhoneInput } from '@/components/PhoneInput';
 import { TelegramIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import type { BrandOption } from '@/server/brands';
@@ -104,22 +105,23 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
             {err('yearTo')}
           </label>
         </div>
-        <div className="label">
-          <span id="fuel-label">{f('fuel')}</span>
-          <div className="segment" role="radiogroup" aria-labelledby="fuel-label">
+        <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
+          <legend style={{ padding: 0, marginBottom: 6 }}>{f('fuel')}</legend>
+          <div className="choices">
             {FUELS.map((fuel) => (
               <label key={fuel}>
                 <input
-                  type="radio"
-                  name="fuel"
+                  type="checkbox"
+                  name="fuels"
                   value={fuel}
-                  defaultChecked={(v['fuel'] ?? 'any') === fuel}
+                  defaultChecked={(v['fuels'] ?? '').split(',').includes(fuel)}
                 />
                 <span>{f(`fuel_${fuel}`)}</span>
               </label>
             ))}
           </div>
-        </div>
+          {err('fuels') ?? <span className="hint">{f('fuelsHint')}</span>}
+        </fieldset>
         <div className="label">
           <span id="gearbox-label">{f('gearbox')}</span>
           <div className="segment" role="radiogroup" aria-labelledby="gearbox-label">
@@ -231,15 +233,7 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
         <legend className="section-label">{t('sectionContact')}</legend>
         <label className="label">
           {f('phone')}
-          <input
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            className="field"
-            defaultValue={v['phone']}
-            placeholder="+380 50 123 45 67"
-            {...invalid('phone')}
-          />
+          <PhoneInput defaultValue={v['phone']} invalid={bad('phone')} />
           {err('phone') ?? <span className="hint">{f('phoneHint')}</span>}
         </label>
         {/* Telegram is the only channel for now: the buyer confirms the phone through our bot. */}

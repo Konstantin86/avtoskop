@@ -18,7 +18,7 @@ export async function getRequestByKey(key: string) {
       yearFrom: buyerRequests.yearFrom,
       yearTo: buyerRequests.yearTo,
       budgetUsd: buyerRequests.budgetUsd,
-      fuel: buyerRequests.fuel,
+      fuels: buyerRequests.fuels,
       gearbox: buyerRequests.gearbox,
       wishes: buyerRequests.wishes,
       region: buyerRequests.region,

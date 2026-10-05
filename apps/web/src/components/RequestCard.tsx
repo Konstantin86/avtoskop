@@ -2,7 +2,7 @@ import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { PublicRequest } from '@/server/requests';
 import { FlagEU, FlagUS } from './icons';
-import { formatNumber, timeAgo, yearsLabel } from './requestFormat';
+import { formatNumber, fuelsLabel, timeAgo, yearsLabel } from './requestFormat';
 import styles from './RequestCard.module.css';
 
 export async function RequestCard({ request: r }: { request: PublicRequest }) {
@@ -12,7 +12,7 @@ export async function RequestCard({ request: r }: { request: PublicRequest }) {
   const regions = (await getMessages()).regions as Record<string, string>;
 
   const specs = [
-    r.fuel !== 'any' ? f(`fuel_${r.fuel}` as 'fuel_any') : null,
+    fuelsLabel(r.fuels, (x) => f(`fuel_${x}` as 'fuel_hybrid')),
     r.gearbox !== 'any' ? f(`gearbox_${r.gearbox}` as 'gearbox_any') : null,
     r.mileageMaxKm
       ? `≤ ${formatNumber(locale, r.mileageMaxKm)} ${locale === 'uk' ? 'км' : 'km'}`

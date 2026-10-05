@@ -8,7 +8,9 @@ export {
   WISHES,
   NOTIFY_CHANNELS,
   canonicalModel,
+  formatUaNational,
   REGION_CODES,
+  uaNationalDigits,
   type BuyerRequestInput,
 } from './request.ts';
 export {

@@ -29,7 +29,8 @@ export const REGION_CODES = [
   'all',
 ] as const;
 
-export const FUELS = ['any', 'hybrid', 'petrol', 'diesel', 'electric'] as const;
+// A request can accept several fuels; none chosen means any fuel.
+export const FUELS = ['hybrid', 'petrol', 'diesel', 'electric'] as const;
 export const GEARBOXES = ['any', 'automatic', 'manual'] as const;
 export const WISHES = [
   'no_accidents',
@@ -41,6 +42,25 @@ export const WISHES = [
 export const NOTIFY_CHANNELS = ['telegram', 'sms', 'email'] as const;
 
 // Accepts the ways Ukrainians type a mobile number and returns +380XXXXXXXXX, or null.
+// The part after +380 while someone types or pastes: drops the country code or the leading 0
+// and keeps at most 9 digits.
+export function uaNationalDigits(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  const national = digits.startsWith('380')
+    ? digits.slice(3)
+    : digits.startsWith('0')
+      ? digits.slice(1)
+      : digits;
+  return national.slice(0, 9);
+}
+
+// "959138819" → "95 913 88 19"
+export function formatUaNational(digits: string): string {
+  return [digits.slice(0, 2), digits.slice(2, 5), digits.slice(5, 7), digits.slice(7, 9)]
+    .filter(Boolean)
+    .join(' ');
+}
+
 export function normalizeUaPhone(raw: string): string | null {
   const digits = raw.replace(/\D/g, '');
   const national = digits.startsWith('380')
@@ -68,7 +88,10 @@ export const buyerRequestInput = z
     yearTo: optionalInt(1990, currentYear),
     budgetUsd: z.coerce.number().int().min(1000).max(500_000),
     mileageMaxKm: optionalInt(1000, 1_000_000),
-    fuel: z.enum(FUELS),
+    fuels: z.preprocess(
+      (v) => (typeof v === 'string' ? v.split(',').filter(Boolean) : (v ?? [])),
+      z.array(z.enum(FUELS)).transform((f) => [...new Set(f)]),
+    ),
     gearbox: z.enum(GEARBOXES).default('any'),
     // Checkbox values arrive as an array, or as a comma-separated string when re-submitted.
     wishes: z.preprocess(

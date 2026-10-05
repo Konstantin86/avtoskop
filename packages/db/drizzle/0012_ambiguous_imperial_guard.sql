@@ -1,0 +1,1 @@
+ALTER TABLE "buyer_requests" DROP COLUMN "fuel";

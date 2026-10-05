@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   buyerRequestInput,
   canonicalModel,
+  formatUaNational,
   localePath,
   normalizeUaPhone,
   slugify,
+  uaNationalDigits,
 } from './index.ts';
 
 describe('slugify', () => {
@@ -45,7 +47,7 @@ describe('buyerRequestInput', () => {
     yearTo: '',
     budgetUsd: '28000',
     mileageMaxKm: '',
-    fuel: 'hybrid',
+    fuels: 'hybrid,diesel',
     gearbox: 'automatic',
     wishes: ['no_accidents', 'one_owner', 'no_accidents'],
     importOk: 'on',
@@ -120,5 +122,43 @@ describe('localePath', () => {
     expect(localePath('uk', '/my/abc')).toBe('/ua/my/abc');
     expect(localePath('en', '/terms')).toBe('/en/terms');
     expect(localePath('de', '/')).toBe('/ua/');
+  });
+});
+
+describe('phone typing helpers', () => {
+  it('keeps only the part after +380, however the number is typed or pasted', () => {
+    expect(uaNationalDigits('0959138819')).toBe('959138819');
+    expect(uaNationalDigits('+380 95 913-88-19')).toBe('959138819');
+    expect(uaNationalDigits('380959138819')).toBe('959138819');
+    expect(uaNationalDigits('95913')).toBe('95913');
+    expect(uaNationalDigits('09591388199999')).toBe('959138819');
+  });
+
+  it('spaces the number as it grows', () => {
+    expect(formatUaNational('95')).toBe('95');
+    expect(formatUaNational('95913')).toBe('95 913');
+    expect(formatUaNational('959138819')).toBe('95 913 88 19');
+  });
+});
+
+describe('buyerRequestInput fuels', () => {
+  it('accepts several fuels, none meaning any', () => {
+    const base = {
+      brandId: '1',
+      model: 'RAV4',
+      yearFrom: '2019',
+      budgetUsd: '28000',
+      region: 'kyiv',
+      importOk: 'on',
+      phone: '0501234567',
+      notifyVia: 'telegram',
+      consent: 'on',
+    };
+    expect(buyerRequestInput.parse({ ...base, fuels: 'diesel,hybrid,diesel' }).fuels).toEqual([
+      'diesel',
+      'hybrid',
+    ]);
+    expect(buyerRequestInput.parse(base).fuels).toEqual([]);
+    expect(buyerRequestInput.safeParse({ ...base, fuels: 'any' }).success).toBe(false);
   });
 });

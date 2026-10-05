@@ -9,7 +9,7 @@ describe('requestDetails', () => {
     const base = {
       budgetUsd: 28000,
       region: 'kyiv',
-      fuel: 'hybrid',
+      fuels: ['hybrid'],
       gearbox: 'automatic',
       importOk: true,
     };
@@ -17,7 +17,7 @@ describe('requestDetails', () => {
       'до $28 000 · Київська обл. · Гібрид · Автомат · імпорт підходить',
     );
     expect(
-      plain(requestDetails('en', { ...base, fuel: 'any', gearbox: 'any', importOk: false })),
+      plain(requestDetails('en', { ...base, fuels: [], gearbox: 'any', importOk: false })),
     ).toBe('up to $28,000 · Kyiv region · only cars in Ukraine');
   });
 });
