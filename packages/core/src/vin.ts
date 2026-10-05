@@ -85,3 +85,15 @@ export function vinMismatches(
   if (decoded.year && Math.abs(decoded.year - offer.year) > 1) found.push('year');
   return found;
 }
+
+// Whether the make decoded from a VIN is the brand the buyer asked for. Brand names in our
+// list can differ in form ("ВАЗ / Lada" vs "LADA"), so any shared word is enough.
+export function makeMatchesBrand(make: string, brand: string): boolean {
+  const makeWords = words(make).split(' ').filter(Boolean);
+  if (makeWords.length === 0) return true;
+  const brandWords = new Set(words(brand).split(' '));
+  return (
+    makeWords.some((w) => brandWords.has(w)) ||
+    words(brand).replace(/ /g, '') === makeWords.join('')
+  );
+}

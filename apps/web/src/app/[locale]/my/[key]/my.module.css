@@ -242,3 +242,9 @@
   color: var(--danger);
   font-weight: 700;
 }
+
+.vinLink {
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}

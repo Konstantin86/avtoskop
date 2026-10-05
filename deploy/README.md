@@ -64,19 +64,21 @@ docker compose -f deploy/compose.yml --env-file deploy/.env logs -f web bot
 
 The bot log should say `Bot @... is running`.
 
-## 6. Copy the car brands (once)
+## 6. Copy the car brands and models
 
-The Pi starts with an empty database; the request form needs the brand list. On the **laptop**, in the repository:
+The Pi starts with an empty database; the request form needs the brand and model lists. Repeat this step whenever the lists change on the laptop: it only adds what is missing and never deletes requests or offers.
+
+On the **laptop**, in the repository:
 
 ```bash
-docker compose exec -T postgres pg_dump -U avtoskop -d avtoskop --data-only -t brands -t models > data/brands.sql
-scp data/brands.sql <user>@<Pi IP>:avtoskop/data/
+docker compose exec -T postgres pg_dump -U avtoskop -d avtoskop --data-only --inserts --on-conflict-do-nothing -t brands -t models > data/brands.sql
+scp data/brands.sql <user>@<Pi IP>:git/avtoskop/data/
 ```
 
 On the **Pi**:
 
 ```bash
-docker compose -f deploy/compose.yml --env-file deploy/.env exec -T db psql -U avtoskop -d avtoskop < data/brands.sql
+docker compose -f deploy/compose.yml --env-file deploy/.env exec -T db psql -q -U avtoskop -d avtoskop < data/brands.sql
 ```
 
 ## 7. Use it

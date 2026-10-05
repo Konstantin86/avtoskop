@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeVin, vinCheckDigit, vinMismatches, vinProblem } from './vin.ts';
+import { makeMatchesBrand, normalizeVin, vinCheckDigit, vinMismatches, vinProblem } from './vin.ts';
 
 describe('vinProblem', () => {
   it('accepts valid VINs, with and without a control digit', () => {
@@ -36,5 +36,19 @@ describe('vinMismatches', () => {
   it('reports a different make, model or year', () => {
     expect(vinMismatches({ car: 'Toyota Camry', year: 2019 }, decoded)).toEqual(['model', 'year']);
     expect(vinMismatches({ car: 'Lexus NX', year: 2021 }, decoded)).toEqual(['make', 'model']);
+  });
+});
+
+describe('makeMatchesBrand', () => {
+  it('matches the same brand written differently', () => {
+    expect(makeMatchesBrand('TOYOTA', 'Toyota')).toBe(true);
+    expect(makeMatchesBrand('MERCEDES-BENZ', 'Mercedes-Benz')).toBe(true);
+    expect(makeMatchesBrand('LADA', 'ВАЗ / Lada')).toBe(true);
+    expect(makeMatchesBrand('LAND ROVER', 'Land Rover')).toBe(true);
+  });
+
+  it('flags a different brand, and accepts an unknown make', () => {
+    expect(makeMatchesBrand('HONDA', 'Toyota')).toBe(false);
+    expect(makeMatchesBrand('', 'Toyota')).toBe(true);
   });
 });

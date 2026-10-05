@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { ConfirmButton } from '@/components/ConfirmButton';
 import { formatNumber, timeAgo } from '@/components/requestFormat';
-import { getAdmin, listOpenReports, listSellersForAdmin } from '@/server/admin';
+import { getAdmin, listOpenReports, listSellersForAdmin, listVinFlags } from '@/server/admin';
 import { resolveReportAction, setSellerStatusAction } from './actions';
 import forms from '../sellers/forms.module.css';
 import styles from './admin.module.css';
@@ -29,7 +29,11 @@ export default async function AdminPage({ params }: Props) {
   const p = await getTranslations('profile');
   const m = await getTranslations('my');
   const regions = (await getMessages()).regions as Record<string, string>;
-  const [sellerList, reportList] = await Promise.all([listSellersForAdmin(), listOpenReports()]);
+  const [sellerList, reportList, vinFlags] = await Promise.all([
+    listSellersForAdmin(),
+    listOpenReports(),
+    listVinFlags(),
+  ]);
 
   const statusButton = (sellerId: string, status: string, label: string, confirm?: string) => (
     <form action={setSellerStatusAction}>
@@ -79,6 +83,52 @@ export default async function AdminPage({ params }: Props) {
                   </button>
                 </form>
               </div>
+            </article>
+          ))}
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.heading}>{t('vinTitle', { count: vinFlags.length })}</h2>
+          {vinFlags.length === 0 && <p className={styles.muted}>{t('noVinFlags')}</p>}
+          {vinFlags.map((r) => (
+            <article key={r.offerId} className={`card ${styles.item}`}>
+              <div className={styles.row}>
+                <div className={styles.actions}>
+                  {r.flags.map((flag) => (
+                    <span
+                      key={flag}
+                      className={`chip ${flag === 'wanted' ? (styles.banned ?? '') : 'chip-yellow'}`}
+                    >
+                      {t(`vinFlag_${flag}`)}
+                    </span>
+                  ))}
+                </div>
+                <span className={styles.muted}>{timeAgo(locale, r.updatedAt)}</span>
+              </div>
+              <div>
+                <code>{r.vin}</code>
+                {r.vinDecoded && (
+                  <span className={styles.muted}>
+                    {' '}
+                    ·{' '}
+                    {[r.vinDecoded.make, r.vinDecoded.model, r.vinDecoded.year]
+                      .filter(Boolean)
+                      .join(' ')}
+                  </span>
+                )}
+              </div>
+              <div className={styles.muted}>
+                {t('vinOffer', {
+                  seller: r.sellerName,
+                  request: `${r.requestBrand} ${r.requestModel}`,
+                  car: `${r.car}, ${r.year}`,
+                })}
+              </div>
+              {r.sellerStatus !== 'banned' && (
+                <div className={styles.actions}>
+                  {statusButton(r.sellerId, 'banned', t('ban'), t('banConfirm'))}
+                </div>
+              )}
             </article>
           ))}
         </section>

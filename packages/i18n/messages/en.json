@@ -336,7 +336,8 @@
     "feature_negotiable": "Price negotiable",
     "vin": "VIN (optional)",
     "vinHint": "17 characters. Only the buyer sees it: we check the car against the wanted list and compare the make and year.",
-    "error_vin": "Check the VIN: 17 characters, no letters I, O, Q"
+    "error_vin": "Check the VIN: 17 characters, no letters I, O, Q",
+    "error_vinMismatch": "By VIN this is {car}, which doesn't match the offer or the brand the buyer wants. Check the VIN and the car name. If everything is right, send the offer again."
   },
   "account": {
     "title": "Account",
@@ -427,7 +428,9 @@
     "vinNotWanted": "Not in the MVS wanted-vehicles database (data as of {date})",
     "vinMatches": "By VIN: {car}. Matches the offer",
     "vinMismatch": "By VIN this is {car}. It doesn't match the offer; ask the seller.",
-    "vinSources": "Sources: MVS open data (data.gov.ua) and the NHTSA VIN decoder. For the car's full history, use services such as Carfax or AutoCheck."
+    "vinSources": "Sources: MVS open data (data.gov.ua) and the NHTSA VIN decoder. For the car's full history, use services such as Carfax or AutoCheck.",
+    "vinOtherBrand": "By VIN this is a {make}, but you were looking for {brand}. Ask the seller.",
+    "vinCheckOfficial": "Check the current status on the MVS website (enter the last 6 VIN characters: {last6})"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
@@ -555,6 +558,12 @@
     "banConfirm": "Block this seller? Their offers will disappear for buyers.",
     "status_pending": "Under review",
     "status_verified": "Verified",
-    "status_banned": "Blocked"
+    "status_banned": "Blocked",
+    "vinTitle": "VIN checks ({count})",
+    "noVinFlags": "No suspicious VINs.",
+    "vinFlag_wanted": "Wanted by police",
+    "vinFlag_otherBrand": "Not the requested brand",
+    "vinFlag_mismatch": "Doesn't match the offer",
+    "vinOffer": "{seller}, request {request}, offer: {car}"
   }
 }

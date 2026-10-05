@@ -2,8 +2,14 @@
 
 import { and, count, eq, gt, sql } from 'drizzle-orm';
 import { getLocale } from 'next-intl/server';
-import { offerInput, offerLimitPerDay, sellerProfileInput } from '@avtoskop/core';
-import { buyerRequests, offers, sellers } from '@avtoskop/db';
+import {
+  makeMatchesBrand,
+  offerInput,
+  offerLimitPerDay,
+  sellerProfileInput,
+  vinMismatches,
+} from '@avtoskop/core';
+import { brands, buyerRequests, offers, sellers } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
 import { getCurrentUser, safeReturnTo } from '@/server/auth';
 import { db } from '@/server/db';
@@ -58,8 +64,9 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
 
   const requestId = values['requestId'] ?? '';
   const [request] = await db
-    .select({ id: buyerRequests.id, status: buyerRequests.status })
+    .select({ id: buyerRequests.id, status: buyerRequests.status, brand: brands.name })
     .from(buyerRequests)
+    .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
     .where(eq(buyerRequests.id, requestId));
   if (!request || request.status !== 'active') {
     return { errors: [], formError: 'closed', values };
@@ -111,6 +118,24 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
       : existing?.vin === vin && existing.vinDecoded
         ? existing.vinDecoded
         : await decodeVin(vin);
+
+  // A VIN that doesn't fit the car or the requested brand is usually a typo: ask the seller
+  // to check once, and accept the same VIN when they send it again.
+  if (vin && vinDecoded && values['vinConfirmed'] !== vin) {
+    const mismatch =
+      vinMismatches(o, vinDecoded).length > 0 || !makeMatchesBrand(vinDecoded.make, request.brand);
+    if (mismatch) {
+      return {
+        errors: [],
+        formError: 'vinMismatch',
+        values: {
+          ...values,
+          vinConfirmed: vin,
+          vinCar: [vinDecoded.make, vinDecoded.model, vinDecoded.year].filter(Boolean).join(' '),
+        },
+      };
+    }
+  }
 
   const row = {
     car: o.car,

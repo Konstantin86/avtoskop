@@ -41,6 +41,7 @@ export {
 export { LOCALE_URL_PREFIX, localePath } from './locale.ts';
 export {
   isVinFormatValid,
+  makeMatchesBrand,
   normalizeVin,
   usesCheckDigit,
   vinCheckDigit,

@@ -31,9 +31,12 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes }: Props)
   return (
     <form action={action} className={`card ${styles.formCard}`} key={JSON.stringify(v)} noValidate>
       <input type="hidden" name="requestId" value={requestId} />
+      <input type="hidden" name="vinConfirmed" value={v['vinConfirmed'] ?? ''} />
       {state.formError && (
         <div className={styles.alert} role="alert">
-          {t(`error_${state.formError}` as 'error_generic')}
+          {state.formError === 'vinMismatch'
+            ? t('error_vinMismatch', { car: v['vinCar'] ?? '' })
+            : t(`error_${state.formError}` as 'error_generic')}
         </div>
       )}
       <label className="label">

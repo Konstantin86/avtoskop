@@ -1,7 +1,13 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { ConfirmButton } from '@/components/ConfirmButton';
-import { matchedWishes, REPORT_REASONS, vinMismatches, WISHES } from '@avtoskop/core';
+import {
+  makeMatchesBrand,
+  matchedWishes,
+  REPORT_REASONS,
+  vinMismatches,
+  WISHES,
+} from '@avtoskop/core';
 import { FlagEU, FlagUS, ShieldIcon } from '@/components/icons';
 import { TelegramConfirm } from '@/components/TelegramConfirm';
 import { formatNumber, timeAgo, yearsLabel } from '@/components/requestFormat';
@@ -164,10 +170,25 @@ export default async function MyRequestPage({ params }: Props) {
                         </div>
                       )
                     )}
+                    <a
+                      href="https://wanted.mvs.gov.ua/searchtransport/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.vinLink}
+                    >
+                      {t('vinCheckOfficial', { last6: offer.vin.slice(-6) })} ↗
+                    </a>
                     {offer.vinDecoded &&
                       (() => {
                         const d = offer.vinDecoded;
                         const car = [d.make, d.model, d.year].filter(Boolean).join(' ');
+                        if (!makeMatchesBrand(d.make, request.brand)) {
+                          return (
+                            <div className={styles.vinWarn}>
+                              ⚠ {t('vinOtherBrand', { make: d.make, brand: request.brand })}
+                            </div>
+                          );
+                        }
                         return vinMismatches(offer, d).length > 0 ? (
                           <div className={styles.vinWarn}>⚠ {t('vinMismatch', { car })}</div>
                         ) : (

@@ -1,8 +1,10 @@
 import 'server-only';
-import { count, desc, eq, sql } from 'drizzle-orm';
+import { count, desc, eq, isNotNull, sql } from 'drizzle-orm';
+import { makeMatchesBrand, vinMismatches } from '@avtoskop/core';
 import { buyerRequests, brands, offers, reports, sellers, users } from '@avtoskop/db';
 import { getCurrentUser } from './auth';
 import { db } from './db';
+import { wantedByVin } from './vin';
 
 // Admins are listed by Telegram ID in ADMIN_TELEGRAM_IDS (comma-separated).
 export async function getAdmin() {
@@ -61,4 +63,40 @@ export async function listOpenReports() {
     .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
     .where(eq(reports.status, 'open'))
     .orderBy(desc(reports.createdAt));
+}
+
+export type VinFlag = 'wanted' | 'otherBrand' | 'mismatch';
+
+// Offers whose VIN is on the wanted list or doesn't fit the offer or the requested brand.
+export async function listVinFlags() {
+  const rows = await db
+    .select({
+      offerId: offers.id,
+      vin: offers.vin,
+      vinDecoded: offers.vinDecoded,
+      car: offers.car,
+      year: offers.year,
+      priceUsd: offers.priceUsd,
+      updatedAt: offers.updatedAt,
+      sellerId: sellers.id,
+      sellerName: sellers.name,
+      sellerStatus: sellers.status,
+      requestBrand: brands.name,
+      requestModel: buyerRequests.model,
+    })
+    .from(offers)
+    .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+    .innerJoin(buyerRequests, eq(offers.requestId, buyerRequests.id))
+    .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
+    .where(isNotNull(offers.vin))
+    .orderBy(desc(offers.updatedAt));
+  const wanted = await wantedByVin(rows.flatMap((r) => (r.vin ? [r.vin] : [])));
+  return rows.flatMap((r) => {
+    const flags: VinFlag[] = [];
+    if (r.vin && wanted.has(r.vin)) flags.push('wanted');
+    if (r.vinDecoded && !makeMatchesBrand(r.vinDecoded.make, r.requestBrand))
+      flags.push('otherBrand');
+    if (r.vinDecoded && vinMismatches(r, r.vinDecoded).length > 0) flags.push('mismatch');
+    return flags.length > 0 ? [{ ...r, flags }] : [];
+  });
 }
