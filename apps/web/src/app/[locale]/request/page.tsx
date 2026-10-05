@@ -1,4 +1,5 @@
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { SELLER_TYPES } from '@avtoskop/core';
 import { LockIcon } from '@/components/icons';
 import { Link } from '@/i18n/navigation';
 import { getBrandOptions } from '@/server/brands';
@@ -46,13 +47,25 @@ export default async function RequestPage({
           defaults={defaults}
         />
         <aside className={`card ${styles.aside}`}>
-          <h2 className={styles.asideTitle}>{t('whoSees')}</h2>
-          <div className={styles.chips}>
-            <span className="chip chip-blue">{t('sellerImporters')}</span>
-            <span className="chip chip-blue">{t('sellerDealers')}</span>
-            <span className="chip chip-blue">{t('sellerBuyout')}</span>
-            <span className="chip chip-blue">{t('sellerOwners')}</span>
+          <h2 className={styles.asideTitle}>{t('whoReplies')}</h2>
+          {/* The checkboxes belong to the request form through the form attribute. */}
+          <div className="choices">
+            {SELLER_TYPES.map((type) => (
+              <label key={type}>
+                <input
+                  type="checkbox"
+                  name="sellerTypes"
+                  value={type}
+                  form="request-form"
+                  defaultChecked={
+                    !defaults['sellerTypes'] || defaults['sellerTypes'].split(',').includes(type)
+                  }
+                />
+                <span>{t(`sellerType_${type}`)}</span>
+              </label>
+            ))}
           </div>
+          <p className="hint">{t('whoRepliesHint')}</p>
           <p className={styles.privacy}>
             <LockIcon />
             {t('privacy')}

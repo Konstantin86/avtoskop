@@ -94,11 +94,6 @@
     "submit": "Post request",
     "submitting": "Posting…",
     "summaryTitle": "Your request",
-    "whoSees": "Who sees the request",
-    "sellerImporters": "Importers",
-    "sellerDealers": "Dealers",
-    "sellerBuyout": "Buyout firms",
-    "sellerOwners": "Owners",
     "privacy": "Your number is hidden. You share it only with sellers you choose.",
     "error_generic": "Please check the highlighted fields.",
     "error_brandId": "Choose a make",
@@ -115,7 +110,13 @@
     "error_gearbox": "Choose a gearbox",
     "error_wishes": "Check the selected wishes",
     "error_modelUnknown": "Choose a model from the list",
-    "error_fuels": "Check the chosen fuels"
+    "error_fuels": "Check the chosen fuels",
+    "whoReplies": "Who can reply",
+    "whoRepliesHint": "All sellers see the request, but only the chosen ones can reply. The more types, the more offers.",
+    "sellerType_importer": "Importers",
+    "sellerType_dealer": "Dealers",
+    "sellerType_buyout": "Buyout firms",
+    "sellerType_owner": "Owners"
   },
   "sent": {
     "title": "Request published",
@@ -238,7 +239,14 @@
     "shareTitle": "Looking for {car} | Avtoskop",
     "notFound": "Request not found or already closed.",
     "years": "Years",
-    "sellerRules": "Rules for sellers"
+    "sellerRules": "Rules for sellers",
+    "repliesOnly": "Replies only from: {types}",
+    "replies": "Who can reply",
+    "repliesAll": "All sellers",
+    "typeOf_importer": "importers",
+    "typeOf_dealer": "dealers",
+    "typeOf_buyout": "buyout firms",
+    "typeOf_owner": "owners"
   },
   "auth": {
     "title": "Sign in to Avtoskop",
@@ -339,7 +347,9 @@
     "vin": "VIN (optional)",
     "vinHint": "17 characters. Only the buyer sees it: we check the car against the wanted list and compare the make and year.",
     "error_vin": "Check the VIN: 17 characters, no letters I, O, Q",
-    "error_vinMismatch": "By VIN this is {car}, which doesn't match the offer or the brand the buyer wants. Check the VIN and the car name. If everything is right, send the offer again."
+    "error_vinMismatch": "By VIN this is {car}, which doesn't match the offer or the brand the buyer wants. Check the VIN and the car name. If everything is right, send the offer again.",
+    "notAllowed": "This buyer accepts offers only from: {types}. Your profile type doesn't match, so you can't send an offer.",
+    "error_notAllowed": "This buyer accepts offers only from certain seller types."
   },
   "account": {
     "title": "Account",

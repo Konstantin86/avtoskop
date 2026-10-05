@@ -48,6 +48,12 @@ export default async function RequestDetailPage({ params }: Props) {
       : []),
     [f('region'), regions[r.region] ?? r.region],
     [f('import'), r.importOk ? t('importOk') : t('onlyUkraine')],
+    [
+      t('replies'),
+      r.sellerTypes.length > 0
+        ? r.sellerTypes.map((type) => t(`typeOf_${type}` as 'typeOf_owner')).join(', ')
+        : t('repliesAll'),
+    ],
   ];
 
   return (

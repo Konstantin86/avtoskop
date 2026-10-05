@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { REGION_CODES, WISHES } from './request.ts';
+import { REGION_CODES, SELLER_TYPES, sellerTypeAllowed, WISHES } from './request.ts';
 import { normalizeVin, vinProblem } from './vin.ts';
 
-export const SELLER_TYPES = ['importer', 'dealer', 'buyout', 'owner'] as const;
 export const SOURCE_COUNTRIES = ['us', 'eu', 'kr', 'cn', 'jp', 'ca'] as const;
 export const AVAILABILITY = ['in_ukraine', 'in_transit', 'to_order'] as const;
 // Features a seller can claim for an offer: the buyer wishes first, then offer-only ones.
@@ -100,8 +99,11 @@ export function offerLimitPerDay(status: string): number {
       : 0;
 }
 
+export { SELLER_TYPES };
+
 export interface AlertRequest {
   brandId: number;
+  sellerTypes: string[];
   region: string;
   importOk: boolean;
 }
@@ -117,6 +119,7 @@ export interface AlertSeller {
 // Whether a newly published request should be sent to this seller in Telegram.
 export function requestMatchesSeller(request: AlertRequest, seller: AlertSeller): boolean {
   if (!seller.alerts || seller.status === 'banned') return false;
+  if (!sellerTypeAllowed(request.sellerTypes, seller.type)) return false;
   if (seller.type === 'importer' && !request.importOk) return false;
   if (seller.brandIds.length > 0 && !seller.brandIds.includes(request.brandId)) return false;
   // A buyer who accepts any region can be served from anywhere.

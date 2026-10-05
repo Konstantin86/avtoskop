@@ -39,6 +39,8 @@ export const WISHES = [
   'no_auction',
   'awd',
 ] as const;
+export const SELLER_TYPES = ['importer', 'dealer', 'buyout', 'owner'] as const;
+
 export const NOTIFY_CHANNELS = ['telegram', 'sms', 'email'] as const;
 
 // Accepts the ways Ukrainians type a mobile number and returns +380XXXXXXXXX, or null.
@@ -98,6 +100,14 @@ export const buyerRequestInput = z
       (v) => (typeof v === 'string' ? v.split(',').filter(Boolean) : (v ?? [])),
       z.array(z.enum(WISHES)).transform((w) => [...new Set(w)]),
     ),
+    // Seller types allowed to reply. Empty means everyone; ticking none or all means everyone too.
+    sellerTypes: z.preprocess(
+      (v) => (typeof v === 'string' ? v.split(',').filter(Boolean) : (v ?? [])),
+      z
+        .array(z.enum(SELLER_TYPES))
+        .transform((t) => [...new Set(t)])
+        .transform((t) => (t.length === SELLER_TYPES.length ? [] : t)),
+    ),
     importOk: z.preprocess((v) => v === true || v === 'on' || v === 'true', z.boolean()),
     region: z.enum(REGION_CODES),
     notes: z.string().trim().max(500).optional().default(''),
@@ -123,4 +133,8 @@ const modelKey = (name: string) => name.toLowerCase().replace(/[^\p{L}\p{N}]/gu,
 export function canonicalModel(typed: string, known: readonly string[]): string {
   const key = modelKey(typed);
   return known.find((name) => modelKey(name) === key) ?? typed;
+}
+
+export function sellerTypeAllowed(allowed: readonly string[], type: string): boolean {
+  return allowed.length === 0 || allowed.includes(type);
 }

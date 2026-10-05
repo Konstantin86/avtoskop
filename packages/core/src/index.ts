@@ -10,6 +10,7 @@ export {
   canonicalModel,
   formatUaNational,
   REGION_CODES,
+  sellerTypeAllowed,
   uaNationalDigits,
   type BuyerRequestInput,
 } from './request.ts';

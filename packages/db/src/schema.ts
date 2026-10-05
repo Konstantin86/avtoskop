@@ -101,6 +101,8 @@ export const buyerRequests = pgTable(
     yearTo: integer('year_to'),
     budgetUsd: integer('budget_usd').notNull(),
     mileageMaxKm: integer('mileage_max_km'),
+    // Seller types allowed to reply; empty means everyone.
+    sellerTypes: text('seller_types').array().notNull().default([]),
     // Empty means any fuel.
     fuels: text('fuels').array().notNull().default([]),
     gearbox: text('gearbox').notNull().default('any'),

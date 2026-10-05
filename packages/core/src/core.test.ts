@@ -5,6 +5,7 @@ import {
   formatUaNational,
   localePath,
   normalizeUaPhone,
+  sellerTypeAllowed,
   slugify,
   uaNationalDigits,
 } from './index.ts';
@@ -160,5 +161,35 @@ describe('buyerRequestInput fuels', () => {
     ]);
     expect(buyerRequestInput.parse(base).fuels).toEqual([]);
     expect(buyerRequestInput.safeParse({ ...base, fuels: 'any' }).success).toBe(false);
+  });
+});
+
+describe('buyerRequestInput seller types', () => {
+  const base = {
+    brandId: '1',
+    model: 'RAV4',
+    yearFrom: '2019',
+    budgetUsd: '28000',
+    region: 'kyiv',
+    importOk: 'on',
+    phone: '0501234567',
+    notifyVia: 'telegram',
+    consent: 'on',
+  };
+
+  it('keeps a limited choice and treats none or all as everyone', () => {
+    expect(buyerRequestInput.parse({ ...base, sellerTypes: 'owner,dealer' }).sellerTypes).toEqual([
+      'owner',
+      'dealer',
+    ]);
+    expect(buyerRequestInput.parse(base).sellerTypes).toEqual([]);
+    expect(
+      buyerRequestInput.parse({ ...base, sellerTypes: 'importer,dealer,buyout,owner' }).sellerTypes,
+    ).toEqual([]);
+  });
+
+  it('checks a seller type against the choice', () => {
+    expect(sellerTypeAllowed([], 'buyout')).toBe(true);
+    expect(sellerTypeAllowed(['owner'], 'buyout')).toBe(false);
   });
 });

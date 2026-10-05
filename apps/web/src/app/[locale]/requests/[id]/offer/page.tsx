@@ -1,4 +1,5 @@
 import { getLocale, getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { sellerTypeAllowed } from '@avtoskop/core';
 import { formatNumber, fuelsLabel, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
@@ -35,6 +36,26 @@ export default async function OfferPage({ params }: Props) {
     return (
       <div className={`container ${styles.page}`}>
         <p>{b('notFound')}</p>
+      </div>
+    );
+  }
+
+  if (!sellerTypeAllowed(request.sellerTypes, user.seller.type)) {
+    return (
+      <div className={`container ${styles.page}`}>
+        <div className={styles.wide}>
+          <h1 className={styles.title}>{t('title')}</h1>
+          <div className={styles.notice}>
+            {t('notAllowed', {
+              types: request.sellerTypes
+                .map((type) => b(`typeOf_${type}` as 'typeOf_owner'))
+                .join(', '),
+            })}
+          </div>
+          <Link href="/requests" className="btn btn-secondary">
+            {b('back')}
+          </Link>
+        </div>
       </div>
     );
   }

@@ -7,6 +7,7 @@ import {
   offerInput,
   offerLimitPerDay,
   sellerProfileInput,
+  sellerTypeAllowed,
   vinMismatches,
 } from '@avtoskop/core';
 import { brands, buyerRequests, offers, sellers } from '@avtoskop/db';
@@ -64,12 +65,20 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
 
   const requestId = values['requestId'] ?? '';
   const [request] = await db
-    .select({ id: buyerRequests.id, status: buyerRequests.status, brand: brands.name })
+    .select({
+      id: buyerRequests.id,
+      status: buyerRequests.status,
+      brand: brands.name,
+      sellerTypes: buyerRequests.sellerTypes,
+    })
     .from(buyerRequests)
     .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
     .where(eq(buyerRequests.id, requestId));
   if (!request || request.status !== 'active') {
     return { errors: [], formError: 'closed', values };
+  }
+  if (!sellerTypeAllowed(request.sellerTypes, user.seller.type)) {
+    return { errors: [], formError: 'notAllowed', values };
   }
 
   const parsed = offerInput.safeParse(values);

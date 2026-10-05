@@ -40,7 +40,13 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
     bad(name) ? { 'aria-invalid': true as const, 'aria-describedby': `${name}-error` } : {};
 
   return (
-    <form action={action} className={`card ${styles.form}`} key={JSON.stringify(v)} noValidate>
+    <form
+      id="request-form"
+      action={action}
+      className={`card ${styles.form}`}
+      key={JSON.stringify(v)}
+      noValidate
+    >
       <input type="hidden" name="locale" value={locale} />
       {state.formError && (
         <div className={styles.alert} role="alert">

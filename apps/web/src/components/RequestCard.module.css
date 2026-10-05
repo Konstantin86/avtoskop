@@ -78,3 +78,10 @@
   font-weight: 600;
   color: var(--muted);
 }
+
+.onlyFrom {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--yellow-ink);
+}

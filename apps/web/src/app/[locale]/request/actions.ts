@@ -25,7 +25,7 @@ export async function submitRequest(
     [...formData.entries()].filter(([k, v]) => !k.startsWith('$') && typeof v === 'string'),
   ) as Record<string, string>;
   // Checkboxes repeat the same name; keep all of them, as one comma-separated value.
-  for (const key of ['wishes', 'fuels']) {
+  for (const key of ['wishes', 'fuels', 'sellerTypes']) {
     values[key] = formData
       .getAll(key)
       .filter((v) => typeof v === 'string')
@@ -85,6 +85,7 @@ export async function submitRequest(
         budgetUsd: input.budgetUsd,
         mileageMaxKm: input.mileageMaxKm ?? null,
         fuels: input.fuels,
+        sellerTypes: input.sellerTypes,
         gearbox: input.gearbox,
         wishes: input.wishes,
         importOk: input.importOk,

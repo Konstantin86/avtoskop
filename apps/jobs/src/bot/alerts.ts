@@ -56,6 +56,7 @@ export function createSellerAlerts(
         fuels: buyerRequests.fuels,
         gearbox: buyerRequests.gearbox,
         importOk: buyerRequests.importOk,
+        sellerTypes: buyerRequests.sellerTypes,
         buyerChatId: buyerRequests.telegramChatId,
       })
       .from(buyerRequests)

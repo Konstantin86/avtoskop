@@ -49,6 +49,13 @@ export async function RequestCard({ request: r }: { request: PublicRequest }) {
         </div>
       )}
       {r.notes && <p className={styles.notes}>{r.notes}</p>}
+      {r.sellerTypes.length > 0 && (
+        <p className={styles.onlyFrom}>
+          {t('repliesOnly', {
+            types: r.sellerTypes.map((type) => t(`typeOf_${type}` as 'typeOf_owner')).join(', '),
+          })}
+        </p>
+      )}
       <div className={styles.footer}>
         <span className={styles.import}>
           {r.importOk ? (

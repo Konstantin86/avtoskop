@@ -1,0 +1,1 @@
+ALTER TABLE "buyer_requests" ADD COLUMN "seller_types" text[] DEFAULT '{}' NOT NULL;

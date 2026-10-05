@@ -151,7 +151,7 @@ describe('requestMatchesSeller', () => {
     brandIds: [],
     serviceRegions: [],
   };
-  const request = { brandId: 5, region: 'lviv', importOk: true };
+  const request = { brandId: 5, region: 'lviv', importOk: true, sellerTypes: [] as string[] };
 
   it('matches everything when the seller set no filters', () => {
     expect(requestMatchesSeller(request, seller)).toBe(true);
@@ -171,6 +171,13 @@ describe('requestMatchesSeller', () => {
       requestMatchesSeller({ ...request, importOk: false }, { ...seller, type: 'importer' }),
     ).toBe(false);
     expect(requestMatchesSeller({ ...request, importOk: false }, seller)).toBe(true);
+  });
+
+  it('skips seller types the buyer did not allow', () => {
+    expect(requestMatchesSeller({ ...request, sellerTypes: ['owner'] }, seller)).toBe(false);
+    expect(requestMatchesSeller({ ...request, sellerTypes: ['owner', 'dealer'] }, seller)).toBe(
+      true,
+    );
   });
 
   it('never alerts banned sellers or sellers who turned alerts off', () => {

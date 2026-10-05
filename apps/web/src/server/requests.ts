@@ -18,6 +18,7 @@ const publicColumns = {
   budgetUsd: buyerRequests.budgetUsd,
   mileageMaxKm: buyerRequests.mileageMaxKm,
   fuels: buyerRequests.fuels,
+  sellerTypes: buyerRequests.sellerTypes,
   gearbox: buyerRequests.gearbox,
   wishes: buyerRequests.wishes,
   importOk: buyerRequests.importOk,
