@@ -58,9 +58,27 @@ In the MVP the report is free: the user enters an email and gets \[N\] reports p
 | Auction archive sites (bidfax, bid.cars, autoastat, stat.vin) | Copart / IAAI sale records and photos by VIN              | Free to view       | No official API, they block automated access, photos are owned by the auctions |
 | Our own listing archive                                       | Earlier listings, prices, mileage, photos of the same VIN | Free               | Grows over time; thin at launch                                                |
 
-For auction sites, the safe MVP approach is to link to the VIN page on those sites rather than copy their data or photos. Paid sources (Carfax, AutoCheck, carVertical) come after the MVP, together with payments.
+For auction sites, the safe MVP approach is to link to the VIN page on those sites rather than copy their data or photos. Auction records through a paid API are available on demand (see below). Carfax and AutoCheck are not included; the report points to them for a further check.
 
 Open question: the daily limit per email, and the report price once payments arrive (compare with carVertical and similar services in Ukraine).
+
+## History checks on offers (decided 2026-10-05)
+
+Sellers can add a VIN to an offer. The buyer then sees checks next to the offer, so a trustworthy offer stands out without anyone paying.
+
+| Check                                           | Source                                                    | Cost to us                                         | Decision                                                                                         |
+| ----------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Wanted (stolen) car                             | MVS open data on data.gov.ua, updated several times a day | Free (credit the source)                           | Build first                                                                                      |
+| Registration history in Ukraine                 | MVS open data on data.gov.ua, monthly bulk files          | Free (credit the source)                           | Build second                                                                                     |
+| US auction records (photos, damage, sale price) | Auction data API, e.g. Apibara                            | 100 requests/month free, then $25/month for 30,000 | On demand only: when the buyer explicitly asks for it                                            |
+| Full US history (Carfax, AutoCheck)             | Official business contract                                | About $2–5 per report at volume                    | Not included. Show a note that services like Carfax or AutoCheck can be used for a further check |
+| Insurance, technical inspection, fines          | MTSBU, Opendatabot and similar                            | Free page or paid API                              | Skip: buyers check these in person                                                               |
+
+Rules:
+
+- The VIN field is optional and shown only to the buyer, never on public pages. The format is checked (17 characters, no I, O or Q; control digit for US-market cars).
+- Cheap resellers of Carfax and AutoCheck reports break those companies' terms. Do not use them.
+- Order: VIN field and wanted check around the launch; registration history and on-demand auction records after the launch test.
 
 ## Listing sources and merging
 
@@ -93,7 +111,7 @@ The site launches in Ukrainian (default) and English. Language support is built 
 - User accounts, saved searches, favourites.
 - Alerts for new listings or price drops.
 - Subscription pricing.
-- Paid history sources (Carfax, AutoCheck, carVertical).
+- Paid history sources (Carfax, AutoCheck, carVertical); the report links to them instead.
 - Duplicate matching without a VIN.
 - Vehicle types other than cars.
 - Cars still abroad or at auction (not yet in Ukraine).
