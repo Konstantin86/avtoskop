@@ -7,7 +7,7 @@ import { buyerRequests, offers, sellers } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
 import { getCurrentUser, safeReturnTo } from '@/server/auth';
 import { db } from '@/server/db';
-import { notifyBuyerOfOffer } from '@/server/notify';
+import { notifyBuyerOfOffer, notifyBuyerOfPriceDrop } from '@/server/notify';
 
 export interface FormState {
   errors: string[];
@@ -77,7 +77,12 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
   const seller = user.seller;
   if (seller.status === 'banned') return { errors: [], formError: 'banned', values };
   const [existing] = await db
-    .select({ id: offers.id })
+    .select({
+      id: offers.id,
+      status: offers.status,
+      priceUsd: offers.priceUsd,
+      notifiedPriceUsd: offers.notifiedPriceUsd,
+    })
     .from(offers)
     .where(and(eq(offers.requestId, requestId), eq(offers.sellerId, seller.id)));
   if (!existing) {
@@ -108,7 +113,7 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
   };
   const [saved] = await db
     .insert(offers)
-    .values({ requestId, sellerId: seller.id, ...row })
+    .values({ requestId, sellerId: seller.id, ...row, notifiedPriceUsd: row.priceUsd })
     .onConflictDoUpdate({
       target: [offers.requestId, offers.sellerId],
       set: { ...row, updatedAt: new Date() },
@@ -117,6 +122,20 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     .returning({ isNew: sql<boolean>`(xmax = 0)` });
   if (saved?.isNew) await notifyBuyerOfOffer(requestId, row);
 
-  redirect({ href: { pathname: '/account', query: { sent: '1' } }, locale: await getLocale() });
+  // A lower price than the buyer last heard about is worth a message, unless they declined.
+  const lastToldPrice = existing?.notifiedPriceUsd ?? existing?.priceUsd;
+  if (existing && existing.status !== 'declined' && lastToldPrice && row.priceUsd < lastToldPrice) {
+    await db
+      .update(offers)
+      .set({ notifiedPriceUsd: row.priceUsd })
+      .where(eq(offers.id, existing.id));
+    await notifyBuyerOfPriceDrop(requestId, { ...row, oldPriceUsd: lastToldPrice });
+  }
+
+  redirect({
+    // Only a new offer notifies the buyer; an edit just updates what they see on their page.
+    href: { pathname: '/account', query: { sent: saved?.isNew ? 'new' : 'updated' } },
+    locale: await getLocale(),
+  });
   return { errors: [], values };
 }

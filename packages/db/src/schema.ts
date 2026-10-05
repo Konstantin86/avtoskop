@@ -207,6 +207,8 @@ export const offers = pgTable(
     link: text('link'),
     description: text('description').notNull().default(''),
     status: text('status').notNull().default('sent'),
+    // Lowest price the buyer was told about; a price-drop message needs a new low.
+    notifiedPriceUsd: integer('notified_price_usd'),
     contactSharedAt: timestamp('contact_shared_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

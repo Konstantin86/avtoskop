@@ -14,8 +14,7 @@ interface OfferSummary {
   priceUsd: number;
 }
 
-// Tells a confirmed buyer about a new offer, with their private link.
-export async function notifyBuyerOfOffer(requestId: string, offer: OfferSummary): Promise<void> {
+async function buyerChat(requestId: string) {
   const [r] = await db
     .select({
       brand: brands.name,
@@ -29,15 +28,45 @@ export async function notifyBuyerOfOffer(requestId: string, offer: OfferSummary)
     .from(buyerRequests)
     .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
     .where(eq(buyerRequests.id, requestId));
-  if (!r?.chatId || !r.key) return;
+  if (!r?.chatId || !r.key) return null;
+  return {
+    chatId: r.chatId,
+    locale: r.locale,
+    request: `${r.brand} ${r.model} ${yearsLabel(r)}`,
+    link: siteUrl() + localePath(r.locale, `/my/${decryptContact(r.key)}`),
+  };
+}
 
-  const t = await getTranslations({ locale: r.locale, namespace: 'notify' });
+// Tells a confirmed buyer about a new offer, with their private link.
+export async function notifyBuyerOfOffer(requestId: string, offer: OfferSummary): Promise<void> {
+  const b = await buyerChat(requestId);
+  if (!b) return;
+  const t = await getTranslations({ locale: b.locale, namespace: 'notify' });
   await sendTelegram(
-    r.chatId,
+    b.chatId,
     t('newOffer', {
-      request: `${r.brand} ${r.model} ${yearsLabel(r)}`,
-      offer: `${offer.car}, ${offer.year}, $${formatNumber(r.locale, offer.priceUsd)}`,
-      link: siteUrl() + localePath(r.locale, `/my/${decryptContact(r.key)}`),
+      request: b.request,
+      offer: `${offer.car}, ${offer.year}, $${formatNumber(b.locale, offer.priceUsd)}`,
+      link: b.link,
+    }),
+  );
+}
+
+export async function notifyBuyerOfPriceDrop(
+  requestId: string,
+  offer: OfferSummary & { oldPriceUsd: number },
+): Promise<void> {
+  const b = await buyerChat(requestId);
+  if (!b) return;
+  const t = await getTranslations({ locale: b.locale, namespace: 'notify' });
+  await sendTelegram(
+    b.chatId,
+    t('priceDrop', {
+      request: b.request,
+      car: `${offer.car}, ${offer.year}`,
+      oldPrice: `$${formatNumber(b.locale, offer.oldPriceUsd)}`,
+      newPrice: `$${formatNumber(b.locale, offer.priceUsd)}`,
+      link: b.link,
     }),
   );
 }

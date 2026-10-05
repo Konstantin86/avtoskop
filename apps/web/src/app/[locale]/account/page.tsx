@@ -50,7 +50,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
     seller ? listOwnOffers(seller.id) : Promise.resolve([]),
   ]);
   const regions = (await getMessages()).regions as Record<string, string>;
-  const sent = (await searchParams)['sent'] === '1';
+  const sent = (await searchParams)['sent'];
 
   const requestsSection = (
     <section className={me.offers}>
@@ -195,7 +195,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
         </div>
         {sent && (
           <div className={styles.success} role="status">
-            {t('sent')}
+            {sent === 'updated' ? t('updated') : t('sent')}
           </div>
         )}
         {/* Sellers see their offers first; everyone else sees their requests first. */}

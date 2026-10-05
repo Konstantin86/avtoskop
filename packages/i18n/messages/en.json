@@ -308,7 +308,7 @@
     "origin": "Country of origin",
     "origin_ua": "Ukraine",
     "link": "Link to the car",
-    "linkHint": "Listing, auction lot or photos (optional)",
+    "linkHint": "Listing, auction lot or photos (optional). Offers with a link get more replies.",
     "description": "Details",
     "descriptionPlaceholder": "Condition, history, what the price includes…",
     "submit": "Send offer",
@@ -358,11 +358,13 @@
     "becomeSeller": "Create a seller profile",
     "status_banned": "Blocked",
     "alertsOn": "New-request alerts are on",
-    "alertsOff": "New-request alerts are off"
+    "alertsOff": "New-request alerts are off",
+    "updated": "Offer updated. The buyer will see the changes on their offers page."
   },
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call or message the buyer soon.",
-    "newOffer": "🚗 New offer for your request {request}:\n{offer}\n\nView it and decide who gets your number: {link}"
+    "newOffer": "🚗 New offer for your request {request}:\n{offer}\n\nView it and decide who gets your number: {link}",
+    "priceDrop": "💰 A seller lowered the price on an offer for your request {request}:\n{car}: {oldPrice} → {newPrice}\n\nView offers: {link}"
   },
   "my": {
     "title": "Your request",
