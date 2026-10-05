@@ -1,0 +1,59 @@
+# Runs Avtoskop on one machine: database, migrations, website and Telegram bot.
+# Usage (from the repository root): docker compose -f deploy/compose.yml --env-file deploy/.env up -d --build
+name: avtoskop
+
+x-app: &app
+  build:
+    context: ..
+  image: avtoskop-app
+  env_file: .env
+  environment:
+    DATABASE_URL: postgres://avtoskop:${POSTGRES_PASSWORD}@db:5432/avtoskop
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: avtoskop
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      POSTGRES_DB: avtoskop
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U avtoskop']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrate:
+    <<: *app
+    restart: 'no'
+    working_dir: /app/packages/db
+    command: ['node', 'src/migrate.ts']
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    <<: *app
+    working_dir: /app/apps/web
+    command: ['node_modules/.bin/next', 'start', '--port', '3000']
+    ports:
+      - '${WEB_PORT:-3000}:3000'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  # Only one copy of the bot may run per bot token: stop `pnpm bot` elsewhere first.
+  bot:
+    <<: *app
+    working_dir: /app/apps/jobs
+    command: ['node', 'src/bot/main.ts']
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  db-data:

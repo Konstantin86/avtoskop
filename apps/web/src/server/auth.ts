@@ -14,7 +14,8 @@ const LOGIN_MINUTES = 10;
 const cookieBase = {
   httpOnly: true,
   sameSite: 'lax' as const,
-  secure: process.env.NODE_ENV === 'production',
+  // Browsers drop secure cookies on plain http, e.g. a home server reached by IP.
+  secure: (process.env['SITE_URL'] ?? '').startsWith('https://'),
   path: '/',
 };
 
