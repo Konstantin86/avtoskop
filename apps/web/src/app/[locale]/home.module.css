@@ -31,11 +31,6 @@
   gap: 16px;
 }
 
-.searchSoon {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
 .sources {
   font-size: 14px;
   color: var(--muted);
@@ -190,8 +185,7 @@
     width: 100%;
   }
 
-  .ctas,
-  .searchSoon {
+  .ctas {
     width: 100%;
   }
 

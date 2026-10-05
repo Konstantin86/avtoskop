@@ -13,6 +13,13 @@ const siteHost = process.env['SITE_URL'] ? new URL(process.env['SITE_URL']).host
 
 const config: NextConfig = {
   ...(siteHost && siteHost !== 'localhost' && { allowedDevOrigins: [siteHost] }),
+  // Old /uk addresses (including links already sent by the bot) move to /ua.
+  async redirects() {
+    return [
+      { source: '/uk', destination: '/ua', permanent: true },
+      { source: '/uk/:path*', destination: '/ua/:path*', permanent: true },
+    ];
+  },
   transpilePackages: ['@avtoskop/core', '@avtoskop/db', '@avtoskop/i18n'],
   // Type checking runs separately with `pnpm typecheck` (TypeScript 7).
   typescript: { ignoreBuildErrors: true },

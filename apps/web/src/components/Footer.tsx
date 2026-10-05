@@ -25,7 +25,6 @@ export async function Footer() {
           <Link href="/privacy" style={{ color: 'inherit' }}>
             {t('privacy')}
           </Link>
-          <span>{t('data')}</span>
         </span>
       </div>
     </footer>

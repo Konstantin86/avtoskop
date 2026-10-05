@@ -26,20 +26,20 @@ export function LockIcon() {
   );
 }
 
+export function FlagIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" {...stroke}>
+      <path d="M5 21V4" />
+      <path d="M5 4h11l-2 4 2 4H5" />
+    </svg>
+  );
+}
+
 export function ShieldIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" {...stroke}>
       <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
       <path d="M9 12l2 2 4-4" />
-    </svg>
-  );
-}
-
-export function GaugeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" {...stroke}>
-      <path d="M4 16a8 8 0 1 1 16 0" />
-      <path d="M12 16l4-5" />
     </svg>
   );
 }

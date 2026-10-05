@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { eq } from 'drizzle-orm';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { hashSecret } from '@avtoskop/core';
+import { hashSecret, localePath } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { CopyLink } from '@/components/CopyLink';
 import { CheckIcon } from '@/components/icons';
@@ -130,7 +130,7 @@ export default async function SentPage({
               <div className={styles.stepText}>{t('linkText')}</div>
             </div>
             <CopyLink
-              path={`/${locale}/my/${key}`}
+              path={localePath(locale, `/my/${key}`)}
               copyLabel={t('copy')}
               copiedLabel={t('copied')}
             />

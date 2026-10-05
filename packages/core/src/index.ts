@@ -35,3 +35,4 @@ export {
   hashSecret,
   newSecret,
 } from './contact-crypto.ts';
+export { LOCALE_URL_PREFIX, localePath } from './locale.ts';

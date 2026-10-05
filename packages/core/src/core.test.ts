@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buyerRequestInput, canonicalModel, normalizeUaPhone, slugify } from './index.ts';
+import {
+  buyerRequestInput,
+  canonicalModel,
+  localePath,
+  normalizeUaPhone,
+  slugify,
+} from './index.ts';
 
 describe('slugify', () => {
   it.each([
@@ -106,5 +112,13 @@ describe('canonicalModel', () => {
   it('keeps unknown or partial names as typed', () => {
     expect(canonicalModel('Prado', known)).toBe('Prado');
     expect(canonicalModel('Sequoia', known)).toBe('Sequoia');
+  });
+});
+
+describe('localePath', () => {
+  it('uses /ua for Ukrainian and /en for English', () => {
+    expect(localePath('uk', '/my/abc')).toBe('/ua/my/abc');
+    expect(localePath('en', '/terms')).toBe('/en/terms');
+    expect(localePath('de', '/')).toBe('/ua/');
   });
 });

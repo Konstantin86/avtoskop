@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { FUELS, GEARBOXES, WISHES } from '@avtoskop/core';
+import { FUELS, GEARBOXES, localePath, WISHES } from '@avtoskop/core';
 import { BrandSelect } from '@/components/BrandSelect';
 import { ModelInput } from '@/components/ModelInput';
 import { TelegramIcon } from '@/components/icons';
@@ -258,12 +258,12 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
           <span>
             {f.rich('consent', {
               terms: (c) => (
-                <a href={`/${locale}/terms`} target="_blank" rel="noopener">
+                <a href={localePath(locale, '/terms')} target="_blank" rel="noopener">
                   {c}
                 </a>
               ),
               privacy: (c) => (
-                <a href={`/${locale}/privacy`} target="_blank" rel="noopener">
+                <a href={localePath(locale, '/privacy')} target="_blank" rel="noopener">
                   {c}
                 </a>
               ),

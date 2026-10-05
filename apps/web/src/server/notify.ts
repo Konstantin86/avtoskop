@@ -1,6 +1,7 @@
 import 'server-only';
 import { eq } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
+import { localePath } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { formatNumber, yearsLabel } from '@/components/requestFormat';
 import { decryptContact } from './contact';
@@ -36,7 +37,7 @@ export async function notifyBuyerOfOffer(requestId: string, offer: OfferSummary)
     t('newOffer', {
       request: `${r.brand} ${r.model} ${yearsLabel(r)}`,
       offer: `${offer.car}, ${offer.year}, $${formatNumber(r.locale, offer.priceUsd)}`,
-      link: `${siteUrl()}/${r.locale}/my/${decryptContact(r.key)}`,
+      link: siteUrl() + localePath(r.locale, `/my/${decryptContact(r.key)}`),
     }),
   );
 }

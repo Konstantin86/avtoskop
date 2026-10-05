@@ -1,5 +1,5 @@
 import { and, desc, eq, gt, inArray, ne, sql } from 'drizzle-orm';
-import { decryptContact, hashContact, hashSecret } from '@avtoskop/core';
+import { decryptContact, hashContact, hashSecret, localePath } from '@avtoskop/core';
 import { brands, buyerRequests, loginTokens, users, type Db } from '@avtoskop/db';
 import type { ReplyMarkup, Telegram, TelegramMessage } from './telegram.ts';
 import { botText, requestLabel } from './texts.ts';
@@ -66,7 +66,8 @@ export function createBotHandler(
 
   async function sendLink(chatId: number, r: BuyerRequest): Promise<void> {
     if (!r.accessKeyEncrypted) return;
-    const link = `${siteUrl}/${r.locale}/my/${decryptContact(r.accessKeyEncrypted, contactKey)}`;
+    const link =
+      siteUrl + localePath(r.locale, `/my/${decryptContact(r.accessKeyEncrypted, contactKey)}`);
     await tg.sendMessage(chatId, botText(r.locale, 'requestLink', { link }));
   }
 
@@ -246,7 +247,7 @@ export function createBotHandler(
     }
     const lines = rows.map((r) =>
       r.accessKeyEncrypted
-        ? `• ${requestLabel(r)}\n${siteUrl}/${r.locale}/my/${decryptContact(r.accessKeyEncrypted, contactKey)}`
+        ? `• ${requestLabel(r)}\n${siteUrl}${localePath(r.locale, `/my/${decryptContact(r.accessKeyEncrypted, contactKey)}`)}`
         : `• ${requestLabel(r)}`,
     );
     await tg.sendMessage(m.chat.id, [botText(locale, 'myRequests'), ...lines].join('\n\n'));

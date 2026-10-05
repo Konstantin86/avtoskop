@@ -4,7 +4,6 @@
     "description": "Post a request for a car — importers, dealers and owners send offers. Your number stays hidden until you decide."
   },
   "header": {
-    "search": "Search cars",
     "how": "How it works",
     "sellers": "For sellers",
     "myRequests": "My requests",
@@ -19,10 +18,8 @@
   "home": {
     "eyebrow": "For car buyers in Ukraine",
     "title": "Describe the car — sellers will offer options",
-    "lead": "Importers, dealers and owners send offers for your request. You compare them with the market and decide who gets your number.",
+    "lead": "Importers, dealers and owners send offers for your request. You compare them and decide who gets your number.",
     "ctaRequest": "Post a request",
-    "ctaSearch": "Search listings",
-    "sources": "Listings from AUTO.RIA, OLX and dealers — in one search",
     "cardTitle": "Which car are you looking for?",
     "cardSubtitle": "Sellers will send offers for your request",
     "cardSubmit": "Get offers",
@@ -38,8 +35,9 @@
     "trust1Text": "Sellers don't call without your consent",
     "trust2Title": "Verified sellers",
     "trust2Text": "Importers and dealers are checked",
-    "trust3Title": "Price check",
-    "trust3Text": "Every offer is compared with the market"
+    "trust3Title": "Protection from scams",
+    "trust3Text": "Report in one click; we block offenders",
+    "note": "Free. No calls from people you didn't choose"
   },
   "fields": {
     "brand": "Make",
@@ -129,7 +127,7 @@
     "telegramTitle": "Confirm your number in Telegram",
     "telegramText": "The bot asks you to share your number; it must match the one in the request",
     "telegramButton": "Confirm in Telegram",
-    "browse": "Browse listings meanwhile",
+    "browse": "To the home page",
     "notFound": "Request not found.",
     "linkTitle": "Your private link",
     "linkText": "Use it to see offers and choose who gets your number. Save it and don't share it.",
@@ -142,7 +140,6 @@
   },
   "footer": {
     "copyright": "© Avtoskop, {year}",
-    "data": "Listing data: AUTO.RIA, OLX",
     "terms": "Terms",
     "privacy": "Privacy"
   },
@@ -202,7 +199,6 @@
     "rule2": "One offer per request — no spam or duplicates",
     "rule3": "Buyer contacts only with the buyer's consent",
     "rule4": "Phone check for everyone, plus registration details for companies",
-    "rule5": "After a deal the buyer rates the seller; ratings are public",
     "priceTitle": "What it costs",
     "priceText": "Free during the pilot. Later you'll pay only when a buyer has chosen to share their number with you.",
     "telegramTitle": "New requests in Telegram",

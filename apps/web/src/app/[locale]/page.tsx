@@ -1,6 +1,7 @@
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { localePath } from '@avtoskop/core';
 import { BrandModelFields } from '@/components/BrandModelFields';
-import { GaugeIcon, LockIcon, ShieldIcon } from '@/components/icons';
+import { FlagIcon, LockIcon, ShieldIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import { Link } from '@/i18n/navigation';
 import { getBrandOptions } from '@/server/brands';
@@ -21,7 +22,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const trust = [
     [LockIcon, 'trust1'],
     [ShieldIcon, 'trust2'],
-    [GaugeIcon, 'trust3'],
+    [FlagIcon, 'trust3'],
   ] as const;
 
   return (
@@ -37,16 +38,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <Link href="/request" className="btn btn-yellow btn-lg">
               {t('ctaRequest')}
             </Link>
-            <span className={styles.searchSoon}>
-              <span className="btn btn-secondary btn-lg" aria-disabled="true">
-                {t('ctaSearch')}
-              </span>
-            </span>
           </div>
-          <span className={styles.sources}>{t('sources')}</span>
+          <span className={styles.sources}>{t('note')}</span>
         </div>
 
-        <form action={`/${locale}/request`} method="get" className={`card ${styles.quick}`}>
+        <form
+          action={localePath(locale, '/request')}
+          method="get"
+          className={`card ${styles.quick}`}
+        >
           <div className={styles.quickHead}>
             <h2 className={styles.quickTitle}>{t('cardTitle')}</h2>
             <p className="hint" style={{ fontSize: 14 }}>

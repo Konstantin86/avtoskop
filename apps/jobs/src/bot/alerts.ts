@@ -1,5 +1,5 @@
 import { and, eq, gt, inArray, ne } from 'drizzle-orm';
-import { requestMatchesSeller } from '@avtoskop/core';
+import { localePath, requestMatchesSeller } from '@avtoskop/core';
 import { brands, buyerRequests, sellers, users, type Db } from '@avtoskop/db';
 import en from '@avtoskop/i18n/messages/en.json' with { type: 'json' };
 import uk from '@avtoskop/i18n/messages/uk.json' with { type: 'json' };
@@ -80,8 +80,8 @@ export function createSellerAlerts(
       const text = botText(SELLER_LOCALE, 'newRequest', {
         request: requestLabel(r),
         details: requestDetails(SELLER_LOCALE, r),
-        link: `${siteUrl}/${SELLER_LOCALE}/requests/${r.id}/offer`,
-        settings: `${siteUrl}/${SELLER_LOCALE}/sellers/profile`,
+        link: siteUrl + localePath(SELLER_LOCALE, `/requests/${r.id}/offer`),
+        settings: siteUrl + localePath(SELLER_LOCALE, '/sellers/profile'),
       });
       let sent = 0;
       for (const s of candidates) {
