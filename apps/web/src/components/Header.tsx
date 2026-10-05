@@ -1,7 +1,7 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
-import { LogoMark, MenuIcon } from './icons';
+import { LogoMark, MenuIcon, PersonIcon } from './icons';
 import styles from './Header.module.css';
 
 export async function Header() {
@@ -15,12 +15,13 @@ export async function Header() {
       <Link href="/#how">{t('how')}</Link>
       <Link href="/requests">{t('requests')}</Link>
       <Link href="/sellers">{t('sellers')}</Link>
-      {user ? (
-        <Link href="/account">{t('account')}</Link>
-      ) : (
-        <Link href="/login">{t('signIn')}</Link>
-      )}
     </>
+  );
+  const account = (
+    <Link href={user ? '/account' : '/login'} className={styles.account}>
+      <PersonIcon />
+      {user ? t('account') : t('signIn')}
+    </Link>
   );
 
   return (
@@ -40,14 +41,22 @@ export async function Header() {
           >
             {t('switchLocale')}
           </Link>
-          <Link href="/request" className="btn btn-yellow btn-sm">
+          <span className={styles.accountWide}>{account}</span>
+          <Link href="/request" className={`btn btn-yellow btn-sm ${styles.cta}`}>
             {t('cta')}
           </Link>
           <details className={styles.menu}>
             <summary aria-label={t('menu')}>
               <MenuIcon />
             </summary>
-            <nav className={styles.menuPanel}>{nav}</nav>
+            <nav className={styles.menuPanel}>
+              {nav}
+              <hr className={styles.menuLine} />
+              {account}
+              <Link href="/request" className="btn btn-yellow btn-sm">
+                {t('cta')}
+              </Link>
+            </nav>
           </details>
         </div>
       </div>

@@ -25,11 +25,3 @@
 .meta {
   color: var(--muted);
 }
-
-.draft {
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: var(--yellow-soft);
-  color: var(--yellow-ink);
-  font-size: 14px !important;
-}

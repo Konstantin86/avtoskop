@@ -67,7 +67,7 @@ export default async function AdminPage({ params }: Props) {
                   seller: r.sellerName,
                   request: `${r.requestBrand} ${r.requestModel}`,
                 })}{' '}
-                — {r.car}, ${formatNumber(locale, r.priceUsd)}
+                · {r.car}, ${formatNumber(locale, r.priceUsd)}
               </div>
               {r.description && <p className={styles.small}>{r.description}</p>}
               <div className={styles.actions}>

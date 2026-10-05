@@ -117,7 +117,7 @@ export function OfferForm({ requestId, defaults, isUpdate }: Props) {
         <label className="label">
           {t('origin')}
           <select name="originCountry" className="field" defaultValue={v['originCountry'] ?? ''}>
-            <option value="">—</option>
+            <option value="">{t('originNone')}</option>
             <option value="ua">{t('origin_ua')}</option>
             {SOURCE_COUNTRIES.map((c) => (
               <option key={c} value={c}>

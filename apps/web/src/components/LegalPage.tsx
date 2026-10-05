@@ -6,7 +6,7 @@ interface Section {
   body: string;
 }
 
-const UPDATED = new Date('2026-10-04');
+const UPDATED = new Date('2026-10-05');
 
 // Operator details come from the environment, so the text needs no edit at launch.
 function fill(text: string): string {
@@ -29,7 +29,6 @@ export async function LegalPage({ doc, locale }: { doc: 'terms' | 'privacy'; loc
       <article className={styles.doc}>
         <h1>{t(`${doc}.title`)}</h1>
         <p className={styles.meta}>{t('updated', { date })}</p>
-        <p className={styles.draft}>{t('draftNote')}</p>
         {sections.map((s) => (
           <section key={s.title}>
             <h2>{s.title}</h2>

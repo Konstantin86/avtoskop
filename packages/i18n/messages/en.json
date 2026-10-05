@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Avtoskop — describe the car, sellers will offer options",
-    "description": "Post a request for a car — importers, dealers and owners send offers. Your number stays hidden until you decide."
+    "title": "Avtoskop: describe the car, sellers will offer options",
+    "description": "Post a request for a car, and importers, dealers and owners send offers. Your number stays hidden until you decide."
   },
   "header": {
     "how": "How it works",
@@ -17,7 +17,7 @@
   },
   "home": {
     "eyebrow": "For car buyers in Ukraine",
-    "title": "Describe the car — sellers will offer options",
+    "title": "Describe the car, and sellers will offer options",
     "lead": "Importers, dealers and owners send offers for your request. You compare them and decide who gets your number.",
     "ctaRequest": "Post a request",
     "cardTitle": "Which car are you looking for?",
@@ -174,7 +174,7 @@
   "sellers": {
     "eyebrow": "For importers, dealers and sellers",
     "title": "Buyers have already described what they want. Offer your car",
-    "lead": "Avtoskop collects requests from people ready to buy: model, years, budget, region. You browse the requests and send an offer — no cold calls, no paid ads.",
+    "lead": "Avtoskop collects requests from people ready to buy: model, years, budget, region. You browse the requests and send an offer. No cold calls, no paid ads.",
     "ctaBoard": "Browse requests",
     "ctaHow": "How it works",
     "activeCount": "{count, plural, =0 {No active requests yet} one {# active request} other {# active requests}} right now",
@@ -193,10 +193,10 @@
     "whoBuyout": "Buyout firms",
     "whoBuyoutText": "Cars you've already bought and are preparing to sell",
     "whoOwners": "Owners",
-    "whoOwnersText": "Selling your car — find someone looking for exactly that",
+    "whoOwnersText": "Selling your car? Find someone looking for exactly that",
     "rulesTitle": "Rules for all sellers",
     "rule1": "Only real cars with a real all-in price",
-    "rule2": "One offer per request — no spam or duplicates",
+    "rule2": "One offer per request, no spam or duplicates",
     "rule3": "Buyer contacts only with the buyer's consent",
     "rule4": "Phone check for everyone, plus registration details for companies",
     "priceTitle": "What it costs",
@@ -222,18 +222,18 @@
     "offer": "Offer a car",
     "details": "Details",
     "emptyTitle": "No requests yet",
-    "emptyText": "Post your request — sellers will see it here.",
+    "emptyText": "Post your request, and sellers will see it here.",
     "emptyCta": "Post a request",
-    "forSellers": "Are you a seller?",
+    "forSellers": "Selling cars?",
     "forSellersText": "See how to send offers and which rules apply on Avtoskop.",
     "forSellersCta": "For sellers",
     "back": "← All requests",
     "posted": "Posted {when}",
     "notes": "Buyer's wishes",
     "offerTitle": "Have this car?",
-    "offerText": "Send an offer — the buyer sees it next to our price check and decides who gets their number.",
+    "offerText": "Send an offer. The buyer compares it with others and decides who gets their number.",
     "offerCta": "Offer a car",
-    "shareTitle": "Looking for {car} — Avtoskop",
+    "shareTitle": "Looking for {car} | Avtoskop",
     "notFound": "Request not found or already closed.",
     "years": "Years",
     "sellerRules": "Rules for sellers"
@@ -244,7 +244,7 @@
     "start": "Sign in with Telegram",
     "step1": "Open the Avtoskop bot in Telegram",
     "step2": "Tap Start, then Share my number",
-    "step3": "Come back here — sign-in completes automatically",
+    "step3": "Come back here, and sign-in completes automatically",
     "openBot": "Open Telegram",
     "waiting": "Waiting for confirmation in Telegram…",
     "expired": "The link has expired. Please try again.",
@@ -314,7 +314,7 @@
     "submit": "Send offer",
     "update": "Update offer",
     "submitting": "Sending…",
-    "existing": "You've already sent an offer for this request — you can update it.",
+    "existing": "You've already sent an offer for this request. You can update it.",
     "rules": "One offer per request. Only real cars with a real all-in price.",
     "error_generic": "Please check the highlighted fields.",
     "error_car": "Enter the car",
@@ -325,7 +325,8 @@
     "error_link": "The link must start with https://",
     "error_closed": "This request is already closed.",
     "error_limit": "You reached the daily offer limit. New sellers can send 5 a day until we review the profile.",
-    "error_banned": "Your account is blocked for breaking the rules."
+    "error_banned": "Your account is blocked for breaking the rules.",
+    "originNone": "Not specified"
   },
   "account": {
     "title": "Account",
@@ -433,41 +434,52 @@
   },
   "legal": {
     "updated": "Updated: {date}",
-    "draftNote": "Draft. A lawyer should review this text before public launch.",
     "terms": {
       "title": "Terms of use",
       "sections": [
         {
           "title": "1. Who we are",
-          "body": "Avtoskop (avtoskop.com.ua) is an online service where buyers describe the car they want and sellers send them offers. The service is provided by {operator}. Contact: {email}."
+          "body": "Avtoskop (avtoskop.com.ua) is an online service where buyers describe the car they want and sellers send them offers. The service is provided by {operator}. Contact: {email}. The service is currently a free pilot for everyone."
         },
         {
-          "title": "2. Our role",
+          "title": "2. Who can use it",
+          "body": "You must be 18 or older. Sign-in and phone confirmation work through Telegram, so you need a Telegram account."
+        },
+        {
+          "title": "3. Our role",
           "body": "We only connect buyers and sellers. We don't sell cars, aren't a party to any deal, don't take payment for cars, and don't guarantee a car's condition, price or a seller's honesty. All agreements and payments are between buyer and seller."
         },
         {
-          "title": "3. For buyers",
-          "body": "Enter only your own phone number. A request is published after you confirm the number in Telegram. You decide which sellers get your number; this can't be undone. Don't pay a deposit before you have seen the car and documents and signed a contract."
+          "title": "4. For buyers",
+          "body": "Enter only your own phone number. A request is published after you confirm the number in Telegram. Everyone visiting the site can see published requests, and we may share them on social networks to find sellers. Your number is never published. Don't put your name, address or other personal details in the request comment; we hide phones, links and usernames automatically. You decide which sellers get your number, and this can't be undone. Don't pay a deposit before you have seen the car and documents and signed a contract."
         },
         {
-          "title": "4. For sellers",
-          "body": "An offer must be about a real car you can sell or deliver. The price must be all-in, including delivery, customs and registration. You may not demand a deposit without a contract, send the same offer to every request, use buyers' numbers for anything other than this deal, or pass them to others."
+          "title": "5. For sellers",
+          "body": "An offer must be about a real car you can sell or deliver. The price must be all-in, including delivery, customs and registration. You may not demand a deposit without a contract or send the same offer to every request. Once you receive a buyer's number, you are responsible for its use: only to contact the buyer about this deal, with no advertising and no passing it on."
         },
         {
-          "title": "5. Not allowed for anyone",
+          "title": "6. Not allowed for anyone",
           "body": "Fraud, false requests or offers, other people's phone numbers, spam, abuse, cars of illegal origin, or cars registered in russia or belarus."
         },
         {
-          "title": "6. Moderation",
+          "title": "7. Moderation",
           "body": "We may review sellers, limit the number of offers, hide offers and block accounts that break these terms, including after buyer complaints. The \"Verified seller\" badge only means we reviewed the seller's profile and contacts; it doesn't guarantee a deal."
         },
         {
-          "title": "7. Liability",
+          "title": "8. Reports",
+          "body": "To report fraud or illegal content, press \"Report this offer\" or write to {email}. We review reports within 7 days, and obvious fraud as soon as possible."
+        },
+        {
+          "title": "9. Liability",
           "body": "The service is provided as is. We aren't liable for losses from deals between buyers and sellers, but we act on complaints and block offenders."
         },
         {
-          "title": "8. Changes",
-          "body": "We may change these terms; a new version applies from the update date on this page."
+          "title": "10. Law and disputes",
+          "body": "These terms are governed by the law of Ukraine. If something goes wrong, write to {email} first and we will try to resolve it. If that fails, a Ukrainian court decides."
+        },
+        {
+          "title": "11. Changes",
+          "body": "We may change these terms. A new version applies from the update date on this page, and we announce important changes through the Telegram bot."
         }
       ]
     },
@@ -476,30 +488,34 @@
       "sections": [
         {
           "title": "1. Who processes data",
-          "body": "Data is processed by {operator} under the Law of Ukraine \"On Personal Data Protection\". Contact about data: {email}."
+          "body": "Data is processed by {operator} under the Law of Ukraine \"On Personal Data Protection\". Contact about data: {email}. By accepting this policy when you post a request or sign in, you consent to the processing described here."
         },
         {
           "title": "2. What we collect",
           "body": "Buyers: phone number, request details (car, budget, region, wishes, comment), site language, and Telegram ID after the number is confirmed. Sellers: Telegram ID, Telegram name and username, profile details (name, type, region, countries, description) and offers. The site uses only technical cookies for sign-in; there are no advertising cookies."
         },
         {
-          "title": "3. How we protect numbers",
+          "title": "3. What others see",
+          "body": "A published request (car, years, budget, region, wishes and comment) is visible to everyone visiting the site, and we may share it on social networks. A buyer's phone number and Telegram account are never published. Buyers see a seller's profile (name, type, region, description) together with the offer."
+        },
+        {
+          "title": "4. How we protect numbers",
           "body": "A buyer's number is stored only encrypted and shown only to sellers the buyer chose. We don't store sellers' numbers, only a protected fingerprint to prevent duplicate accounts."
         },
         {
-          "title": "4. Why",
-          "body": "To publish requests without contact details, deliver offers, notify you in Telegram about new offers, prevent fraud and duplicates, and handle complaints."
+          "title": "5. Why",
+          "body": "To publish requests without contact details, deliver offers, notify you in Telegram about new requests and offers, prevent fraud and duplicates, and handle complaints."
         },
         {
-          "title": "5. Who we share with",
-          "body": "A buyer's number goes only to sellers the buyer chose. Notifications are sent through Telegram. Data is stored on servers in the EU. We don't sell data or share it with advertisers."
+          "title": "6. Who we share with",
+          "body": "A buyer's number goes only to sellers the buyer chose. After that the seller is responsible for how the number is used, and we can't take it back. Sign-in and notifications work through Telegram, where Telegram's own privacy policy applies. Data is stored on servers in the EU. We don't sell data or share it with advertisers."
         },
         {
-          "title": "6. How long",
-          "body": "While a request or account is active, and 12 months after a request is closed, to handle complaints. Then we delete or anonymise the data."
+          "title": "7. How long",
+          "body": "We keep data while a request or account is active, and as long as needed to handle complaints. You can ask us to delete your data at any time by writing to {email}."
         },
         {
-          "title": "7. Your rights",
+          "title": "8. Your rights",
           "body": "You can ask what data we hold, correct it, withdraw consent or ask us to delete it: write to {email}. We reply within 30 days."
         }
       ]
