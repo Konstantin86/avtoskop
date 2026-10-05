@@ -176,6 +176,10 @@ export const sellers = pgTable('sellers', {
   region: text('region').notNull(),
   countries: text('countries').array().notNull().default([]),
   about: text('about').notNull().default(''),
+  // New-request alerts in Telegram; empty arrays mean all brands / all of Ukraine.
+  brandIds: integer('brand_ids').array().notNull().default([]),
+  serviceRegions: text('service_regions').array().notNull().default([]),
+  alerts: boolean('alerts').notNull().default(true),
   // pending -> verified by an admin; banned sellers can't send offers and their offers are hidden.
   status: text('status').notNull().default('pending'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

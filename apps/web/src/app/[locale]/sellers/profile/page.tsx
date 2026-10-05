@@ -1,6 +1,7 @@
 import { getLocale, getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { redirect } from '@/i18n/navigation';
 import { getCurrentUser, safeReturnTo } from '@/server/auth';
+import { getBrandOptions } from '@/server/brands';
 import { ProfileForm } from './ProfileForm';
 import styles from '../forms.module.css';
 
@@ -33,8 +34,11 @@ export default async function ProfilePage({ params, searchParams }: Props) {
         region: s.region,
         countries: s.countries.join(','),
         about: s.about,
+        brandIds: s.brandIds.join(','),
+        serviceRegions: s.serviceRegions.join(','),
+        alerts: s.alerts ? 'on' : '',
       }
-    : { type: 'importer', name: user.name, region: 'kyiv' };
+    : { type: 'importer', name: user.name, region: 'kyiv', alerts: 'on' };
 
   return (
     <div className={`container ${styles.page}`}>
@@ -45,6 +49,10 @@ export default async function ProfilePage({ params, searchParams }: Props) {
           defaults={defaults}
           regionNames={(await getMessages()).regions as Record<string, string>}
           returnTo={returnTo}
+          brands={(await getBrandOptions()).all.map((b) => ({
+            value: String(b.id),
+            label: b.name,
+          }))}
         />
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { SELLER_TYPES, SOURCE_COUNTRIES } from '@avtoskop/core';
+import { MultiSelect, type Option } from '@/components/MultiSelect';
 import { RegionSelect } from '@/components/RegionSelect';
 import { saveProfileAction, type FormState } from '../actions';
 import styles from '../forms.module.css';
@@ -11,9 +12,10 @@ interface Props {
   defaults: Record<string, string>;
   regionNames: Record<string, string>;
   returnTo: string;
+  brands: Option[];
 }
 
-export function ProfileForm({ defaults, regionNames, returnTo }: Props) {
+export function ProfileForm({ defaults, regionNames, returnTo, brands }: Props) {
   const t = useTranslations('profile');
   const [state, action, pending] = useActionState<FormState, FormData>(saveProfileAction, {
     errors: [],
@@ -22,6 +24,10 @@ export function ProfileForm({ defaults, regionNames, returnTo }: Props) {
   const v = state.values;
   const [type, setType] = useState(v['type'] ?? 'importer');
   const bad = (name: string) => state.errors.includes(name);
+  const list = (name: string) => (v[name] ?? '').split(',').filter(Boolean);
+  const regionOptions = Object.entries(regionNames)
+    .filter(([code]) => code !== 'all')
+    .map(([value, label]) => ({ value, label }));
   const err = (name: string) =>
     bad(name) ? <span className="error-text">{t(`error_${name}` as 'error_name')}</span> : null;
 
@@ -101,6 +107,38 @@ export function ProfileForm({ defaults, regionNames, returnTo }: Props) {
           maxLength={500}
         />
       </label>
+      <fieldset className={styles.alertsBox}>
+        <legend>{t('alertsTitle')}</legend>
+        <p className="hint">{t('alertsLead')}</p>
+        <label className="label" htmlFor="brandIds">
+          {t('alertBrands')}
+          <MultiSelect
+            id="brandIds"
+            name="brandIds"
+            options={brands}
+            defaultValues={list('brandIds')}
+            placeholder={t('addBrand')}
+            emptyLabel={t('allBrands')}
+            removeLabel={t('remove')}
+          />
+        </label>
+        <label className="label" htmlFor="serviceRegions">
+          {t('alertRegions')}
+          <MultiSelect
+            id="serviceRegions"
+            name="serviceRegions"
+            options={regionOptions}
+            defaultValues={list('serviceRegions')}
+            placeholder={t('addRegion')}
+            emptyLabel={t('allRegions')}
+            removeLabel={t('remove')}
+          />
+        </label>
+        <label className={styles.checkRow}>
+          <input type="checkbox" name="alerts" defaultChecked={v['alerts'] === 'on'} />
+          <span>{t('alertsOn')}</span>
+        </label>
+      </fieldset>
       <button type="submit" className="btn btn-yellow btn-lg btn-block" disabled={pending}>
         {pending ? t('saving') : t('save')}
       </button>

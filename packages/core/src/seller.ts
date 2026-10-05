@@ -19,10 +19,16 @@ export const sellerProfileInput = z
     region: z.enum(REGION_CODES),
     countries: z.preprocess(asArray, z.array(z.enum(SOURCE_COUNTRIES))),
     about: z.string().trim().max(500).optional().default(''),
+    brandIds: z.preprocess(asArray, z.array(z.coerce.number().int().positive()).max(40)),
+    serviceRegions: z.preprocess(asArray, z.array(z.enum(REGION_CODES)).max(30)),
+    alerts: z.preprocess((v) => v === true || v === 'on', z.boolean()),
   })
   .transform((s) => ({
     ...s,
     countries: s.type === 'importer' ? [...new Set(s.countries)] : [],
+    brandIds: [...new Set(s.brandIds)],
+    // Choosing "all of Ukraine" is the same as choosing nothing.
+    serviceRegions: s.serviceRegions.includes('all') ? [] : [...new Set(s.serviceRegions)],
   }));
 
 export type SellerProfileInput = z.infer<typeof sellerProfileInput>;
@@ -77,4 +83,28 @@ export function offerLimitPerDay(status: string): number {
     : status === 'pending'
       ? OFFER_LIMITS_PER_DAY.pending
       : 0;
+}
+
+export interface AlertRequest {
+  brandId: number;
+  region: string;
+  importOk: boolean;
+}
+
+export interface AlertSeller {
+  type: string;
+  status: string;
+  alerts: boolean;
+  brandIds: number[];
+  serviceRegions: string[];
+}
+
+// Whether a newly published request should be sent to this seller in Telegram.
+export function requestMatchesSeller(request: AlertRequest, seller: AlertSeller): boolean {
+  if (!seller.alerts || seller.status === 'banned') return false;
+  if (seller.type === 'importer' && !request.importOk) return false;
+  if (seller.brandIds.length > 0 && !seller.brandIds.includes(request.brandId)) return false;
+  // A buyer who accepts any region can be served from anywhere.
+  if (request.region === 'all' || seller.serviceRegions.length === 0) return true;
+  return seller.serviceRegions.includes(request.region);
 }

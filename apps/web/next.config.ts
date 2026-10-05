@@ -8,7 +8,11 @@ try {
   // No .env file, e.g. on the server where Coolify sets the variables.
 }
 
+// Lets other devices on the network open the dev server at SITE_URL (e.g. a phone on Wi-Fi).
+const siteHost = process.env['SITE_URL'] ? new URL(process.env['SITE_URL']).hostname : null;
+
 const config: NextConfig = {
+  ...(siteHost && siteHost !== 'localhost' && { allowedDevOrigins: [siteHost] }),
   transpilePackages: ['@avtoskop/core', '@avtoskop/db', '@avtoskop/i18n'],
   // Type checking runs separately with `pnpm typecheck` (TypeScript 7).
   typescript: { ignoreBuildErrors: true },

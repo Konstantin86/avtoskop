@@ -7,7 +7,13 @@ import {
   hashSecret,
   newSecret,
 } from './contact-crypto.ts';
-import { offerInput, offerLimitPerDay, reportInput, sellerProfileInput } from './seller.ts';
+import {
+  offerInput,
+  offerLimitPerDay,
+  reportInput,
+  requestMatchesSeller,
+  sellerProfileInput,
+} from './seller.ts';
 
 describe('sellerProfileInput', () => {
   it('keeps countries only for importers', () => {
@@ -110,5 +116,64 @@ describe('reportInput', () => {
       comment: 'asked $500 upfront',
     });
     expect(reportInput.safeParse({ reason: 'boring' }).success).toBe(false);
+  });
+});
+
+describe('sellerProfileInput alert settings', () => {
+  const base = { type: 'dealer', name: 'Авто Плюс', region: 'lviv' };
+
+  it('reads brands, regions and the alerts checkbox from form values', () => {
+    const p = sellerProfileInput.parse({
+      ...base,
+      brandIds: '5,9,5',
+      serviceRegions: 'lviv,volyn',
+      alerts: 'on',
+    });
+    expect(p.brandIds).toEqual([5, 9]);
+    expect(p.serviceRegions).toEqual(['lviv', 'volyn']);
+    expect(p.alerts).toBe(true);
+  });
+
+  it('treats "all of Ukraine" as no region filter, and a missing checkbox as off', () => {
+    const p = sellerProfileInput.parse({ ...base, serviceRegions: 'all,lviv' });
+    expect(p.serviceRegions).toEqual([]);
+    expect(p.brandIds).toEqual([]);
+    expect(p.alerts).toBe(false);
+  });
+});
+
+describe('requestMatchesSeller', () => {
+  const seller = {
+    type: 'dealer',
+    status: 'pending',
+    alerts: true,
+    brandIds: [],
+    serviceRegions: [],
+  };
+  const request = { brandId: 5, region: 'lviv', importOk: true };
+
+  it('matches everything when the seller set no filters', () => {
+    expect(requestMatchesSeller(request, seller)).toBe(true);
+  });
+
+  it('filters by brand and region', () => {
+    expect(requestMatchesSeller(request, { ...seller, brandIds: [5] })).toBe(true);
+    expect(requestMatchesSeller(request, { ...seller, brandIds: [7] })).toBe(false);
+    expect(requestMatchesSeller(request, { ...seller, serviceRegions: ['kyiv'] })).toBe(false);
+    expect(
+      requestMatchesSeller({ ...request, region: 'all' }, { ...seller, serviceRegions: ['kyiv'] }),
+    ).toBe(true);
+  });
+
+  it('skips importers when the buyer does not want an imported car', () => {
+    expect(
+      requestMatchesSeller({ ...request, importOk: false }, { ...seller, type: 'importer' }),
+    ).toBe(false);
+    expect(requestMatchesSeller({ ...request, importOk: false }, seller)).toBe(true);
+  });
+
+  it('never alerts banned sellers or sellers who turned alerts off', () => {
+    expect(requestMatchesSeller(request, { ...seller, status: 'banned' })).toBe(false);
+    expect(requestMatchesSeller(request, { ...seller, alerts: false })).toBe(false);
   });
 });

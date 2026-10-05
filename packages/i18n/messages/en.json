@@ -281,7 +281,17 @@
     "error_generic": "Please check the highlighted fields.",
     "error_name": "Enter a name or company (2+ characters)",
     "error_type": "Choose who you are",
-    "error_region": "Choose a region"
+    "error_region": "Choose a region",
+    "alertsTitle": "New-request alerts",
+    "alertsLead": "The bot sends you requests in Telegram that match these brands and regions.",
+    "alertBrands": "Brands",
+    "addBrand": "Add a brand…",
+    "allBrands": "All brands",
+    "alertRegions": "Regions you serve",
+    "addRegion": "Add a region…",
+    "allRegions": "All of Ukraine",
+    "remove": "Remove",
+    "alertsOn": "Send alerts in Telegram"
   },
   "offer": {
     "title": "Your offer",
@@ -347,7 +357,9 @@
     "becomeSellerTitle": "Selling cars?",
     "becomeSellerText": "Create a seller profile to send offers to buyers.",
     "becomeSeller": "Create a seller profile",
-    "status_banned": "Blocked"
+    "status_banned": "Blocked",
+    "alertsOn": "New-request alerts are on",
+    "alertsOff": "New-request alerts are off"
   },
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call the buyer soon.",
@@ -415,7 +427,11 @@
     "requestLink": "Your private link to the offers (don't forward it): {link}",
     "myRequests": "Your requests:",
     "noRequests": "You have no confirmed requests yet. Post a request on the site and confirm it here.",
-    "commandRequests": "My requests and links to offers"
+    "commandRequests": "My requests and links to offers",
+    "newRequest": "🔔 New buyer request\n\n{request}\n{details}\n\nOffer a car: {link}\n\nAlert settings: {settings}",
+    "alertBudget": "up to ${amount}",
+    "alertImportOk": "import is fine",
+    "alertImportNo": "only cars in Ukraine"
   },
   "legal": {
     "updated": "Updated: {date}",

@@ -1,5 +1,6 @@
 import { contactKey } from '@avtoskop/core';
 import { createDb } from '@avtoskop/db';
+import { createSellerAlerts } from './alerts.ts';
 import { createBotHandler } from './handler.ts';
 import { createTelegram } from './telegram.ts';
 import { botText } from './texts.ts';
@@ -13,9 +14,13 @@ function env(name: string): string {
 const log = (m: string) => console.log(`[${new Date().toISOString().slice(11, 19)}] ${m}`);
 const tg = createTelegram(env('TELEGRAM_BOT_TOKEN'));
 const { db, close } = createDb(env('DATABASE_URL'));
+const siteUrl = env('SITE_URL').replace(/\/$/, '');
+const alertSellers = createSellerAlerts(db, tg, siteUrl, log);
 const handle = createBotHandler(db, tg, {
   contactKey: contactKey(process.env['REQUEST_CONTACT_KEY']),
-  siteUrl: env('SITE_URL').replace(/\/$/, ''),
+  siteUrl,
+  onPublished: (ids) =>
+    alertSellers(ids).catch((error: Error) => log(`Seller alerts failed: ${error.message}`)),
 });
 
 let running = true;

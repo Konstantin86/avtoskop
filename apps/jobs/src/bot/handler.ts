@@ -10,6 +10,8 @@ const SELLER_LOCALE = 'uk';
 interface Options {
   contactKey: Buffer;
   siteUrl: string;
+  // Called with the ids of requests that just became public.
+  onPublished?: (requestIds: string[]) => Promise<void>;
 }
 
 function askPhoneKeyboard(locale: string): ReplyMarkup {
@@ -43,7 +45,11 @@ function displayName(m: TelegramMessage): string {
 
 // Seller sign-in (/start login_<code>) and buyer request confirmation (/start req_<id>).
 // Both end with the person sharing their own contact; one shared contact completes both.
-export function createBotHandler(db: Db, tg: Telegram, { contactKey, siteUrl }: Options) {
+export function createBotHandler(
+  db: Db,
+  tg: Telegram,
+  { contactKey, siteUrl, onPublished }: Options,
+) {
   const requestColumns = {
     id: buyerRequests.id,
     brand: brands.name,
@@ -98,6 +104,9 @@ export function createBotHandler(db: Db, tg: Telegram, { contactKey, siteUrl }: 
       );
       await sendLink(chatId, r);
     }
+    const published = rows.filter((r) => r.status === 'active').map((r) => r.id);
+    // Seller alerts run in the background so the buyer's chat isn't held up.
+    if (onPublished && published.length > 0) void onPublished(published).catch(() => {});
   }
 
   // A phone this Telegram account has already proven, as a seller or on an earlier request.

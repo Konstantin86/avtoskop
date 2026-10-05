@@ -123,6 +123,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
         >
           {t('editProfile')}
         </Link>
+        <div className={me.meta}>{seller.alerts ? t('alertsOn') : t('alertsOff')}</div>
       </section>
 
       <section className={me.offers}>

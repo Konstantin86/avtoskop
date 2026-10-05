@@ -29,7 +29,7 @@ function formValues(formData: FormData, multi: string[] = []): Record<string, st
 }
 
 export async function saveProfileAction(_prev: FormState, formData: FormData): Promise<FormState> {
-  const values = formValues(formData, ['countries']);
+  const values = formValues(formData, ['countries', 'brandIds', 'serviceRegions']);
   const user = await getCurrentUser();
   if (!user) return { errors: [], formError: 'generic', values };
 

@@ -17,9 +17,12 @@ export {
   offerLimitPerDay,
   REPORT_REASONS,
   reportInput,
+  requestMatchesSeller,
   sellerProfileInput,
   SELLER_TYPES,
   SOURCE_COUNTRIES,
+  type AlertRequest,
+  type AlertSeller,
   type OfferInput,
   type SellerProfileInput,
 } from './seller.ts';
