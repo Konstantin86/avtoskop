@@ -167,6 +167,19 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes }: Props)
         <span className="hint">{t('featuresHint')}</span>
       </fieldset>
       <label className="label">
+        {t('vin')}
+        <input
+          name="vin"
+          className="field"
+          defaultValue={v['vin']}
+          maxLength={25}
+          autoCapitalize="characters"
+          spellCheck={false}
+          {...invalid('vin')}
+        />
+        {err('vin') ?? <span className="hint">{t('vinHint')}</span>}
+      </label>
+      <label className="label">
         {t('description')}
         <textarea
           name="description"

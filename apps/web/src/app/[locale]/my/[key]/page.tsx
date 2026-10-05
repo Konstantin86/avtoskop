@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { ConfirmButton } from '@/components/ConfirmButton';
-import { matchedWishes, REPORT_REASONS, WISHES } from '@avtoskop/core';
+import { matchedWishes, REPORT_REASONS, vinMismatches, WISHES } from '@avtoskop/core';
 import { FlagEU, FlagUS, ShieldIcon } from '@/components/icons';
 import { TelegramConfirm } from '@/components/TelegramConfirm';
 import { formatNumber, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { getRequestByKey, listRequestOffers, markOffersShown } from '@/server/buyer';
 import { botStartLink } from '@/server/telegram';
+import { wantedByVin, wantedListDate } from '@/server/vin';
 import {
   declineOfferAction,
   reportOfferAction,
@@ -49,6 +50,11 @@ export default async function MyRequestPage({ params }: Props) {
   }
 
   const offerList = await listRequestOffers(request.id);
+  const [wanted, wantedDate] = await Promise.all([
+    wantedByVin(offerList.flatMap((o) => (o.vin ? [o.vin] : []))),
+    wantedListDate(),
+  ]);
+  const shortDate = (d: Date) => d.toLocaleDateString(locale === 'uk' ? 'uk-UA' : 'en-GB');
   await markOffersShown(request.id);
   const regions = (await getMessages()).regions as Record<string, string>;
   const closed = request.status === 'closed';
@@ -142,6 +148,35 @@ export default async function MyRequestPage({ params }: Props) {
                     <span>{t('turnkey')}</span>
                   </div>
                 </div>
+                {offer.vin && (
+                  <div className={styles.vin}>
+                    <div>
+                      <span className={styles.vinLabel}>VIN</span> <code>{offer.vin}</code>
+                    </div>
+                    {wanted.has(offer.vin) ? (
+                      <div className={styles.vinBad}>
+                        ⚠ {t('vinWanted', { date: wantedDate ? shortDate(wantedDate) : '' })}
+                      </div>
+                    ) : (
+                      wantedDate && (
+                        <div className={styles.vinGood}>
+                          ✓ {t('vinNotWanted', { date: shortDate(wantedDate) })}
+                        </div>
+                      )
+                    )}
+                    {offer.vinDecoded &&
+                      (() => {
+                        const d = offer.vinDecoded;
+                        const car = [d.make, d.model, d.year].filter(Boolean).join(' ');
+                        return vinMismatches(offer, d).length > 0 ? (
+                          <div className={styles.vinWarn}>⚠ {t('vinMismatch', { car })}</div>
+                        ) : (
+                          <div className={styles.vinGood}>✓ {t('vinMatches', { car })}</div>
+                        );
+                      })()}
+                    <span className={styles.claim}>{t('vinSources')}</span>
+                  </div>
+                )}
                 {offer.features.length > 0 && (
                   <div className={styles.features}>
                     {request.wishes.length > 0 && (

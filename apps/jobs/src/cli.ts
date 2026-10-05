@@ -4,6 +4,7 @@ import { createDb, sourceRequests } from '@avtoskop/db';
 import { createAutoriaClient } from './autoria/client.ts';
 import { createCollector, DIMENSIONS, type Dimension } from './autoria/collector.ts';
 import { MODEL_BRANDS } from './autoria/model-brands.ts';
+import { importWanted } from './mvs/wanted.ts';
 import { trackedModels } from './autoria/tracked-models.ts';
 import { addDemoRequests, clearDemoRequests } from './demo-requests.ts';
 
@@ -16,6 +17,7 @@ Commands:
   status    [--model 715]          coverage and quota use
   brands                           import all auto.ria brands (1 request, cached 30 days)
   models                           import model lists for popular brands (1 request per brand)
+  wanted                           load the MVS wanted-vehicles list (skipped if unchanged)
   demo-requests [--clear]          add (or remove) sample buyer requests for local development`;
 
 function env(name: string): string {
@@ -82,6 +84,8 @@ try {
     else log(`Added ${await addDemoRequests(db)} demo requests`);
   } else if (command === 'brands') {
     log(`Imported ${await collector.importBrands()} brands`);
+  } else if (command === 'wanted') {
+    await importWanted(db, log);
   } else if (command === 'models') {
     log(`Imported ${await collector.importModels(MODEL_BRANDS)} models`);
   } else if (command === 'status') {

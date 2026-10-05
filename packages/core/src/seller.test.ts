@@ -201,3 +201,25 @@ describe('offer features', () => {
     expect(matchedWishes([], ['awd'])).toEqual([]);
   });
 });
+
+describe('offer VIN', () => {
+  const base = {
+    car: 'Toyota RAV4',
+    year: '2021',
+    mileageKm: '40000',
+    priceUsd: '25000',
+    availability: 'in_ukraine',
+  };
+
+  it('is optional and normalised', () => {
+    expect(offerInput.parse(base).vin).toBeUndefined();
+    expect(offerInput.parse({ ...base, vin: ' ' }).vin).toBeUndefined();
+    expect(offerInput.parse({ ...base, vin: '1hgcm82633a004352' }).vin).toBe('1HGCM82633A004352');
+  });
+
+  it('rejects a VIN with a typo', () => {
+    const result = offerInput.safeParse({ ...base, vin: '1HGCM82643A004352' });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(['vin']);
+  });
+});

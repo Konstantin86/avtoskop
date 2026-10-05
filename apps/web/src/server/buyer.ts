@@ -49,6 +49,8 @@ export async function listRequestOffers(requestId: string) {
         link: offers.link,
         description: offers.description,
         features: offers.features,
+        vin: offers.vin,
+        vinDecoded: offers.vinDecoded,
         status: offers.status,
         createdAt: offers.createdAt,
         reported: isNotNull(reports.id).mapWith(Boolean),

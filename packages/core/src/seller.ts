@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { REGION_CODES, WISHES } from './request.ts';
+import { normalizeVin, vinProblem } from './vin.ts';
 
 export const SELLER_TYPES = ['importer', 'dealer', 'buyout', 'owner'] as const;
 export const SOURCE_COUNTRIES = ['us', 'eu', 'kr', 'cn', 'jp', 'ca'] as const;
@@ -62,6 +63,13 @@ export const offerInput = z
         .optional(),
     ),
     description: z.string().trim().max(1000).optional().default(''),
+    vin: z.preprocess(
+      (v) => (typeof v === 'string' && v.trim() !== '' ? normalizeVin(v) : undefined),
+      z
+        .string()
+        .refine((v) => vinProblem(v) === null)
+        .optional(),
+    ),
     features: z.preprocess(
       (v) => [...new Set(asArray(v) as unknown[])],
       z.array(z.enum(OFFER_FEATURES)),

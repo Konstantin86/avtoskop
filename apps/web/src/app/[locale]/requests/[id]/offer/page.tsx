@@ -52,6 +52,7 @@ export default async function OfferPage({ params }: Props) {
         link: existing.link ?? '',
         description: existing.description,
         features: existing.features.join(','),
+        vin: existing.vin ?? '',
       }
     : { car: `${request.brand} ${request.model}`, availability: 'in_ukraine' };
 

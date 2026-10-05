@@ -206,6 +206,9 @@ export const offers = pgTable(
     originCountry: text('origin_country'),
     link: text('link'),
     description: text('description').notNull().default(''),
+    // Shown only to the buyer. vinDecoded holds make/model/year from the NHTSA decoder.
+    vin: text('vin'),
+    vinDecoded: jsonb('vin_decoded').$type<{ make: string; model: string; year: number | null }>(),
     // Seller's claims about the car: buyer wishes it meets plus offer extras (OFFER_FEATURES).
     features: text('features').array().notNull().default([]),
     status: text('status').notNull().default('sent'),
@@ -239,6 +242,28 @@ export const reports = pgTable(
     index('reports_status_idx').on(t.status, t.createdAt),
   ],
 );
+
+// Cars the police are looking for, from MVS open data on data.gov.ua (only rows with a valid VIN).
+export const wantedVehicles = pgTable(
+  'wanted_vehicles',
+  {
+    id: serial('id').primaryKey(),
+    vin: text('vin').notNull(),
+    brandModel: text('brand_model').notNull(),
+    color: text('color').notNull().default(''),
+    seizedAt: timestamp('seized_at', { withTimezone: true }),
+  },
+  (t) => [index('wanted_vehicles_vin_idx').on(t.vin)],
+);
+
+// When each bulk open-data source was last loaded, and how fresh its content is.
+export const dataSnapshots = pgTable('data_snapshots', {
+  source: text('source').primaryKey(),
+  asOf: timestamp('as_of', { withTimezone: true }),
+  fileModified: text('file_modified'),
+  rows: integer('rows').notNull(),
+  importedAt: timestamp('imported_at', { withTimezone: true }).notNull().defaultNow(),
+});
 
 // Every call to an outside API, cached or not, so we can see quota use.
 export const sourceRequests = pgTable(

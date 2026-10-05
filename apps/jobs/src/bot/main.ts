@@ -1,5 +1,6 @@
 import { contactKey } from '@avtoskop/core';
 import { createDb } from '@avtoskop/db';
+import { importWanted } from '../mvs/wanted.ts';
 import { createSellerAlerts } from './alerts.ts';
 import { createBotHandler } from './handler.ts';
 import { createTelegram } from './telegram.ts';
@@ -49,6 +50,15 @@ await tg.setMyCommands(
 );
 log(`Bot @${me.username} is running (long polling)`);
 
+// The bot process also keeps the wanted-vehicles list fresh: at start, then daily.
+const DAY_MS = 24 * 60 * 60 * 1000;
+const refreshWanted = () =>
+  importWanted(db, log).catch((error: Error) =>
+    log(`Wanted list refresh failed: ${error.message}`),
+  );
+void refreshWanted();
+const wantedTimer = setInterval(refreshWanted, DAY_MS);
+
 // Long polling needs no public URL, so the bot also runs on a laptop.
 let offset = 0;
 while (running) {
@@ -69,5 +79,6 @@ while (running) {
     await new Promise((r) => setTimeout(r, 5000));
   }
 }
+clearInterval(wantedTimer);
 await close();
 log('Bot stopped');

@@ -8,6 +8,7 @@ import { redirect } from '@/i18n/navigation';
 import { getCurrentUser, safeReturnTo } from '@/server/auth';
 import { db } from '@/server/db';
 import { notifyBuyerOfOffer, notifyBuyerOfPriceDrop } from '@/server/notify';
+import { decodeVin } from '@/server/vin';
 
 export interface FormState {
   errors: string[];
@@ -82,6 +83,8 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
       status: offers.status,
       priceUsd: offers.priceUsd,
       notifiedPriceUsd: offers.notifiedPriceUsd,
+      vin: offers.vin,
+      vinDecoded: offers.vinDecoded,
     })
     .from(offers)
     .where(and(eq(offers.requestId, requestId), eq(offers.sellerId, seller.id)));
@@ -100,6 +103,15 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     }
   }
 
+  // Decode only when the VIN is new or changed; the decoder is an outside service.
+  const vin = o.vin ?? null;
+  const vinDecoded =
+    vin === null
+      ? null
+      : existing?.vin === vin && existing.vinDecoded
+        ? existing.vinDecoded
+        : await decodeVin(vin);
+
   const row = {
     car: o.car,
     year: o.year,
@@ -111,6 +123,8 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     link: o.link ?? null,
     description: o.description,
     features: o.features,
+    vin,
+    vinDecoded,
   };
   const [saved] = await db
     .insert(offers)

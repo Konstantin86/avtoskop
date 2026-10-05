@@ -39,3 +39,13 @@ export {
   newSecret,
 } from './contact-crypto.ts';
 export { LOCALE_URL_PREFIX, localePath } from './locale.ts';
+export {
+  isVinFormatValid,
+  normalizeVin,
+  usesCheckDigit,
+  vinCheckDigit,
+  vinMismatches,
+  vinProblem,
+  type DecodedVin,
+  type VinProblem,
+} from './vin.ts';

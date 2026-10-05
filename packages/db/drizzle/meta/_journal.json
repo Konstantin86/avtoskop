@@ -71,6 +71,13 @@
       "when": 1791228938073,
       "tag": "0009_true_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791229633240,
+      "tag": "0010_pretty_sumo",
+      "breakpoints": true
     }
   ]
 }

@@ -205,3 +205,40 @@
   font-size: 12px;
   color: var(--muted);
 }
+
+.vin {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-muted);
+  font-size: 14px;
+}
+
+.vin code {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.vinLabel {
+  font-weight: 700;
+}
+
+.vinGood {
+  color: var(--good);
+  font-weight: 600;
+}
+
+.vinWarn {
+  color: var(--yellow-ink);
+  font-weight: 600;
+}
+
+.vinBad {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 700;
+}
