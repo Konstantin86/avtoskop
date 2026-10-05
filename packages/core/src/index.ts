@@ -7,6 +7,7 @@ export {
   GEARBOXES,
   WISHES,
   NOTIFY_CHANNELS,
+  canonicalModel,
   REGION_CODES,
   type BuyerRequestInput,
 } from './request.ts';

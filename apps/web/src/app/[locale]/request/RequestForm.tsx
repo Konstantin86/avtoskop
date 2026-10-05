@@ -1,9 +1,10 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FUELS, GEARBOXES, WISHES } from '@avtoskop/core';
 import { BrandSelect } from '@/components/BrandSelect';
+import { ModelInput } from '@/components/ModelInput';
 import { TelegramIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import type { BrandOption } from '@/server/brands';
@@ -26,6 +27,7 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
   });
 
   const v = state.values;
+  const [brandId, setBrandId] = useState(v['brandId'] ?? '');
   const bad = (name: string) => state.errors.includes(name);
   const err = (name: string) =>
     bad(name) ? (
@@ -60,20 +62,20 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
               }}
               defaultValue={v['brandId']}
               invalid={bad('brandId')}
+              onChange={setBrandId}
             />
             {err('brandId')}
           </label>
           <label className="label">
             {f('model')}
-            <input
-              name="model"
-              className="field"
+            <ModelInput
+              brandId={brandId}
               defaultValue={v['model']}
               placeholder={f('modelPlaceholder')}
-              maxLength={60}
-              {...invalid('model')}
+              invalid={bad('model') || bad('modelUnknown')}
+              unknownLabel={t('error_modelUnknown')}
             />
-            {err('model')}
+            {err('model') ?? err('modelUnknown')}
           </label>
         </div>
         <div className={styles.pair}>

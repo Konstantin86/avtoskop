@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buyerRequestInput, normalizeUaPhone, slugify } from './index.ts';
+import { buyerRequestInput, canonicalModel, normalizeUaPhone, slugify } from './index.ts';
 
 describe('slugify', () => {
   it.each([
@@ -90,5 +90,21 @@ describe('buyerRequestInput', () => {
 
   it('rejects reversed years', () => {
     expect(buyerRequestInput.safeParse({ ...valid, yearTo: '2015' }).success).toBe(false);
+  });
+});
+
+describe('canonicalModel', () => {
+  const known = ['Land Cruiser', 'Land Cruiser Prado', 'RAV4', 'C-HR'];
+
+  it('fixes case, spaces and hyphens to the official name', () => {
+    expect(canonicalModel('land cruiser', known)).toBe('Land Cruiser');
+    expect(canonicalModel('Land-Cruiser', known)).toBe('Land Cruiser');
+    expect(canonicalModel('rav 4', known)).toBe('RAV4');
+    expect(canonicalModel('chr', known)).toBe('C-HR');
+  });
+
+  it('keeps unknown or partial names as typed', () => {
+    expect(canonicalModel('Prado', known)).toBe('Prado');
+    expect(canonicalModel('Sequoia', known)).toBe('Sequoia');
   });
 });

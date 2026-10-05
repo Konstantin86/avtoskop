@@ -280,5 +280,42 @@ export function createCollector(client: AutoriaClient, db: Db, log: (m: string) 
     return rows.length;
   }
 
-  return { partition, recent, details, summary, importBrands };
+  // Fetches the model list for each named brand; returns how many models were saved.
+  async function importModels(brandNames: string[]): Promise<number> {
+    const rows = await db
+      .select({ id: brands.id, name: brands.name, autoriaId: brands.autoriaId })
+      .from(brands)
+      .where(inArray(brands.name, brandNames));
+    let total = 0;
+    for (const brand of rows) {
+      if (!brand.autoriaId) continue;
+      const list = namedValueList.parse(
+        await client.get(`/auto/categories/1/marks/${brand.autoriaId}/models`, {}, TTL.reference),
+      );
+      if (list.length === 0) continue;
+      const used = new Set<string>();
+      const values = list.map((m) => {
+        let slug = slugify(m.name) || `model-${m.value}`;
+        if (used.has(slug)) slug = `${slug}-${m.value}`;
+        used.add(slug);
+        return { brandId: brand.id, name: m.name, slug, autoriaId: m.value };
+      });
+      await db
+        .insert(models)
+        .values(values)
+        .onConflictDoUpdate({
+          target: models.autoriaId,
+          set: {
+            name: sql`excluded.name`,
+            slug: sql`excluded.slug`,
+            brandId: sql`excluded.brand_id`,
+          },
+        });
+      total += values.length;
+      log(`${brand.name}: ${values.length} models`);
+    }
+    return total;
+  }
+
+  return { partition, recent, details, summary, importBrands, importModels };
 }

@@ -92,3 +92,12 @@ export const buyerRequestInput = z
   });
 
 export type BuyerRequestInput = z.infer<typeof buyerRequestInput>;
+
+const modelKey = (name: string) => name.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+
+// Returns the official spelling when the typed model matches a known one ("land cruiser",
+// "Land-Cruiser" → "Land Cruiser"); otherwise keeps what the buyer typed.
+export function canonicalModel(typed: string, known: readonly string[]): string {
+  const key = modelKey(typed);
+  return known.find((name) => modelKey(name) === key) ?? typed;
+}

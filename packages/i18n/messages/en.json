@@ -113,7 +113,8 @@
     "error_limit": "This number already has several requests today. Please try tomorrow.",
     "error_server": "Could not save the request. Please try again.",
     "error_gearbox": "Choose a gearbox",
-    "error_wishes": "Check the selected wishes"
+    "error_wishes": "Check the selected wishes",
+    "error_modelUnknown": "Choose a model from the list"
   },
   "sent": {
     "title": "Request published",
@@ -362,7 +363,7 @@
     "alertsOff": "New-request alerts are off"
   },
   "notify": {
-    "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call the buyer soon.",
+    "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call or message the buyer soon.",
     "newOffer": "🚗 New offer for your request {request}:\n{offer}\n\nView it and decide who gets your number: {link}"
   },
   "my": {

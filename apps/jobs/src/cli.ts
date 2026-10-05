@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util';
 import { createDb, sourceRequests } from '@avtoskop/db';
 import { createAutoriaClient } from './autoria/client.ts';
 import { createCollector, DIMENSIONS, type Dimension } from './autoria/collector.ts';
+import { MODEL_BRANDS } from './autoria/model-brands.ts';
 import { trackedModels } from './autoria/tracked-models.ts';
 import { addDemoRequests, clearDemoRequests } from './demo-requests.ts';
 
@@ -14,6 +15,7 @@ Commands:
   details   --id <auto.ria id>     full details for one listing
   status    [--model 715]          coverage and quota use
   brands                           import all auto.ria brands (1 request, cached 30 days)
+  models                           import model lists for popular brands (1 request per brand)
   demo-requests [--clear]          add (or remove) sample buyer requests for local development`;
 
 function env(name: string): string {
@@ -80,6 +82,8 @@ try {
     else log(`Added ${await addDemoRequests(db)} demo requests`);
   } else if (command === 'brands') {
     log(`Imported ${await collector.importBrands()} brands`);
+  } else if (command === 'models') {
+    log(`Imported ${await collector.importModels(MODEL_BRANDS)} models`);
   } else if (command === 'status') {
     const hourAgo = Date.now() - 60 * 60 * 1000;
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();

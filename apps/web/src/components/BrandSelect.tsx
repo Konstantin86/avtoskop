@@ -6,9 +6,10 @@ interface Props {
   labels: { placeholder: string; popular: string; all: string };
   defaultValue?: string | undefined;
   invalid?: boolean;
+  onChange?: (brandId: string) => void;
 }
 
-export function BrandSelect({ id, brands, labels, defaultValue, invalid }: Props) {
+export function BrandSelect({ id, brands, labels, defaultValue, invalid, onChange }: Props) {
   return (
     <select
       id={id}
@@ -16,6 +17,7 @@ export function BrandSelect({ id, brands, labels, defaultValue, invalid }: Props
       className="field"
       defaultValue={defaultValue ?? ''}
       aria-invalid={invalid || undefined}
+      onChange={onChange && ((e) => onChange(e.target.value))}
       required
     >
       <option value="" disabled>

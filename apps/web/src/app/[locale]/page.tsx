@@ -1,5 +1,5 @@
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { BrandSelect } from '@/components/BrandSelect';
+import { BrandModelFields } from '@/components/BrandModelFields';
 import { GaugeIcon, LockIcon, ShieldIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import { Link } from '@/i18n/navigation';
@@ -54,27 +54,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </p>
           </div>
           <div className={styles.pair}>
-            <label className="label" htmlFor="q-brand">
-              {f('brand')}
-              <BrandSelect
-                id="q-brand"
-                brands={brands}
-                labels={{
-                  placeholder: f('brandPlaceholder'),
-                  popular: f('popularBrands'),
-                  all: f('allBrands'),
-                }}
-              />
-            </label>
-            <label className="label">
-              {f('model')}
-              <input
-                name="model"
-                className="field"
-                placeholder={f('modelPlaceholder')}
-                maxLength={60}
-              />
-            </label>
+            <BrandModelFields
+              idPrefix="q"
+              brands={brands}
+              labels={{
+                brand: f('brand'),
+                model: f('model'),
+                brandPlaceholder: f('brandPlaceholder'),
+                modelPlaceholder: f('modelPlaceholder'),
+                popular: f('popularBrands'),
+                all: f('allBrands'),
+              }}
+            />
           </div>
           <div className={styles.pair}>
             <label className="label">

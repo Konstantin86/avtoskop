@@ -1,12 +1,13 @@
 'use server';
 
 import { and, count, eq, gt } from 'drizzle-orm';
-import { buyerRequestInput, hashSecret, newSecret } from '@avtoskop/core';
+import { buyerRequestInput, canonicalModel, hashSecret, newSecret } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
 import { encryptContact, hashContact } from '@/server/contact';
 import { db } from '@/server/db';
+import { modelNames } from '@/server/models';
 
 const MAX_REQUESTS_PER_PHONE_PER_DAY = 3;
 
@@ -32,9 +33,20 @@ export async function submitRequest(
     ? (values['locale'] as Locale)
     : routing.defaultLocale;
 
+  // Brands with a known model list only accept models from that list. Checked before the
+  // other fields so the buyer sees every problem at once.
+  const brandId = Number(values['brandId']);
+  const typedModel = (values['model'] ?? '').trim();
+  const known = Number.isInteger(brandId) && brandId > 0 ? await modelNames(brandId) : [];
+  const model = canonicalModel(typedModel, known);
+  const modelUnknown = typedModel !== '' && known.length > 0 && !known.includes(model);
+
   const parsed = buyerRequestInput.safeParse(values);
-  if (!parsed.success) {
-    const errors = [...new Set(parsed.error.issues.map((i) => String(i.path[0])))];
+  if (!parsed.success || modelUnknown) {
+    const errors = parsed.success
+      ? []
+      : [...new Set(parsed.error.issues.map((i) => String(i.path[0])))];
+    if (modelUnknown) errors.push('modelUnknown');
     return { errors, formError: 'generic', values };
   }
   const input = parsed.data;
@@ -65,7 +77,7 @@ export async function submitRequest(
       .insert(buyerRequests)
       .values({
         brandId: input.brandId,
-        model: input.model,
+        model,
         yearFrom: input.yearFrom,
         yearTo: input.yearTo ?? null,
         budgetUsd: input.budgetUsd,
