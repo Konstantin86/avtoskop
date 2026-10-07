@@ -13,7 +13,10 @@
     "switchLocaleLabel": "Українська версія",
     "requests": "Buyer requests",
     "account": "Account",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "theme_system": "Theme: follow device. Click to change",
+    "theme_light": "Theme: light. Click to change",
+    "theme_dark": "Theme: dark. Click to change"
   },
   "home": {
     "eyebrow": "For car buyers in Ukraine",
@@ -55,7 +58,8 @@
     "perk3Title": "You choose who replies",
     "perk3Text": "Owners only, or importers and dealers too: it's your call",
     "finalTitle": "Describe the car you're looking for",
-    "finalNote": "Two minutes. Free. Your number stays hidden"
+    "finalNote": "Two minutes. Free. Your number stays hidden",
+    "liveWeek": "{requests, plural, one {# request} other {# requests}} and {offers, plural, one {# offer} other {# offers}} in the last week"
   },
   "fields": {
     "brand": "Make",
@@ -157,7 +161,8 @@
     "openOffers": "Go to offers",
     "titlePending": "One step left",
     "telegramDoneTitle": "Number confirmed",
-    "telegramDoneText": "Offers will arrive in Telegram"
+    "telegramDoneText": "Offers will arrive in Telegram",
+    "telegramQr": "Telegram on your phone? Point the camera at the code to open the bot there. This page updates by itself."
   },
   "footer": {
     "copyright": "© Avtoskop, {year}",
@@ -381,7 +386,10 @@
     "error_vin": "Check the VIN: 17 characters, no letters I, O, Q",
     "error_vinMismatch": "By VIN this is {car}, which doesn't match the offer or the brand the buyer wants. Check the VIN and the car name. If everything is right, send the offer again.",
     "notAllowed": "This buyer accepts offers only from: {types}. Your profile type doesn't match, so you can't send an offer.",
-    "error_notAllowed": "This buyer accepts offers only from certain seller types."
+    "error_notAllowed": "This buyer accepts offers only from certain seller types.",
+    "copyFrom": "Copy from a previous offer",
+    "copyPick": "Choose an offer…",
+    "copyHint": "Fills the form with that offer's details. Check and change anything before sending."
   },
   "account": {
     "title": "Account",
@@ -414,7 +422,11 @@
     "status_banned": "Blocked",
     "alertsOn": "New-request alerts are on",
     "alertsOff": "New-request alerts are off",
-    "updated": "Offer updated. The buyer will see the changes on their offers page."
+    "updated": "Offer updated. The buyer will see the changes on their offers page.",
+    "forYouTitle": "Requests for you",
+    "forYouEmpty": "No new requests for your brands and regions yet. We'll send them to Telegram as soon as they appear.",
+    "forYouOffer": "Make an offer",
+    "forYouHint": "Matched to the brands, regions and seller type in your profile."
   },
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call or message the buyer soon.",
@@ -433,7 +445,6 @@
     "sellerVerified": "Verified seller",
     "sellerNew": "New seller",
     "share": "Share my number",
-    "shareConfirm": "The seller will get your phone number and can call you. This can't be undone. Continue?",
     "shared": "Number shared. The seller got it in Telegram and will call you.",
     "decline": "Not interested",
     "declined": "You declined this offer.",
@@ -442,7 +453,7 @@
     "closeText": "Close the request: it leaves the board and no new offers arrive.",
     "close": "Close request",
     "reopenTitle": "Request closed",
-    "reopenText": "Sellers can't see it. You can open it again.",
+    "reopenText": "Sellers can't see it. If you open it again, it stays open for another 30 days.",
     "reopen": "Open again",
     "closedNotice": "Request closed. No new offers arrive.",
     "keepLink": "This is your private link. Don't share it with other people.",
@@ -474,7 +485,16 @@
     "vinMismatch": "By VIN this is {car}. It doesn't match the offer; ask the seller.",
     "vinSources": "Sources: MVS open data (data.gov.ua) and the NHTSA VIN decoder. For the car's full history, use services such as Carfax or AutoCheck.",
     "vinOtherBrand": "By VIN this is a {make}, but you were looking for {brand}. Ask the seller.",
-    "vinCheckOfficial": "Check the current status on the MVS website (enter the last 6 VIN characters: {last6})"
+    "vinCheckOfficial": "Check the current status on the MVS website (enter the last 6 VIN characters: {last6})",
+    "confirmQr": "Telegram on your phone? Point the camera at the code to open the bot there. This page updates by itself.",
+    "reached": "{count, plural, one {Your request reached # seller} other {Your request reached # sellers}}",
+    "shareTitle": "Share your number with \"{seller}\"?",
+    "shareText": "The seller gets your number in Telegram and can call or message you. This can't be undone.",
+    "shareSafety": "Don't pay a deposit before you've seen the car and documents and signed a contract.",
+    "shareYes": "Yes, share my number",
+    "shareCancel": "Cancel",
+    "activeUntil": "Request open until {date}",
+    "extend": "Extend by 30 days"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
@@ -496,7 +516,10 @@
     "newRequest": "🔔 New buyer request\n\n{request}\n{details}\n\nOffer a car: {link}\n\nAlert settings: {settings}",
     "alertBudget": "up to ${amount}",
     "alertImportOk": "import is fine",
-    "alertImportNo": "only cars in Ukraine"
+    "alertImportNo": "only cars in Ukraine",
+    "requestReached": "📣 Your request reached {sellers}. As soon as someone sends an offer, we'll tell you here.",
+    "requestExpiring": "⏳ Your request \"{request}\" closes on {date}. If you are still looking, extend it by 30 days: {link}",
+    "requestExpired": "Your request \"{request}\" closed after 30 days. If you are still looking, open it again: {link}"
   },
   "legal": {
     "updated": "Updated: {date}",
@@ -558,7 +581,7 @@
         },
         {
           "title": "2. What we collect",
-          "body": "Buyers: phone number, request details (car, budget, region, wishes, comment), site language, and Telegram ID after the number is confirmed. Sellers: Telegram ID, Telegram name and username, profile details (name, type, region, countries, description) and offers. The site uses only technical cookies for sign-in; there are no advertising cookies."
+          "body": "Buyers: phone number, request details (car, budget, region, wishes, comment), site language, and Telegram ID after the number is confirmed. Sellers: Telegram ID, Telegram name and username, profile details (name, type, region, countries, description) and offers. The site uses only technical cookies for sign-in; there are no advertising cookies. We count page views without cookies or IP addresses, only as daily totals."
         },
         {
           "title": "3. What others see",
@@ -608,6 +631,31 @@
     "vinFlag_wanted": "Wanted by police",
     "vinFlag_otherBrand": "Not the requested brand",
     "vinFlag_mismatch": "Doesn't match the offer",
-    "vinOffer": "{seller}, request {request}, offer: {car}"
+    "vinOffer": "{seller}, request {request}, offer: {car}",
+    "statsTitle": "Statistics",
+    "statsWeek": "7 days",
+    "statsMonth": "30 days",
+    "stat_views": "Page views",
+    "stat_requests": "New requests",
+    "stat_confirmed": "Confirmed requests",
+    "stat_offersSent": "Offers",
+    "stat_shared": "Numbers shared",
+    "stat_newSellers": "New sellers",
+    "statsSources": "Traffic sources (30 days)",
+    "statsPages": "Pages (30 days)",
+    "statsEmpty": "No data yet.",
+    "statsNote": "Views are counted without cookies or IP addresses. To see which posts bring people, add ?utm_source=instagram (or threads, x, telegram) to your links."
+  },
+  "og": {
+    "brand": "Avtoskop",
+    "domain": "avtoskop.com.ua",
+    "homeEyebrow": "For car buyers in Ukraine",
+    "homeTitle": "Describe the car, and sellers will offer options",
+    "homeLine": "Importers, dealers and owners. Your number stays hidden.",
+    "sellersEyebrow": "For importers, dealers and sellers",
+    "sellersTitle": "Buyers have already said what they want",
+    "sellersLine": "New requests in Telegram. Free during the pilot.",
+    "requestEyebrow": "Looking for a car",
+    "requestFooter": "Have this car? Make an offer on avtoskop.com.ua"
   }
 }

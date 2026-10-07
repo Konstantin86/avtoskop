@@ -108,3 +108,15 @@ export async function submitRequest(
   redirect({ href: { pathname: '/request/sent', query: { id, key } }, locale });
   return { errors: [], values };
 }
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Whether the buyer has confirmed the request in Telegram yet (public requests show this anyway).
+export async function requestConfirmedAction(id: string): Promise<boolean> {
+  if (typeof id !== 'string' || !UUID.test(id)) return false;
+  const [row] = await db
+    .select({ verified: buyerRequests.phoneVerified })
+    .from(buyerRequests)
+    .where(eq(buyerRequests.id, id));
+  return row?.verified ?? false;
+}

@@ -3,7 +3,7 @@ import { sellerTypeAllowed } from '@avtoskop/core';
 import { formatNumber, fuelsLabel, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
-import { getOwnOffer } from '@/server/offers';
+import { getOwnOffer, listOfferTemplates } from '@/server/offers';
 import { getPublicRequest } from '@/server/requests';
 import { OfferForm } from './OfferForm';
 import styles from '../../../sellers/forms.module.css';
@@ -61,6 +61,7 @@ export default async function OfferPage({ params }: Props) {
   }
 
   const existing = await getOwnOffer(id, user.seller.id);
+  const templates = existing ? [] : await listOfferTemplates(user.seller.id);
   const defaults: Record<string, string> = existing
     ? {
         car: existing.car,
@@ -111,6 +112,7 @@ export default async function OfferPage({ params }: Props) {
           defaults={defaults}
           isUpdate={Boolean(existing)}
           buyerWishes={request.wishes}
+          templates={templates}
         />
       </div>
     </div>

@@ -138,3 +138,37 @@ export function canonicalModel(typed: string, known: readonly string[]): string 
 export function sellerTypeAllowed(allowed: readonly string[], type: string): boolean {
   return allowed.length === 0 || allowed.includes(type);
 }
+
+// "Your request reached N sellers" is shown only from this many; a small number would discourage.
+export const MIN_SELLERS_TO_SHOW = 3;
+
+// Ukrainian noun form after a number: 1 продавець, 3 продавці, 7 продавців.
+export function pluralUk(n: number, forms: readonly [string, string, string]): string {
+  const ten = n % 10;
+  const hundred = n % 100;
+  if (ten === 1 && hundred !== 11) return forms[0];
+  if (ten >= 2 && ten <= 4 && (hundred < 12 || hundred > 14)) return forms[1];
+  return forms[2];
+}
+
+// A confirmed request stays open this long; the buyer can extend it.
+export const REQUEST_LIFETIME_DAYS = 30;
+export const EXPIRY_REMINDER_DAYS = 3;
+
+export function requestExpiry(from: Date): Date {
+  return new Date(from.getTime() + REQUEST_LIFETIME_DAYS * 86_400_000);
+}
+
+// Public activity numbers ("12 requests this week") appear only from this value; small ones discourage.
+export const LIVE_STATS_MIN = 10;
+
+const ID_SEGMENT = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// A page address reduced to its page type for visit counts: no request ids, never a private key.
+export function pageKind(path: string): string | null {
+  const parts = path.split('?')[0]!.split('/').filter(Boolean);
+  if (parts[0] === 'ua' || parts[0] === 'en' || parts[0] === 'uk') parts.shift();
+  if (parts[0] === 'my') return '/my';
+  const kind = parts.map((p) => (ID_SEGMENT.test(p) ? ':id' : p)).join('/');
+  return /^[a-z:/-]{0,40}$/.test(kind) ? `/${kind}` : null;
+}

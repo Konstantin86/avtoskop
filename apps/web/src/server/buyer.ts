@@ -24,6 +24,8 @@ export async function getRequestByKey(key: string) {
       region: buyerRequests.region,
       status: buyerRequests.status,
       phoneVerified: buyerRequests.phoneVerified,
+      alertedSellers: buyerRequests.alertedSellers,
+      expiresAt: buyerRequests.expiresAt,
       createdAt: buyerRequests.createdAt,
     })
     .from(buyerRequests)

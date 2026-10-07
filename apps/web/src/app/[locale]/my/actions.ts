@@ -3,7 +3,7 @@
 import { and, eq, inArray, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { getTranslations } from 'next-intl/server';
-import { reportInput } from '@avtoskop/core';
+import { reportInput, requestExpiry } from '@avtoskop/core';
 import { buyerRequests, offers, reports, sellers, users } from '@avtoskop/db';
 import { formatNumber, yearsLabel } from '@/components/requestFormat';
 import { getRequestByKey } from '@/server/buyer';
@@ -93,7 +93,26 @@ export async function setRequestOpenAction(formData: FormData): Promise<void> {
   const open = field(formData, 'open') === '1';
   await db
     .update(buyerRequests)
-    .set({ status: open ? (request.phoneVerified ? 'active' : 'new') : 'closed' })
+    .set(
+      open
+        ? {
+            status: request.phoneVerified ? 'active' : 'new',
+            // A reopened request gets a fresh 30 days.
+            expiresAt: request.phoneVerified ? requestExpiry(new Date()) : null,
+            expiryRemindedAt: null,
+          }
+        : { status: 'closed' },
+    )
+    .where(eq(buyerRequests.id, request.id));
+  refresh();
+}
+
+export async function extendRequestAction(formData: FormData): Promise<void> {
+  const request = await getRequestByKey(field(formData, 'key'));
+  if (!request || request.status !== 'active') return;
+  await db
+    .update(buyerRequests)
+    .set({ expiresAt: requestExpiry(new Date()), expiryRemindedAt: null })
     .where(eq(buyerRequests.id, request.id));
   refresh();
 }

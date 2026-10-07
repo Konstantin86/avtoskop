@@ -1,5 +1,5 @@
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { localePath } from '@avtoskop/core';
+import { LIVE_STATS_MIN, localePath } from '@avtoskop/core';
 import { BrandModelFields } from '@/components/BrandModelFields';
 import { CarDrawing, RoadScene } from '@/components/CarScene';
 import { Compare } from '@/components/Compare';
@@ -15,6 +15,7 @@ import {
 import { RegionSelect } from '@/components/RegionSelect';
 import { Link } from '@/i18n/navigation';
 import { getBrandOptions } from '@/server/brands';
+import { liveNumbers } from '@/server/stats';
 import styles from './home.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -25,7 +26,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const t = await getTranslations('home');
   const f = await getTranslations('fields');
   const messages = await getMessages();
-  const brands = await getBrandOptions();
+  const [brands, live] = await Promise.all([getBrandOptions(), liveNumbers()]);
   const year = new Date().getFullYear();
 
   const steps = [1, 2, 3] as const;
@@ -55,6 +56,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </Link>
           </div>
           <span className={styles.sources}>{t('note')}</span>
+          {live.requestsWeek >= LIVE_STATS_MIN && live.offersWeek >= LIVE_STATS_MIN && (
+            <span className={styles.live}>
+              <span className={styles.dot} aria-hidden="true" />
+              {t('liveWeek', { requests: live.requestsWeek, offers: live.offersWeek })}
+            </span>
+          )}
         </div>
 
         <form

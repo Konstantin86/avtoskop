@@ -17,7 +17,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'board' });
   const car = `${r.brand} ${r.model} ${yearsLabel(r)}, ${t('budget', { amount: formatNumber(locale, r.budgetUsd) })}`;
   const title = t('shareTitle', { car });
-  return { title, openGraph: { title, description: t('lead') } };
+  return {
+    title,
+    openGraph: { title, description: t('lead') },
+    twitter: { card: 'summary_large_image', title },
+  };
 }
 
 export default async function RequestDetailPage({ params }: Props) {

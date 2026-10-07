@@ -1,0 +1,1 @@
+ALTER TABLE "buyer_requests" ADD COLUMN "alerted_sellers" integer DEFAULT 0 NOT NULL;

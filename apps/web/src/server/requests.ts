@@ -1,7 +1,7 @@
 import 'server-only';
-import { and, count, desc, eq, inArray, or } from 'drizzle-orm';
-import { redactContacts } from '@avtoskop/core';
-import { brands, buyerRequests } from '@avtoskop/db';
+import { and, count, desc, eq, inArray, notInArray, or } from 'drizzle-orm';
+import { redactContacts, requestMatchesSeller } from '@avtoskop/core';
+import { brands, buyerRequests, offers } from '@avtoskop/db';
 import { db } from './db';
 
 // Only requests whose phone the buyer confirmed in Telegram are shown publicly.
@@ -70,4 +70,29 @@ export async function getPublicRequest(id: string): Promise<PublicRequest | null
     .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
     .where(and(eq(buyerRequests.id, id), visible()));
   return row ? { ...row, notes: redactContacts(row.notes) } : null;
+}
+
+interface SellerMatch {
+  id: string;
+  type: string;
+  status: string;
+  brandIds: number[];
+  serviceRegions: string[];
+}
+
+// Open requests this seller could answer, by the same rules as the Telegram alerts,
+// leaving out the ones they already sent an offer for.
+export async function listRequestsForSeller(seller: SellerMatch, limit = 8) {
+  const answered = db
+    .select({ id: offers.requestId })
+    .from(offers)
+    .where(eq(offers.sellerId, seller.id));
+  const rows = await db
+    .select({ ...publicColumns, brandId: buyerRequests.brandId })
+    .from(buyerRequests)
+    .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
+    .where(and(visible(), notInArray(buyerRequests.id, answered)))
+    .orderBy(desc(buyerRequests.createdAt))
+    .limit(200);
+  return rows.filter((r) => requestMatchesSeller(r, { ...seller, alerts: true })).slice(0, limit);
 }

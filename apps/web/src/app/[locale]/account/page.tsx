@@ -5,6 +5,7 @@ import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
 import { listUserRequests } from '@/server/buyer';
 import { listOwnOffers } from '@/server/offers';
+import { listRequestsForSeller } from '@/server/requests';
 import { signOutAction } from '../login/actions';
 import styles from '../sellers/forms.module.css';
 import me from './account.module.css';
@@ -45,9 +46,10 @@ export default async function AccountPage({ params, searchParams }: Props) {
   }
 
   const seller = user.seller;
-  const [requests, offers] = await Promise.all([
+  const [requests, offers, forYou] = await Promise.all([
     listUserRequests(user.telegramId),
     seller ? listOwnOffers(seller.id) : Promise.resolve([]),
+    seller ? listRequestsForSeller(seller) : Promise.resolve([]),
   ]);
   const regions = (await getMessages()).regions as Record<string, string>;
   const sent = (await searchParams)['sent'];
@@ -103,6 +105,38 @@ export default async function AccountPage({ params, searchParams }: Props) {
 
   const sellerSection = seller ? (
     <>
+      <section className={me.offers}>
+        <h2 className={me.offersTitle}>{t('forYouTitle')}</h2>
+        {forYou.length === 0 ? (
+          <div className={`card ${me.empty}`}>
+            <p className={styles.lead}>{t('forYouEmpty')}</p>
+            <Link href="/requests" className="btn btn-secondary">
+              {t('browse')}
+            </Link>
+          </div>
+        ) : (
+          <ul className={me.list}>
+            {forYou.map((r) => (
+              <li key={r.id} className={`card ${me.item}`}>
+                <div>
+                  <Link href={`/requests/${r.id}`} className={me.itemTitle}>
+                    {r.brand} {r.model} {yearsLabel(r)}
+                  </Link>
+                  <div className={me.meta}>
+                    {b('budget', { amount: formatNumber(locale, r.budgetUsd) })} ·{' '}
+                    {regions[r.region]} · {timeAgo(locale, r.createdAt)}
+                  </div>
+                </div>
+                <Link href={`/requests/${r.id}/offer`} className="btn btn-yellow btn-sm">
+                  {t('forYouOffer')}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className={me.hint}>{t('forYouHint')}</p>
+      </section>
+
       <section className={`card ${me.profile}`}>
         <div className={me.profileTop}>
           <div>

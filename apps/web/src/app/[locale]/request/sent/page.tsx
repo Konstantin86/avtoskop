@@ -108,6 +108,8 @@ export default async function SentPage({
           title={confirmed ? t('telegramDoneTitle') : t('telegramTitle')}
           text={confirmed ? t('telegramDoneText') : t('telegramText')}
           button={t('telegramButton')}
+          requestId={id}
+          qrCaption={t('telegramQr')}
         />
 
         <ol className={`card ${styles.timeline}`}>

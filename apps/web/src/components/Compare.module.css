@@ -104,8 +104,8 @@
 }
 
 .tick {
-  background: var(--blue);
-  color: var(--surface);
+  background: var(--blue-solid);
+  color: var(--on-blue);
 }
 
 @media (max-width: 720px) {

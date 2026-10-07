@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { AVAILABILITY, OFFER_FEATURES, SOURCE_COUNTRIES, WISHES } from '@avtoskop/core';
+import type { OfferTemplate } from '@/server/offers';
 import { saveOfferAction, type FormState } from '../../../sellers/actions';
 import styles from '../../../sellers/forms.module.css';
 
@@ -11,9 +12,10 @@ interface Props {
   defaults: Record<string, string>;
   isUpdate: boolean;
   buyerWishes: string[];
+  templates: OfferTemplate[];
 }
 
-export function OfferForm({ requestId, defaults, isUpdate, buyerWishes }: Props) {
+export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, templates }: Props) {
   const t = useTranslations('offer');
   const p = useTranslations('profile');
   const fields = useTranslations('fields');
@@ -21,7 +23,11 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes }: Props)
     errors: [],
     values: defaults,
   });
-  const v = state.values;
+  // A copied offer fills the form until the next submit; after that the server's values win.
+  const [copied, setCopied] = useState<{ values: Record<string, string>; for: FormState } | null>(
+    null,
+  );
+  const v = copied && copied.for === state ? copied.values : state.values;
   const [availability, setAvailability] = useState(v['availability'] ?? 'in_ukraine');
   const bad = (name: string) => state.errors.includes(name);
   const err = (name: string) =>
@@ -31,6 +37,29 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes }: Props)
   return (
     <form action={action} className={`card ${styles.formCard}`} key={JSON.stringify(v)} noValidate>
       <input type="hidden" name="requestId" value={requestId} />
+      {templates.length > 0 && (
+        <label className="label">
+          {t('copyFrom')}
+          <select
+            className="field"
+            value=""
+            onChange={(e) => {
+              const template = templates[Number(e.target.value)];
+              if (!template) return;
+              setCopied({ values: template.values, for: state });
+              setAvailability(template.values['availability'] ?? 'in_ukraine');
+            }}
+          >
+            <option value="">{t('copyPick')}</option>
+            {templates.map((template, i) => (
+              <option key={template.label} value={i}>
+                {template.label}
+              </option>
+            ))}
+          </select>
+          <span className="hint">{t('copyHint')}</span>
+        </label>
+      )}
       <input type="hidden" name="vinConfirmed" value={v['vinConfirmed'] ?? ''} />
       {state.formError && (
         <div className={styles.alert} role="alert">

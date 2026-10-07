@@ -1,5 +1,5 @@
 import { and, desc, eq, gt, inArray, ne, sql } from 'drizzle-orm';
-import { decryptContact, hashContact, hashSecret, localePath } from '@avtoskop/core';
+import { decryptContact, hashContact, hashSecret, localePath, requestExpiry } from '@avtoskop/core';
 import { brands, buyerRequests, loginTokens, users, type Db } from '@avtoskop/db';
 import type { ReplyMarkup, Telegram, TelegramMessage } from './telegram.ts';
 import { botText, requestLabel } from './texts.ts';
@@ -79,6 +79,8 @@ export function createBotHandler(
         phoneVerified: true,
         telegramChatId: chatId,
         confirmedAt: new Date(),
+        expiresAt: requestExpiry(new Date()),
+        expiryRemindedAt: null,
         status: sql`case when ${buyerRequests.status} = 'new' then 'active' else ${buyerRequests.status} end`,
       })
       .where(and(eq(buyerRequests.phoneHash, phoneHash), eq(buyerRequests.phoneVerified, false)))

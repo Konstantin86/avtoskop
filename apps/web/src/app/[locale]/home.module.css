@@ -238,3 +238,19 @@
   width: 180px;
   height: auto;
 }
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--good);
+  box-shadow: 0 0 0 4px var(--good-soft);
+}

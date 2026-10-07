@@ -116,6 +116,10 @@ The site launches in Ukrainian (default) and English. Language support is built 
 - Vehicle types other than cars.
 - Cars still abroad or at auction (not yet in Ukraine).
 
+## After the MVP (decided 2026-10-07)
+
+- Sorting offers on the buyer's page by price or by how many of the buyer's wishes they meet, with the best match marked. Postponed until buyers regularly get several offers per request.
+
 ## Build order
 
 ```mermaid

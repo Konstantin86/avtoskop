@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { LIVE_STATS_MIN } from '@avtoskop/core';
 import { RoadScene } from '@/components/CarScene';
 import { Compare } from '@/components/Compare';
 import {
@@ -75,10 +76,12 @@ export default async function SellersPage({ params }: Props) {
         <Link href="/login" className={styles.signIn}>
           {t('signInLink')} →
         </Link>
-        <span className={styles.live}>
-          <span className={styles.dot} aria-hidden="true" />
-          {t('activeCount', { count: active })}
-        </span>
+        {active >= LIVE_STATS_MIN && (
+          <span className={styles.live}>
+            <span className={styles.dot} aria-hidden="true" />
+            {t('activeCount', { count: active })}
+          </span>
+        )}
       </section>
 
       <RoadScene />

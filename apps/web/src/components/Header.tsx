@@ -1,14 +1,20 @@
+import { cookies } from 'next/headers';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
 import { LogoMark, MenuIcon, PersonIcon } from './icons';
+import { LocaleSwitch } from './LocaleSwitch';
+import { MobileMenu } from './MobileMenu';
+import { parseTheme, THEME_COOKIE } from './theme';
+import { ThemeToggle } from './ThemeToggle';
 import styles from './Header.module.css';
 
 export async function Header() {
   const t = await getTranslations('header');
   const locale = await getLocale();
-  const otherLocale = locale === 'uk' ? 'en' : 'uk';
+  const otherLocale: 'uk' | 'en' = locale === 'uk' ? 'en' : 'uk';
   const user = await getCurrentUser();
+  const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
 
   const nav = (
     <>
@@ -33,31 +39,30 @@ export async function Header() {
         </Link>
         <nav className={styles.nav}>{nav}</nav>
         <div className={styles.actions}>
-          <Link
-            href="/"
+          <ThemeToggle initial={theme} />
+          <LocaleSwitch
             locale={otherLocale}
+            label={t('switchLocale')}
+            ariaLabel={t('switchLocaleLabel')}
             className={styles.locale}
-            aria-label={t('switchLocaleLabel')}
-          >
-            {t('switchLocale')}
-          </Link>
+          />
           <span className={styles.accountWide}>{account}</span>
           <Link href="/request" className={`btn btn-yellow btn-sm ${styles.cta}`}>
             {t('cta')}
           </Link>
-          <details className={styles.menu}>
-            <summary aria-label={t('menu')}>
-              <MenuIcon />
-            </summary>
-            <nav className={styles.menuPanel}>
-              {nav}
-              <hr className={styles.menuLine} />
-              {account}
-              <Link href="/request" className="btn btn-yellow btn-sm">
-                {t('cta')}
-              </Link>
-            </nav>
-          </details>
+          <MobileMenu
+            label={t('menu')}
+            icon={<MenuIcon />}
+            className={styles.menu}
+            panelClassName={styles.menuPanel}
+          >
+            {nav}
+            <hr className={styles.menuLine} />
+            {account}
+            <Link href="/request" className="btn btn-yellow btn-sm">
+              {t('cta')}
+            </Link>
+          </MobileMenu>
         </div>
       </div>
     </header>

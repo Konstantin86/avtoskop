@@ -2,10 +2,12 @@ import {
   bigint,
   bigserial,
   boolean,
+  date,
   index,
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   serial,
   text,
   timestamp,
@@ -101,6 +103,8 @@ export const buyerRequests = pgTable(
     yearTo: integer('year_to'),
     budgetUsd: integer('budget_usd').notNull(),
     mileageMaxKm: integer('mileage_max_km'),
+    // How many sellers got the new-request alert in Telegram.
+    alertedSellers: integer('alerted_sellers').notNull().default(0),
     // Seller types allowed to reply; empty means everyone.
     sellerTypes: text('seller_types').array().notNull().default([]),
     // Empty means any fuel.
@@ -120,6 +124,9 @@ export const buyerRequests = pgTable(
     // Set when the buyer confirms the phone by sharing it with our Telegram bot.
     telegramChatId: bigint('telegram_chat_id', { mode: 'number' }),
     confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
+    // Confirmed requests close on their own at expiresAt (null: never, e.g. demo rows).
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    expiryRemindedAt: timestamp('expiry_reminded_at', { withTimezone: true }),
     notifyVia: text('notify_via').notNull(),
     locale: text('locale').notNull(),
     status: text('status').notNull().default('new'),
@@ -257,6 +264,18 @@ export const wantedVehicles = pgTable(
     seizedAt: timestamp('seized_at', { withTimezone: true }),
   },
   (t) => [index('wanted_vehicles_vin_idx').on(t.vin)],
+);
+
+// Anonymous visit counts per day, page type and traffic source: no cookies, no IP addresses.
+export const pageViews = pgTable(
+  'page_views',
+  {
+    day: date('day').notNull(),
+    page: text('page').notNull(),
+    source: text('source').notNull(),
+    views: integer('views').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.page, t.source] })],
 );
 
 // When each bulk open-data source was last loaded, and how fresh its content is.

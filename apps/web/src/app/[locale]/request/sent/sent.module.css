@@ -66,8 +66,8 @@
 }
 
 .done {
-  background: var(--blue);
-  color: #fff;
+  background: var(--blue-solid);
+  color: var(--on-blue);
 }
 
 .now {

@@ -10,7 +10,7 @@ const stroke = {
 export function LogoMark({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 28 28" aria-hidden="true">
-      <rect width="28" height="28" rx="8" fill="var(--blue)" />
+      <rect width="28" height="28" rx="8" fill="var(--blue-solid)" />
       <circle cx="12.5" cy="12.5" r="5.5" fill="none" stroke="var(--yellow)" strokeWidth="2.4" />
       <path d="M16.6 16.6L21 21" stroke="var(--yellow)" strokeWidth="2.4" strokeLinecap="round" />
     </svg>

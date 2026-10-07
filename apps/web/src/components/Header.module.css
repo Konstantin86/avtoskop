@@ -54,6 +54,24 @@
   gap: 16px;
 }
 
+.theme {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.theme:hover {
+  color: var(--ink);
+  background: var(--surface-muted);
+}
+
 .locale {
   color: var(--muted);
   text-decoration: none;

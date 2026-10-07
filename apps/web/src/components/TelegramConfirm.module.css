@@ -1,10 +1,39 @@
 .card {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  gap: 16px;
   padding: 20px;
   border-radius: 16px;
   background: var(--blue-soft);
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.qr {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--blue) 20%, transparent);
+}
+
+.qrImage {
+  flex-shrink: 0;
+  width: 112px;
+  height: 112px;
+  padding: 6px;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.qrImage svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .done {
@@ -34,8 +63,15 @@
   margin-top: 2px;
 }
 
+/* On phones the bot opens directly from the button, so the QR code is only for wide screens. */
+@media (max-width: 720px) {
+  .qr {
+    display: none;
+  }
+}
+
 @media (max-width: 520px) {
-  .card {
+  .main {
     flex-wrap: wrap;
   }
 

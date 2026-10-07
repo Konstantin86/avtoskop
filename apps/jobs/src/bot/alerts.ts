@@ -1,5 +1,5 @@
 import { and, eq, gt, inArray, ne } from 'drizzle-orm';
-import { localePath, requestMatchesSeller } from '@avtoskop/core';
+import { localePath, MIN_SELLERS_TO_SHOW, pluralUk, requestMatchesSeller } from '@avtoskop/core';
 import { brands, buyerRequests, sellers, users, type Db } from '@avtoskop/db';
 import en from '@avtoskop/i18n/messages/en.json' with { type: 'json' };
 import uk from '@avtoskop/i18n/messages/uk.json' with { type: 'json' };
@@ -58,6 +58,7 @@ export function createSellerAlerts(
         importOk: buyerRequests.importOk,
         sellerTypes: buyerRequests.sellerTypes,
         buyerChatId: buyerRequests.telegramChatId,
+        locale: buyerRequests.locale,
       })
       .from(buyerRequests)
       .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
@@ -98,6 +99,19 @@ export function createSellerAlerts(
         await new Promise((resolve) => setTimeout(resolve, SEND_GAP_MS));
       }
       log(`Request ${r.id}: alerted ${sent} seller(s)`);
+      await db
+        .update(buyerRequests)
+        .set({ alertedSellers: sent })
+        .where(eq(buyerRequests.id, r.id));
+      if (r.buyerChatId && sent >= MIN_SELLERS_TO_SHOW) {
+        const sellers =
+          r.locale === 'en'
+            ? `${sent} sellers`
+            : `${sent} ${pluralUk(sent, ['продавець', 'продавці', 'продавців'])}`;
+        await tg
+          .sendMessage(r.buyerChatId, botText(r.locale, 'requestReached', { sellers }))
+          .catch((error: Error) => log(`Reach message failed: ${error.message}`));
+      }
     }
   };
 }

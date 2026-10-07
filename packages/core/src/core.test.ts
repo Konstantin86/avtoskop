@@ -5,6 +5,8 @@ import {
   formatUaNational,
   localePath,
   normalizeUaPhone,
+  pageKind,
+  pluralUk,
   sellerTypeAllowed,
   slugify,
   uaNationalDigits,
@@ -191,5 +193,39 @@ describe('buyerRequestInput seller types', () => {
   it('checks a seller type against the choice', () => {
     expect(sellerTypeAllowed([], 'buyout')).toBe(true);
     expect(sellerTypeAllowed(['owner'], 'buyout')).toBe(false);
+  });
+});
+
+describe('pluralUk', () => {
+  const forms = ['продавець', 'продавці', 'продавців'] as const;
+  it('picks the Ukrainian form for a number', () => {
+    expect([1, 3, 5, 11, 12, 21, 22, 25, 101, 112].map((n) => pluralUk(n, forms))).toEqual([
+      'продавець',
+      'продавці',
+      'продавців',
+      'продавців',
+      'продавців',
+      'продавець',
+      'продавці',
+      'продавців',
+      'продавець',
+      'продавців',
+    ]);
+  });
+});
+
+describe('pageKind', () => {
+  it('drops the language, ids and private keys', () => {
+    expect(pageKind('/ua')).toBe('/');
+    expect(pageKind('/en/requests')).toBe('/requests');
+    expect(pageKind('/ua/requests/3a466e90-163c-43d3-997d-6203ee87a306/offer')).toBe(
+      '/requests/:id/offer',
+    );
+    expect(pageKind('/ua/my/f7IaOcpRtiCz9qkAwgQV3-dT51jrO1VI')).toBe('/my');
+    expect(pageKind('/ua/request/sent?id=1&key=secret')).toBe('/request/sent');
+  });
+
+  it('ignores odd addresses', () => {
+    expect(pageKind('/ua/<script>')).toBeNull();
   });
 });

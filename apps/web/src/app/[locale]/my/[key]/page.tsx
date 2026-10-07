@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { ConfirmButton } from '@/components/ConfirmButton';
+import { ShareNumberButton } from '@/components/ShareNumberButton';
 import {
   makeMatchesBrand,
+  MIN_SELLERS_TO_SHOW,
   matchedWishes,
   REPORT_REASONS,
   vinMismatches,
@@ -16,6 +17,7 @@ import { botStartLink } from '@/server/telegram';
 import { wantedByVin, wantedListDate } from '@/server/vin';
 import {
   declineOfferAction,
+  extendRequestAction,
   reportOfferAction,
   restoreOfferAction,
   setRequestOpenAction,
@@ -93,6 +95,19 @@ export default async function MyRequestPage({ params }: Props) {
           <span className={forms.summaryMeta}>{meta}</span>
         </div>
         {closed && <div className={forms.notice}>{t('closedNotice')}</div>}
+        {!closed && request.expiresAt && (
+          <div className={styles.expiry}>
+            <span>{t('activeUntil', { date: shortDate(request.expiresAt) })}</span>
+            {request.expiresAt.getTime() - Date.now() < 7 * 86_400_000 && (
+              <form action={extendRequestAction}>
+                <input type="hidden" name="key" value={key} />
+                <button type="submit" className="btn btn-secondary btn-sm">
+                  {t('extend')}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
         {!closed && !request.phoneVerified && (
           <TelegramConfirm
             href={botStartLink(`req_${request.id}`)}
@@ -100,11 +115,16 @@ export default async function MyRequestPage({ params }: Props) {
             title={t('confirmTitle')}
             text={t('confirmText')}
             button={t('confirmButton')}
+            requestId={request.id}
+            qrCaption={t('confirmQr')}
           />
         )}
 
         <section className={styles.offers}>
           <h2 className={styles.offersTitle}>{t('offersCount', { count: offerList.length })}</h2>
+          {request.phoneVerified && request.alertedSellers >= MIN_SELLERS_TO_SHOW && (
+            <p className={styles.reached}>{t('reached', { count: request.alertedSellers })}</p>
+          )}
           {offerList.length > 0 && (
             <div className={styles.warning}>
               <ShieldIcon />
@@ -267,13 +287,18 @@ export default async function MyRequestPage({ params }: Props) {
                     </form>
                   ) : (
                     <>
-                      <form action={shareContactAction}>
-                        <input type="hidden" name="key" value={key} />
-                        <input type="hidden" name="offerId" value={offer.id} />
-                        <ConfirmButton confirm={t('shareConfirm')} className="btn btn-yellow">
-                          {t('share')}
-                        </ConfirmButton>
-                      </form>
+                      <ShareNumberButton
+                        action={shareContactAction}
+                        fields={{ key, offerId: offer.id }}
+                        labels={{
+                          open: t('share'),
+                          title: t('shareTitle', { seller: offer.seller.name }),
+                          text: t('shareText'),
+                          safety: t('shareSafety'),
+                          confirm: t('shareYes'),
+                          cancel: t('shareCancel'),
+                        }}
+                      />
                       <form action={declineOfferAction}>
                         <input type="hidden" name="key" value={key} />
                         <input type="hidden" name="offerId" value={offer.id} />

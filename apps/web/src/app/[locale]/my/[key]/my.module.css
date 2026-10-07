@@ -248,3 +248,20 @@
   font-weight: 600;
   text-decoration: none;
 }
+
+.reached {
+  margin: -6px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--good);
+}
+
+.expiry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}

@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { ConfirmButton } from '@/components/ConfirmButton';
 import { formatNumber, timeAgo } from '@/components/requestFormat';
 import { getAdmin, listOpenReports, listSellersForAdmin, listVinFlags } from '@/server/admin';
+import { funnel, topViews } from '@/server/stats';
 import { resolveReportAction, setSellerStatusAction } from './actions';
 import forms from '../sellers/forms.module.css';
 import styles from './admin.module.css';
@@ -34,6 +35,13 @@ export default async function AdminPage({ params }: Props) {
     listOpenReports(),
     listVinFlags(),
   ]);
+  const [week, month, sources, pages] = await Promise.all([
+    funnel(7),
+    funnel(30),
+    topViews(30, 'source'),
+    topViews(30, 'page'),
+  ]);
+  const metrics = ['views', 'requests', 'confirmed', 'offersSent', 'shared', 'newSellers'] as const;
 
   const statusButton = (sellerId: string, status: string, label: string, confirm?: string) => (
     <form action={setSellerStatusAction}>
@@ -55,6 +63,50 @@ export default async function AdminPage({ params }: Props) {
     <div className={`container ${forms.page}`}>
       <div className={styles.wide}>
         <h1 className={forms.title}>{t('title')}</h1>
+
+        <section className={styles.section}>
+          <h2 className={styles.heading}>{t('statsTitle')}</h2>
+          <div className={`card ${styles.item}`}>
+            <table className={styles.stats}>
+              <thead>
+                <tr>
+                  <th />
+                  <th>{t('statsWeek')}</th>
+                  <th>{t('statsMonth')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {metrics.map((m) => (
+                  <tr key={m}>
+                    <td>{t(`stat_${m}`)}</td>
+                    <td>{formatNumber(locale, week[m])}</td>
+                    <td>{formatNumber(locale, month[m])}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.statsLists}>
+            {(
+              [
+                ['statsSources', sources],
+                ['statsPages', pages],
+              ] as const
+            ).map(([title, rows]) => (
+              <div key={title} className={`card ${styles.item}`}>
+                <strong>{t(title)}</strong>
+                {rows.length === 0 && <span className={styles.muted}>{t('statsEmpty')}</span>}
+                {rows.map((r) => (
+                  <div key={r.name} className={styles.row}>
+                    <span>{r.name}</span>
+                    <span className={styles.muted}>{formatNumber(locale, r.views)}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <p className={styles.muted}>{t('statsNote')}</p>
+        </section>
 
         <section className={styles.section}>
           <h2 className={styles.heading}>{t('reportsTitle', { count: reportList.length })}</h2>

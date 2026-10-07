@@ -62,3 +62,43 @@
   background: var(--danger-soft);
   color: var(--danger);
 }
+
+.stats {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.stats th,
+.stats td {
+  padding: 8px 4px;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+}
+
+.stats th:first-child,
+.stats td:first-child {
+  text-align: left;
+}
+
+.stats tr:last-child td {
+  border-bottom: 0;
+}
+
+.stats th {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.statsLists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 720px) {
+  .statsLists {
+    grid-template-columns: 1fr;
+  }
+}

@@ -2,6 +2,7 @@ import { contactKey } from '@avtoskop/core';
 import { createDb } from '@avtoskop/db';
 import { importWanted } from '../mvs/wanted.ts';
 import { createSellerAlerts } from './alerts.ts';
+import { createExpiryJob } from './expiry.ts';
 import { createBotHandler } from './handler.ts';
 import { createTelegram } from './telegram.ts';
 import { botText } from './texts.ts';
@@ -59,6 +60,17 @@ const refreshWanted = () =>
 void refreshWanted();
 const wantedTimer = setInterval(refreshWanted, DAY_MS);
 
+// Hourly: remind buyers before a request expires, and close expired ones.
+const runExpiry = createExpiryJob(db, tg, {
+  contactKey: contactKey(process.env['REQUEST_CONTACT_KEY']),
+  siteUrl,
+  log,
+});
+const checkExpiry = () =>
+  runExpiry().catch((error: Error) => log(`Expiry check failed: ${error.message}`));
+void checkExpiry();
+const expiryTimer = setInterval(checkExpiry, 60 * 60 * 1000);
+
 // Long polling needs no public URL, so the bot also runs on a laptop.
 let offset = 0;
 while (running) {
@@ -80,5 +92,6 @@ while (running) {
   }
 }
 clearInterval(wantedTimer);
+clearInterval(expiryTimer);
 await close();
 log('Bot stopped');

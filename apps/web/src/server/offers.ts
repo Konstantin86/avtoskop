@@ -37,3 +37,43 @@ export async function listOwnOffers(sellerId: string) {
     buyerPhone: row.status === 'contact_shared' ? decryptContact(phoneEncrypted) : null,
   }));
 }
+
+export interface OfferTemplate {
+  label: string;
+  values: Record<string, string>;
+}
+
+// The seller's recent offers, to reuse when the same car suits another buyer.
+export async function listOfferTemplates(sellerId: string, limit = 10): Promise<OfferTemplate[]> {
+  const rows = await db
+    .select()
+    .from(offers)
+    .where(eq(offers.sellerId, sellerId))
+    .orderBy(desc(offers.updatedAt))
+    .limit(50);
+  const seen = new Set<string>();
+  const templates: OfferTemplate[] = [];
+  for (const o of rows) {
+    const id = `${o.car}|${o.year}|${o.vin ?? ''}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    templates.push({
+      label: `${o.car}, ${o.year} · $${o.priceUsd.toLocaleString('uk-UA')}`,
+      values: {
+        car: o.car,
+        year: String(o.year),
+        mileageKm: String(o.mileageKm),
+        priceUsd: String(o.priceUsd),
+        availability: o.availability,
+        etaWeeks: o.etaWeeks ? String(o.etaWeeks) : '',
+        originCountry: o.originCountry ?? '',
+        link: o.link ?? '',
+        description: o.description,
+        features: o.features.join(','),
+        vin: o.vin ?? '',
+      },
+    });
+    if (templates.length === limit) break;
+  }
+  return templates;
+}
