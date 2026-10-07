@@ -1,7 +1,7 @@
 .footer {
   margin-top: auto;
   /* Vertical space lives here: the .container class sets its own padding shorthand. */
-  padding: 32px 0 36px;
+  padding: 20px 0 24px;
   border-top: 1px solid var(--line);
   font-size: 14px;
   color: var(--muted);
@@ -12,13 +12,13 @@
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 20px 40px;
+  gap: 14px 40px;
 }
 
 .about {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .feedback {
@@ -44,7 +44,7 @@
 
 @media (max-width: 720px) {
   .footer {
-    padding: 28px 0 32px;
+    padding: 18px 0 22px;
   }
 
   .inner {
