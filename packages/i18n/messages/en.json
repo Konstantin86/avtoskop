@@ -14,6 +14,7 @@
     "requests": "Buyer requests",
     "account": "Account",
     "signIn": "Sign in",
+    "newOffers": "{count, plural, one {# new offer} other {# new offers}}",
     "theme_system": "Theme: follow device. Click to change",
     "theme_light": "Theme: light. Click to change",
     "theme_dark": "Theme: dark. Click to change"

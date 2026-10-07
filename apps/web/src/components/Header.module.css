@@ -95,6 +95,35 @@
   color: var(--blue);
 }
 
+.badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--yellow);
+  color: var(--on-yellow);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+.menuIcon {
+  position: relative;
+  display: flex;
+}
+
+.dot {
+  position: absolute;
+  top: -3px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--yellow);
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
 .accountWide {
   display: contents;
 }

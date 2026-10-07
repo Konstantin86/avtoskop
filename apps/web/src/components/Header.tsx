@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
+import { countNewOffers } from '@/server/buyer';
 import { LogoMark, MenuIcon, PersonIcon } from './icons';
 import { LocaleSwitch } from './LocaleSwitch';
 import { MobileMenu } from './MobileMenu';
@@ -15,6 +16,8 @@ export async function Header() {
   const otherLocale: 'uk' | 'en' = locale === 'uk' ? 'en' : 'uk';
   const user = await getCurrentUser();
   const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
+  const newOffers = user ? await countNewOffers(user.telegramId) : 0;
+  const newLabel = newOffers > 0 ? t('newOffers', { count: newOffers }) : '';
 
   const nav = (
     <>
@@ -27,6 +30,12 @@ export async function Header() {
     <Link href={user ? '/account' : '/login'} className={styles.account}>
       <PersonIcon />
       {user ? t('account') : t('signIn')}
+      {newOffers > 0 && (
+        <span className={styles.badge} title={newLabel}>
+          {newOffers > 9 ? '9+' : newOffers}
+          <span className="visually-hidden">, {newLabel}</span>
+        </span>
+      )}
     </Link>
   );
 
@@ -52,8 +61,13 @@ export async function Header() {
             {t('cta')}
           </Link>
           <MobileMenu
-            label={t('menu')}
-            icon={<MenuIcon />}
+            label={newOffers > 0 ? `${t('menu')}, ${newLabel}` : t('menu')}
+            icon={
+              <span className={styles.menuIcon}>
+                <MenuIcon />
+                {newOffers > 0 && <span className={styles.dot} />}
+              </span>
+            }
             className={styles.menu}
             panelClassName={styles.menuPanel}
           >

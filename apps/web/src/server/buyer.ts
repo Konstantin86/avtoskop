@@ -109,3 +109,21 @@ export async function listUserRequests(telegramId: number) {
     key: accessKeyEncrypted ? decryptContact(accessKeyEncrypted) : null,
   }));
 }
+
+// Offers the person hasn't opened yet, across all their confirmed requests. Shown in the header.
+export async function countNewOffers(telegramId: number): Promise<number> {
+  const [row] = await db
+    .select({ n: count() })
+    .from(offers)
+    .innerJoin(buyerRequests, eq(offers.requestId, buyerRequests.id))
+    .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+    .where(
+      and(
+        eq(buyerRequests.telegramChatId, telegramId),
+        eq(buyerRequests.phoneVerified, true),
+        eq(offers.status, 'sent'),
+        ne(sellers.status, 'banned'),
+      ),
+    );
+  return row?.n ?? 0;
+}

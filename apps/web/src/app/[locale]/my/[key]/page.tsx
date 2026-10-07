@@ -15,6 +15,7 @@ import {
 import { FlagEU, FlagUS, ShieldIcon } from '@/components/icons';
 import { TelegramConfirm } from '@/components/TelegramConfirm';
 import { formatNumber, fuelsLabel, timeAgo, yearsLabel } from '@/components/requestFormat';
+import { RefreshOnce } from '@/components/RefreshOnce';
 import { getRequestByKey, listRequestOffers, markOffersShown } from '@/server/buyer';
 import { botStartLink } from '@/server/telegram';
 import { wantedByVin, wantedListDate } from '@/server/vin';
@@ -66,6 +67,7 @@ export default async function MyRequestPage({ params }: Props) {
     wantedListDate(),
   ]);
   const shortDate = (d: Date) => d.toLocaleDateString(locale === 'uk' ? 'uk-UA' : 'en-GB');
+  const hadNew = offerList.some((o) => o.status === 'sent');
   await markOffersShown(request.id);
   const regions = (await getMessages()).regions as Record<string, string>;
   const closed = request.status === 'closed';
@@ -87,6 +89,7 @@ export default async function MyRequestPage({ params }: Props) {
   return (
     <div className={`container ${forms.page}`}>
       <div className={forms.wide}>
+        {hadNew && <RefreshOnce />}
         <h1 className={forms.title}>{t('title')}</h1>
         <div className={forms.summary}>
           <span className={forms.summaryLabel}>
