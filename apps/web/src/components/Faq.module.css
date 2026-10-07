@@ -1,0 +1,64 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.item + .item {
+  border-top: 1px solid var(--line);
+}
+
+.item {
+  scroll-margin-top: 96px;
+}
+
+.q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.q::-webkit-details-marker {
+  display: none;
+}
+
+.q::after {
+  content: '+';
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-weight: 700;
+  transition: transform 160ms ease;
+}
+
+.item[open] .q::after {
+  transform: rotate(45deg);
+}
+
+.a {
+  margin: 0;
+  padding: 0 22px 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Opened from a link such as /faq#telegram. */
+.item:target {
+  background: var(--blue-soft);
+}

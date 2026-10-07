@@ -1,8 +1,9 @@
 'use server';
 
 import { and, count, eq, gt, sql } from 'drizzle-orm';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import {
+  localePath,
   makeMatchesBrand,
   offerInput,
   offerLimitPerDay,
@@ -14,7 +15,9 @@ import { brands, buyerRequests, offers, sellers } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
 import { getCurrentUser, safeReturnTo } from '@/server/auth';
 import { db } from '@/server/db';
+import { feedbackUrl } from '@/server/contactLinks';
 import { notifyBuyerOfOffer, notifyBuyerOfPriceDrop } from '@/server/notify';
+import { sendTelegram, siteUrl } from '@/server/telegram';
 import { decodeVin } from '@/server/vin';
 
 export interface FormState {
@@ -49,10 +52,26 @@ export async function saveProfileAction(_prev: FormState, formData: FormData): P
       values,
     };
   }
-  await db
+  const [saved] = await db
     .insert(sellers)
     .values({ userId: user.userId, ...parsed.data })
-    .onConflictDoUpdate({ target: sellers.userId, set: { ...parsed.data, updatedAt: new Date() } });
+    .onConflictDoUpdate({ target: sellers.userId, set: { ...parsed.data, updatedAt: new Date() } })
+    .returning({ isNew: sql<boolean>`(xmax = 0)` });
+  // A new seller gets a short how-to from the bot.
+  if (saved?.isNew) {
+    const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
+    const feedback = feedbackUrl();
+    const text = [
+      t('sellerWelcome', {
+        name: parsed.data.name,
+        link: siteUrl() + localePath('uk', '/account'),
+      }),
+      feedback ? t('sellerWelcomeVerify', { link: feedback }) : null,
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+    await sendTelegram(user.telegramId, text);
+  }
 
   redirect({ href: safeReturnTo(values['return']), locale: await getLocale() });
   return { errors: [], values };

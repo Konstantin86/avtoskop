@@ -33,6 +33,11 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
   const v = state.values;
   const [brandId, setBrandId] = useState(v['brandId'] ?? '');
   const bad = (name: string) => state.errors.includes(name);
+  const optional = ['fuels', 'gearbox', 'mileageMaxKm', 'wishes', 'notes'];
+  const moreOpen =
+    optional.some((name) => bad(name)) ||
+    Boolean(v['fuels'] || v['mileageMaxKm'] || v['wishes'] || v['notes']) ||
+    (v['gearbox'] ?? 'any') !== 'any';
   const err = (name: string) =>
     bad(name) ? (
       <span className="error-text" id={`${name}-error`}>
@@ -116,39 +121,6 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
             {err('yearTo')}
           </label>
         </div>
-        <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
-          <legend style={{ padding: 0, marginBottom: 6 }}>{f('fuel')}</legend>
-          <div className="choices">
-            {FUELS.map((fuel) => (
-              <label key={fuel}>
-                <input
-                  type="checkbox"
-                  name="fuels"
-                  value={fuel}
-                  defaultChecked={(v['fuels'] ?? '').split(',').includes(fuel)}
-                />
-                <span>{f(`fuel_${fuel}`)}</span>
-              </label>
-            ))}
-          </div>
-          {err('fuels') ?? <span className="hint">{f('fuelsHint')}</span>}
-        </fieldset>
-        <div className="label">
-          <span id="gearbox-label">{f('gearbox')}</span>
-          <div className="segment" role="radiogroup" aria-labelledby="gearbox-label">
-            {GEARBOXES.map((g) => (
-              <label key={g}>
-                <input
-                  type="radio"
-                  name="gearbox"
-                  value={g}
-                  defaultChecked={(v['gearbox'] ?? 'any') === g}
-                />
-                <span>{f(`gearbox_${g}`)}</span>
-              </label>
-            ))}
-          </div>
-        </div>
       </fieldset>
 
       <fieldset className={styles.section}>
@@ -166,29 +138,17 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
             />
             {err('budgetUsd')}
           </label>
-          <label className="label">
-            {f('mileageMax')}
-            <input
-              name="mileageMaxKm"
-              className="field"
-              inputMode="numeric"
-              defaultValue={v['mileageMaxKm']}
-              placeholder="100000"
-              {...invalid('mileageMaxKm')}
+          <label className="label" htmlFor="region">
+            {f('region')}
+            <RegionSelect
+              id="region"
+              names={regionNames}
+              defaultValue={v['region']}
+              invalid={bad('region')}
             />
-            {err('mileageMaxKm')}
+            {err('region')}
           </label>
         </div>
-        <label className="label" htmlFor="region">
-          {f('region')}
-          <RegionSelect
-            id="region"
-            names={regionNames}
-            defaultValue={v['region']}
-            invalid={bad('region')}
-          />
-          {err('region')}
-        </label>
         <div className="label">
           <span id="import-label">{f('import')}</span>
           <div className="segment" role="radiogroup" aria-labelledby="import-label">
@@ -212,33 +172,90 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
             </label>
           </div>
         </div>
-        <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
-          <legend style={{ padding: 0, marginBottom: 6 }}>{f('wishes')}</legend>
-          <div className="choices">
-            {WISHES.map((w) => (
-              <label key={w}>
-                <input
-                  type="checkbox"
-                  name="wishes"
-                  value={w}
-                  defaultChecked={(v['wishes'] ?? '').split(',').includes(w)}
-                />
-                <span>{f(`wish_${w}`)}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-        <label className="label">
-          {f('notes')}
-          <textarea
-            name="notes"
-            className="field"
-            defaultValue={v['notes']}
-            placeholder={f('notesPlaceholder')}
-            maxLength={500}
-          />
-        </label>
       </fieldset>
+
+      {/* Optional details stay folded so the form looks short; they open when filled or invalid. */}
+      <details className={styles.more} open={moreOpen}>
+        <summary className={styles.moreSummary}>
+          <span>{t('moreParams')}</span>
+          <span className="hint">{t('moreHint')}</span>
+        </summary>
+        <div className={styles.moreBody}>
+          <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
+            <legend style={{ padding: 0, marginBottom: 6 }}>{f('fuel')}</legend>
+            <div className="choices">
+              {FUELS.map((fuel) => (
+                <label key={fuel}>
+                  <input
+                    type="checkbox"
+                    name="fuels"
+                    value={fuel}
+                    defaultChecked={(v['fuels'] ?? '').split(',').includes(fuel)}
+                  />
+                  <span>{f(`fuel_${fuel}`)}</span>
+                </label>
+              ))}
+            </div>
+            {err('fuels') ?? <span className="hint">{f('fuelsHint')}</span>}
+          </fieldset>
+          <div className="label">
+            <span id="gearbox-label">{f('gearbox')}</span>
+            <div className="segment" role="radiogroup" aria-labelledby="gearbox-label">
+              {GEARBOXES.map((g) => (
+                <label key={g}>
+                  <input
+                    type="radio"
+                    name="gearbox"
+                    value={g}
+                    defaultChecked={(v['gearbox'] ?? 'any') === g}
+                  />
+                  <span>{f(`gearbox_${g}`)}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className={styles.pair}>
+            <label className="label">
+              {f('mileageMax')}
+              <input
+                name="mileageMaxKm"
+                className="field"
+                inputMode="numeric"
+                defaultValue={v['mileageMaxKm']}
+                placeholder="100000"
+                {...invalid('mileageMaxKm')}
+              />
+              {err('mileageMaxKm')}
+            </label>
+          </div>
+          <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
+            <legend style={{ padding: 0, marginBottom: 6 }}>{f('wishes')}</legend>
+            <div className="choices">
+              {WISHES.map((w) => (
+                <label key={w}>
+                  <input
+                    type="checkbox"
+                    name="wishes"
+                    value={w}
+                    defaultChecked={(v['wishes'] ?? '').split(',').includes(w)}
+                  />
+                  <span>{f(`wish_${w}`)}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <label className="label">
+            {f('notes')}
+            <textarea
+              name="notes"
+              className="field"
+              defaultValue={v['notes']}
+              placeholder={f('notesPlaceholder')}
+              maxLength={500}
+            />
+          </label>
+        </div>
+      </details>
 
       <fieldset className={styles.section}>
         <legend className="section-label">{t('sectionContact')}</legend>
@@ -251,7 +268,12 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
         <input type="hidden" name="notifyVia" value="telegram" />
         <p className={styles.notifyNote}>
           <TelegramIcon />
-          <span>{f('notifyNote')}</span>
+          <span>
+            {f('notifyNote')} {/* New tab, so a half-filled form isn't lost. */}
+            <a href={localePath(locale, '/faq#telegram')} target="_blank" rel="noopener">
+              {t('whyTelegram')}
+            </a>
+          </span>
         </p>
         <label className={styles.consent}>
           <input

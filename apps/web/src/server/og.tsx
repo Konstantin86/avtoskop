@@ -79,22 +79,21 @@ export async function ogCard({ eyebrow, title, lines, footer, brand }: Card) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 16,
-            background: C.blue,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <svg width="34" height="34" viewBox="0 0 28 28">
-            <circle cx="12.5" cy="12.5" r="5.5" fill="none" stroke={C.yellow} strokeWidth="2.4" />
-            <path d="M16.6 16.6L21 21" stroke={C.yellow} strokeWidth="2.4" strokeLinecap="round" />
-          </svg>
-        </div>
+        <svg width="60" height="60" viewBox="0 0 64 64">
+          <rect width="64" height="64" rx="16" fill={C.blue} />
+          <circle cx="28" cy="28" r="16" fill={C.blue} stroke={C.yellow} strokeWidth="5" />
+          <path d="M41 41l11 11" stroke={C.yellow} strokeWidth="6" strokeLinecap="round" />
+          <path
+            d="M19 29l2.6-6.2a2.4 2.4 0 0 1 2.2-1.5h8.4a2.4 2.4 0 0 1 2.2 1.5l2.6 6.2"
+            fill="none"
+            stroke={C.white}
+            strokeWidth="2.6"
+            strokeLinejoin="round"
+          />
+          <rect x="17.5" y="28.5" width="21" height="7" rx="2.2" fill={C.white} />
+          <circle cx="21.8" cy="32" r="1.7" fill={C.yellow} />
+          <circle cx="34.2" cy="32" r="1.7" fill={C.yellow} />
+        </svg>
         <div style={{ fontSize: 34, fontWeight: 700 }}>{brand}</div>
       </div>
 

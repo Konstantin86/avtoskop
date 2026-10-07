@@ -5,6 +5,7 @@ import { formatNumber, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
 import { listUserRequests } from '@/server/buyer';
+import { feedbackUrl } from '@/server/contactLinks';
 import { listOwnOffers } from '@/server/offers';
 import { listRequestsForSeller } from '@/server/requests';
 import { signOutAction } from '../login/actions';
@@ -52,6 +53,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
     seller ? listOwnOffers(seller.id) : Promise.resolve([]),
     seller ? listRequestsForSeller(seller) : Promise.resolve([]),
   ]);
+  const feedback = feedbackUrl();
   const regions = (await getMessages()).regions as Record<string, string>;
   const sent = (await searchParams)['sent'];
 
@@ -161,6 +163,14 @@ export default async function AccountPage({ params, searchParams }: Props) {
           {t('editProfile')}
         </Link>
         <div className={me.meta}>{seller.alerts ? t('alertsOn') : t('alertsOff')}</div>
+        {seller.status === 'pending' && feedback && (
+          <p className={me.verify}>
+            {t('verifyHint')}{' '}
+            <a href={feedback} target="_blank" rel="noopener noreferrer">
+              {t('verifyWrite')} →
+            </a>
+          </p>
+        )}
       </section>
 
       <section className={me.offers}>

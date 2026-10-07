@@ -254,3 +254,16 @@
   background: var(--good);
   box-shadow: 0 0 0 4px var(--good-soft);
 }
+
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 56px;
+}
+
+.faqAll {
+  align-self: flex-start;
+  font-weight: 600;
+  text-decoration: none;
+}

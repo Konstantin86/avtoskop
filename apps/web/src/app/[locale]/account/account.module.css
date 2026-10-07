@@ -115,3 +115,18 @@
   font-size: 13px;
   color: var(--muted);
 }
+
+.verify {
+  margin: 4px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--yellow-soft);
+  color: var(--yellow-ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.verify a {
+  color: inherit;
+  font-weight: 700;
+}

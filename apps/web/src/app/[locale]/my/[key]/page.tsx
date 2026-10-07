@@ -97,6 +97,28 @@ export default async function MyRequestPage({ params }: Props) {
             {request.brand} {request.model}
           </span>
           <span className={forms.summaryMeta}>{meta}</span>
+          {/* Where things stand, at a glance. */}
+          <span className={styles.status}>
+            <span
+              className={
+                closed
+                  ? styles.statusOff
+                  : request.phoneVerified
+                    ? styles.statusOn
+                    : styles.statusWait
+              }
+            >
+              {closed
+                ? t('statusClosed')
+                : request.phoneVerified
+                  ? t('statusPublished')
+                  : t('statusWaiting')}
+            </span>
+            {!closed && request.phoneVerified && request.alertedSellers >= MIN_SELLERS_TO_SHOW && (
+              <span>{t('reached', { count: request.alertedSellers })}</span>
+            )}
+            <span>{t('offersCount', { count: offerList.length })}</span>
+          </span>
         </div>
         {closed && <div className={forms.notice}>{t('closedNotice')}</div>}
         {!closed && request.expiresAt && (
@@ -124,9 +146,6 @@ export default async function MyRequestPage({ params }: Props) {
 
         <section className={styles.offers}>
           <h2 className={styles.offersTitle}>{t('offersCount', { count: offerList.length })}</h2>
-          {request.phoneVerified && request.alertedSellers >= MIN_SELLERS_TO_SHOW && (
-            <p className={styles.reached}>{t('reached', { count: request.alertedSellers })}</p>
-          )}
           {offerList.length > 0 && (
             <div className={styles.warning}>
               <ShieldIcon />

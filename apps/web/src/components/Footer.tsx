@@ -1,34 +1,31 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
+import { feedbackUrl } from '@/server/contactLinks';
+import styles from './Footer.module.css';
 
 export async function Footer() {
   const t = await getTranslations('footer');
+  const feedback = feedbackUrl();
   return (
-    <footer style={{ borderTop: '1px solid var(--line)', marginTop: 'auto' }}>
-      <div
-        className="container"
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          gap: 12,
-          padding: '28px var(--page-x)',
-          fontSize: 14,
-          color: 'var(--muted)',
-        }}
-      >
-        <span>
-          {t('copyright', { year: new Date().getFullYear() })}
-          <span style={{ display: 'block', fontSize: 12, marginTop: 4 }}>{t('trademarks')}</span>
-        </span>
-        <span style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-          <Link href="/terms" style={{ color: 'inherit' }}>
-            {t('terms')}
-          </Link>
-          <Link href="/privacy" style={{ color: 'inherit' }}>
-            {t('privacy')}
-          </Link>
-        </span>
+    <footer className={styles.footer}>
+      <div className={`container ${styles.inner}`}>
+        {feedback && (
+          <a href={feedback} target="_blank" rel="noopener noreferrer" className={styles.feedback}>
+            {t('feedback')} →
+          </a>
+        )}
+        <div className={styles.row}>
+          <span>
+            {t('copyright', { year: new Date().getFullYear() })}
+            <span className={styles.small}>{t('trademarks')}</span>
+          </span>
+          <nav className={styles.links}>
+            <Link href="/about">{t('about')}</Link>
+            <Link href="/faq">{t('faq')}</Link>
+            <Link href="/terms">{t('terms')}</Link>
+            <Link href="/privacy">{t('privacy')}</Link>
+          </nav>
+        </div>
       </div>
     </footer>
   );

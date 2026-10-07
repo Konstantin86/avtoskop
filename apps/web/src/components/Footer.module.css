@@ -1,0 +1,43 @@
+.footer {
+  margin-top: auto;
+  border-top: 1px solid var(--line);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 24px;
+  padding-bottom: 28px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.feedback {
+  align-self: flex-start;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.links a {
+  color: inherit;
+}

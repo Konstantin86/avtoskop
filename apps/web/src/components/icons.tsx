@@ -7,12 +7,32 @@ const stroke = {
   'aria-hidden': true,
 };
 
-export function LogoMark({ size = 28 }: { size?: number }) {
+// The Avtoskop mark: a magnifier with a car in its lens (master file: design/brand/avtoskop-mark.svg).
+export function LogoMark({ size = 32 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 28 28" aria-hidden="true">
-      <rect width="28" height="28" rx="8" fill="var(--blue-solid)" />
-      <circle cx="12.5" cy="12.5" r="5.5" fill="none" stroke="var(--yellow)" strokeWidth="2.4" />
-      <path d="M16.6 16.6L21 21" stroke="var(--yellow)" strokeWidth="2.4" strokeLinecap="round" />
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="16" fill="var(--blue-solid)" />
+      <circle
+        cx="28"
+        cy="28"
+        r="16"
+        fill="var(--blue-solid)"
+        stroke="var(--yellow)"
+        strokeWidth="5"
+      />
+      <path d="M41 41l11 11" stroke="var(--yellow)" strokeWidth="6" strokeLinecap="round" />
+      <g transform="translate(0 0.4)">
+        <path
+          d="M19 28.6l2.6-6.2a2.4 2.4 0 0 1 2.2-1.5h8.4a2.4 2.4 0 0 1 2.2 1.5l2.6 6.2"
+          fill="none"
+          stroke="var(--on-blue)"
+          strokeWidth="2.6"
+          strokeLinejoin="round"
+        />
+        <rect x="17.5" y="28.1" width="21" height="7" rx="2.2" fill="var(--on-blue)" />
+        <circle cx="21.8" cy="31.6" r="1.7" fill="var(--yellow)" />
+        <circle cx="34.2" cy="31.6" r="1.7" fill="var(--yellow)" />
+      </g>
     </svg>
   );
 }

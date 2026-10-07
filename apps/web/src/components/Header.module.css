@@ -176,8 +176,9 @@
     gap: 4px;
   }
 
-  .accountWide,
-  .cta {
+  /* .actions raises specificity above the global .btn display rule, whatever the CSS order. */
+  .actions .accountWide,
+  .actions .cta {
     display: none;
   }
 }

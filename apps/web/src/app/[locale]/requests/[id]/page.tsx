@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ViewTransition } from 'react';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { BrandLogo } from '@/components/BrandLogo';
+import { StickyCta } from '@/components/StickyCta';
 import { FlagEU, FlagUS } from '@/components/icons';
 import { formatNumber, fuelsLabel, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { Link } from '@/i18n/navigation';
@@ -119,7 +120,11 @@ export default async function RequestDetailPage({ params }: Props) {
           )}
           <h2 className={styles.offerTitle}>{t('offerTitle')}</h2>
           <p className={styles.offerText}>{t('offerText')}</p>
-          <Link href={`/requests/${r.id}/offer`} className="btn btn-yellow btn-block">
+          <Link
+            id="offer-cta"
+            href={`/requests/${r.id}/offer`}
+            className="btn btn-yellow btn-block"
+          >
             {t('offerCta')}
           </Link>
           <Link href="/sellers" className={styles.offerRules}>
@@ -127,6 +132,7 @@ export default async function RequestDetailPage({ params }: Props) {
           </Link>
         </aside>
       </div>
+      <StickyCta href={`/requests/${r.id}/offer`} label={t('offerCta')} watchId="offer-cta" />
     </div>
   );
 }

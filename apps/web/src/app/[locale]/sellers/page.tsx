@@ -16,6 +16,7 @@ import {
   TelegramIcon,
 } from '@/components/icons';
 import { Link } from '@/i18n/navigation';
+import { feedbackUrl } from '@/server/contactLinks';
 import { countPublicRequests } from '@/server/requests';
 import styles from './sellers.module.css';
 
@@ -36,6 +37,8 @@ export default async function SellersPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('sellers');
+  const f = await getTranslations('faq');
+  const feedback = feedbackUrl();
   const active = await countPublicRequests();
 
   const who = [
@@ -124,6 +127,21 @@ export default async function SellersPage({ params }: Props) {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className={`card ${styles.verify}`}>
+        <h2 className={styles.sectionTitle}>{t('verifyTitle')}</h2>
+        <ol className={styles.verifySteps}>
+          <li>{t('verify1')}</li>
+          <li>{t('verify2')}</li>
+          <li>{t('verify3')}</li>
+        </ol>
+        <p className={styles.muted}>{t('verifyNote')}</p>
+        {feedback && (
+          <a href={feedback} target="_blank" rel="noopener noreferrer" className="btn btn-blue">
+            {f('write')}
+          </a>
+        )}
       </section>
 
       <section className={styles.split}>

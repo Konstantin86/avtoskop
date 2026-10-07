@@ -3,6 +3,8 @@ import { LIVE_STATS_MIN, localePath } from '@avtoskop/core';
 import { BrandModelFields } from '@/components/BrandModelFields';
 import { CarDrawing, RoadScene } from '@/components/CarScene';
 import { Compare } from '@/components/Compare';
+import { Faq, type FaqItem } from '@/components/Faq';
+import { StickyCta } from '@/components/StickyCta';
 import {
   CarIcon,
   CheckIcon,
@@ -23,6 +25,7 @@ export const dynamic = 'force-dynamic';
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const faq = await getTranslations('faq');
   const t = await getTranslations('home');
   const f = await getTranslations('fields');
   const messages = await getMessages();
@@ -51,7 +54,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <h1 className={styles.title}>{t('title')}</h1>
           <p className={styles.lead}>{t('lead')}</p>
           <div className={styles.ctas}>
-            <Link href="/request" className="btn btn-yellow btn-lg">
+            <Link id="hero-cta" href="/request" className="btn btn-yellow btn-lg">
               {t('ctaRequest')}
             </Link>
           </div>
@@ -163,6 +166,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         ))}
       </section>
 
+      <section className={styles.faq}>
+        <h2 className={styles.sectionTitle}>{faq('homeTitle')}</h2>
+        <Faq items={(faq.raw('buyerItems') as FaqItem[]).slice(0, 5)} />
+        <Link href="/faq" className={styles.faqAll}>
+          {faq('all')} →
+        </Link>
+      </section>
+
       <section className={styles.finalCta}>
         <CarDrawing className={styles.finalCar} />
         <h2 className={styles.sectionTitle}>{t('finalTitle')}</h2>
@@ -171,6 +182,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </Link>
         <span className={styles.sources}>{t('finalNote')}</span>
       </section>
+      <StickyCta href="/request" label={t('ctaRequest')} watchId="hero-cta" />
     </div>
   );
 }

@@ -249,13 +249,6 @@
   text-decoration: none;
 }
 
-.reached {
-  margin: -6px 0 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--good);
-}
-
 .expiry {
   display: flex;
   flex-wrap: wrap;
@@ -263,5 +256,34 @@
   justify-content: space-between;
   gap: 10px;
   font-size: 14px;
+  color: var(--muted);
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.status > span + span::before {
+  content: '·';
+  margin-right: 14px;
+  color: var(--line-strong);
+}
+
+.statusOn {
+  color: var(--good);
+}
+
+.statusWait {
+  color: var(--yellow-ink);
+}
+
+.statusOff {
   color: var(--muted);
 }
