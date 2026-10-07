@@ -62,7 +62,10 @@ export default async function OfferPage({ params }: Props) {
   }
 
   const existing = await getOwnOffer(id, user.seller.id);
-  const templates = existing ? [] : await listOfferTemplates(user.seller.id);
+  // Only earlier offers for the same car; with none, the "copy" field is hidden.
+  const templates = existing
+    ? []
+    : await listOfferTemplates(user.seller.id, { brand: request.brand, model: request.model });
   const defaults: Record<string, string> = existing
     ? {
         car: existing.car,

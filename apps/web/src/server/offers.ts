@@ -43,17 +43,45 @@ export interface OfferTemplate {
   values: Record<string, string>;
 }
 
-// The seller's recent offers, to reuse when the same car suits another buyer.
-export async function listOfferTemplates(sellerId: string, limit = 10): Promise<OfferTemplate[]> {
+const key = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+
+// Whether an earlier offer is about the same car as this request: it answered a request for the
+// same brand and model, or its own car name mentions both ("Toyota RAV4 Hybrid" for a RAV4).
+function sameCar(
+  offer: { car: string; requestBrand: string; requestModel: string },
+  target: { brand: string; model: string },
+): boolean {
+  const model = key(target.model);
+  if (key(offer.requestBrand) === key(target.brand) && key(offer.requestModel) === model) {
+    return true;
+  }
+  const car = key(offer.car);
+  // Brand names can have several forms ("ВАЗ / Lada"); any of their words will do.
+  const brandWords = target.brand
+    .split(/[\s/]+/)
+    .map(key)
+    .filter((w) => w.length > 1);
+  return model !== '' && car.includes(model) && brandWords.some((w) => car.includes(w));
+}
+
+// The seller's recent offers for the same car, to reuse when it suits another buyer.
+export async function listOfferTemplates(
+  sellerId: string,
+  target: { brand: string; model: string },
+  limit = 10,
+): Promise<OfferTemplate[]> {
   const rows = await db
-    .select()
+    .select({ offer: offers, requestBrand: brands.name, requestModel: buyerRequests.model })
     .from(offers)
+    .innerJoin(buyerRequests, eq(offers.requestId, buyerRequests.id))
+    .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
     .where(eq(offers.sellerId, sellerId))
     .orderBy(desc(offers.updatedAt))
     .limit(50);
   const seen = new Set<string>();
   const templates: OfferTemplate[] = [];
-  for (const o of rows) {
+  for (const { offer: o, requestBrand, requestModel } of rows) {
+    if (!sameCar({ car: o.car, requestBrand, requestModel }, target)) continue;
     const id = `${o.car}|${o.year}|${o.vin ?? ''}`;
     if (seen.has(id)) continue;
     seen.add(id);
