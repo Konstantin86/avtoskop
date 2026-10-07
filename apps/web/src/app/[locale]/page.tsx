@@ -1,7 +1,17 @@
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { localePath } from '@avtoskop/core';
 import { BrandModelFields } from '@/components/BrandModelFields';
-import { FlagIcon, LockIcon, ShieldIcon } from '@/components/icons';
+import { CarDrawing, RoadScene } from '@/components/CarScene';
+import { Compare } from '@/components/Compare';
+import {
+  CarIcon,
+  CheckIcon,
+  LockIcon,
+  OffersIcon,
+  PersonIcon,
+  PhoneCheckIcon,
+  TelegramIcon,
+} from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import { Link } from '@/i18n/navigation';
 import { getBrandOptions } from '@/server/brands';
@@ -19,10 +29,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const year = new Date().getFullYear();
 
   const steps = [1, 2, 3] as const;
+  const stepIcons = {
+    1: <CarIcon size={30} />,
+    2: <OffersIcon size={30} />,
+    3: <PhoneCheckIcon size={30} />,
+  };
   const trust = [
-    [LockIcon, 'trust1'],
-    [ShieldIcon, 'trust2'],
-    [FlagIcon, 'trust3'],
+    [CheckIcon, 'perk1'],
+    [TelegramIcon, 'perk2'],
+    [PersonIcon, 'perk3'],
   ] as const;
 
   return (
@@ -97,18 +112,34 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </form>
       </section>
 
+      <RoadScene />
+
       <section id="how" className={styles.how}>
         <h2 className={styles.sectionTitle}>{t('howTitle')}</h2>
         <div className={styles.steps}>
           {steps.map((n) => (
             <div key={n} className={`card ${styles.step}`}>
-              <span className={styles.stepNum}>{n}</span>
+              <div className={styles.stepTop}>
+                <span className={styles.stepNum}>{n}</span>
+                <span className={styles.stepIcon}>{stepIcons[n]}</span>
+              </div>
               <h3 className={styles.stepTitle}>{t(`step${n}Title`)}</h3>
               <p className={styles.stepText}>{t(`step${n}Text`)}</p>
             </div>
           ))}
         </div>
       </section>
+
+      <Compare
+        title={t('whyTitle')}
+        lead={t('whyLead')}
+        before={t('whyBefore')}
+        after={t('whyAfter')}
+        rows={([1, 2, 3, 4, 5, 6] as const).map((n) => ({
+          before: t(`why${n}Before`),
+          after: t(`why${n}After`),
+        }))}
+      />
 
       <section className={styles.trust}>
         {trust.map(([Icon, key]) => (
@@ -122,6 +153,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
           </div>
         ))}
+      </section>
+
+      <section className={styles.finalCta}>
+        <CarDrawing className={styles.finalCar} />
+        <h2 className={styles.sectionTitle}>{t('finalTitle')}</h2>
+        <Link href="/request" className="btn btn-yellow btn-lg">
+          {t('ctaRequest')}
+        </Link>
+        <span className={styles.sources}>{t('finalNote')}</span>
       </section>
     </div>
   );

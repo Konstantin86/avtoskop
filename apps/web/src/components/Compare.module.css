@@ -1,0 +1,139 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 56px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 680px;
+}
+
+.title {
+  font-size: 32px;
+}
+
+.lead {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.headerRow,
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.headerRow {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.beforeHead,
+.afterHead {
+  padding: 14px 24px;
+}
+
+.beforeHead {
+  color: var(--muted);
+  background: var(--surface-muted);
+}
+
+.afterHead {
+  color: var(--blue-dark);
+  background: var(--blue-soft);
+}
+
+.row + .row,
+.headerRow + .row {
+  border-top: 1px solid var(--line);
+}
+
+.before,
+.after {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 18px 24px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.before {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-muted) 55%, transparent);
+}
+
+.after {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.cross,
+.tick {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.cross {
+  background: var(--line);
+  color: var(--muted);
+}
+
+.tick {
+  background: var(--blue);
+  color: var(--surface);
+}
+
+@media (max-width: 720px) {
+  .title {
+    font-size: 26px;
+  }
+
+  .headerRow {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .before {
+    padding-bottom: 6px;
+    font-size: 14px;
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, var(--muted) 50%, transparent);
+  }
+
+  .after {
+    padding-top: 6px;
+    background: transparent;
+  }
+
+  .before {
+    background: transparent;
+  }
+}

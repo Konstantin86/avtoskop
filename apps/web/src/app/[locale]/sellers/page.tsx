@@ -1,11 +1,16 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { RoadScene } from '@/components/CarScene';
+import { Compare } from '@/components/Compare';
 import {
   CheckIcon,
   FlagEU,
   FlagUS,
   KeyIcon,
+  OffersIcon,
   PersonIcon,
+  PhoneCheckIcon,
+  SearchListIcon,
   StoreIcon,
   TelegramIcon,
 } from '@/components/icons';
@@ -44,6 +49,11 @@ export default async function SellersPage({ params }: Props) {
     [<KeyIcon key="key" />, 'whoBuyout'],
     [<PersonIcon key="person" />, 'whoOwners'],
   ] as const;
+  const stepIcons = {
+    1: <SearchListIcon size={30} />,
+    2: <OffersIcon size={30} />,
+    3: <PhoneCheckIcon size={30} />,
+  };
   const rules = ['rule1', 'rule2', 'rule3', 'rule4'] as const;
 
   return (
@@ -71,18 +81,34 @@ export default async function SellersPage({ params }: Props) {
         </span>
       </section>
 
+      <RoadScene />
+
       <section id="how" className={styles.section}>
         <h2 className={styles.sectionTitle}>{t('howTitle')}</h2>
         <div className={styles.steps}>
           {([1, 2, 3] as const).map((n) => (
             <div key={n} className={`card ${styles.step}`}>
-              <span className={styles.stepNum}>{n}</span>
+              <div className={styles.stepTop}>
+                <span className={styles.stepNum}>{n}</span>
+                <span className={styles.stepIcon}>{stepIcons[n]}</span>
+              </div>
               <h3 className={styles.stepTitle}>{t(`step${n}Title`)}</h3>
               <p className={styles.muted}>{t(`step${n}Text`)}</p>
             </div>
           ))}
         </div>
       </section>
+
+      <Compare
+        title={t('whyTitle')}
+        lead={t('whyLead')}
+        before={t('whyBefore')}
+        after={t('whyAfter')}
+        rows={([1, 2, 3, 4, 5] as const).map((n) => ({
+          before: t(`why${n}Before`),
+          after: t(`why${n}After`),
+        }))}
+      />
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>{t('whoTitle')}</h2>
@@ -124,7 +150,12 @@ export default async function SellersPage({ params }: Props) {
               <h2 className={styles.sideTitle}>{t('telegramTitle')}</h2>
               <p className={styles.muted}>{t('telegramText')}</p>
             </div>
-            <span className="chip chip-blue">{t('telegramSoon')}</span>
+            <Link
+              href={{ pathname: '/sellers/profile', query: { return: '/sellers' } }}
+              className="btn btn-secondary btn-sm"
+            >
+              {t('telegramSetup')}
+            </Link>
           </div>
           <Link href="/requests" className="btn btn-yellow btn-lg btn-block">
             {t('ctaBoard')}

@@ -232,3 +232,14 @@
   text-decoration: none;
   align-self: flex-start;
 }
+
+.stepTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stepIcon {
+  color: var(--blue);
+  display: flex;
+}

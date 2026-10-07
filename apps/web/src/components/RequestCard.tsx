@@ -1,7 +1,7 @@
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { PublicRequest } from '@/server/requests';
-import { FlagEU, FlagUS } from './icons';
+import { CarIcon, FlagEU, FlagUS } from './icons';
 import { formatNumber, fuelsLabel, timeAgo, yearsLabel } from './requestFormat';
 import styles from './RequestCard.module.css';
 
@@ -25,11 +25,16 @@ export async function RequestCard({ request: r }: { request: PublicRequest }) {
         <span className={styles.when}>{timeAgo(locale, r.createdAt)}</span>
         <span className={styles.region}>{regions[r.region]}</span>
       </div>
-      <h3 className={styles.title}>
-        <Link href={`/requests/${r.id}`}>
-          {r.brand} {r.model}
-        </Link>
-      </h3>
+      <div className={styles.titleRow}>
+        <span className={styles.badge} aria-hidden="true">
+          <CarIcon size={20} />
+        </span>
+        <h3 className={styles.title}>
+          <Link href={`/requests/${r.id}`}>
+            {r.brand} {r.model}
+          </Link>
+        </h3>
+      </div>
       <div className={styles.meta}>
         <span>{yearsLabel(r)}</span>
         {specs.map((s) => (

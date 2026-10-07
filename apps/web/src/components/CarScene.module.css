@@ -1,0 +1,99 @@
+.body {
+  fill: var(--surface);
+  stroke: var(--blue);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+}
+
+.window {
+  fill: var(--blue-soft);
+  stroke: var(--blue);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.wheel {
+  fill: var(--surface);
+  stroke: var(--ink);
+  stroke-width: 4;
+}
+
+.hub {
+  fill: var(--yellow);
+}
+
+.light {
+  fill: var(--yellow);
+}
+
+.beam {
+  fill: var(--yellow);
+  opacity: 0.35;
+}
+
+.speed path {
+  stroke: var(--line);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.road {
+  position: relative;
+  height: 110px;
+  margin: 0 0 40px;
+}
+
+/* Asphalt edge and the yellow centre line. */
+.road::before,
+.road::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.road::before {
+  bottom: 14px;
+  height: 2px;
+  background: var(--line);
+}
+
+.road::after {
+  bottom: 4px;
+  height: 4px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, var(--yellow) 0 26px, transparent 26px 48px);
+}
+
+.car {
+  position: absolute;
+  left: 6%;
+  bottom: 12px;
+  width: 210px;
+  height: auto;
+  animation: drive-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes drive-in {
+  from {
+    transform: translateX(-60px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .car {
+    animation: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .road {
+    height: 84px;
+    margin-bottom: 24px;
+  }
+
+  .car {
+    width: 150px;
+  }
+}

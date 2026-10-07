@@ -142,3 +142,45 @@ export function KeyIcon() {
     </svg>
   );
 }
+
+export function CarIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M5 11l1.5-4.1A2 2 0 0 1 8.4 5.6h7.2a2 2 0 0 1 1.9 1.3L19 11" />
+      <rect x="3" y="11" width="18" height="6.5" rx="2" />
+      <path d="M6 17.5V20M18 17.5V20" />
+      <circle cx="7.5" cy="14.2" r="1" />
+      <circle cx="16.5" cy="14.2" r="1" />
+    </svg>
+  );
+}
+
+export function OffersIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <rect x="7" y="3" width="13" height="10" rx="2" />
+      <path d="M4 8v10a2 2 0 0 0 2 2h10" />
+      <path d="M10 8h7M10 10.5h4" />
+    </svg>
+  );
+}
+
+export function PhoneCheckIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <rect x="6" y="2.5" width="12" height="19" rx="2.5" />
+      <path d="M11 18.5h2" />
+      <path d="M9.2 10.5l2 2 3.6-3.8" />
+    </svg>
+  );
+}
+
+export function SearchListIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+      <path d="M4 6h9M4 11h6M4 16h5" />
+      <circle cx="16" cy="14" r="3.5" />
+      <path d="M18.6 16.6L21 19" />
+    </svg>
+  );
+}
