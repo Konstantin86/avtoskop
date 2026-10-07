@@ -147,7 +147,10 @@ p {
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 120ms ease;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 90ms ease;
 }
 
 .btn:focus-visible,
@@ -385,5 +388,27 @@ textarea.field {
 @media (max-width: 480px) {
   .segment label {
     min-width: calc(33% - 4px);
+  }
+}
+
+/* A button whose form is being sent. */
+.btn[aria-busy='true'] {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* People who turn off animations on their device get none here either. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

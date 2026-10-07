@@ -1,7 +1,8 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useFocusFirstError } from '@/components/useFocusFirstError';
 import { FUELS, GEARBOXES, localePath, WISHES } from '@avtoskop/core';
 import { BrandPicker } from '@/components/BrandPicker';
 import { ModelInput } from '@/components/ModelInput';
@@ -26,6 +27,8 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
     errors: [],
     values: defaults,
   });
+  const formRef = useRef<HTMLFormElement>(null);
+  useFocusFirstError(formRef, state, Boolean(state.formError) || state.errors.length > 0);
 
   const v = state.values;
   const [brandId, setBrandId] = useState(v['brandId'] ?? '');
@@ -41,6 +44,7 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
 
   return (
     <form
+      ref={formRef}
       id="request-form"
       action={action}
       className={`card ${styles.form}`}

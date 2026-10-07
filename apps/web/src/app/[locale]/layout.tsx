@@ -7,6 +7,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { NavProgress } from '@/components/NavProgress';
 import { PageView } from '@/components/PageView';
 import { parseTheme, THEME_COOKIE } from '@/components/theme';
 import { routing } from '@/i18n/routing';
@@ -63,6 +64,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     >
       <body style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
         <NextIntlClientProvider>
+          <NavProgress />
           <Header />
           <main style={{ flex: 1 }}>{children}</main>
           <Footer />

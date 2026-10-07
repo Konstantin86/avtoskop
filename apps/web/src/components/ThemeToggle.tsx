@@ -63,8 +63,14 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
   function next() {
     const value = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]!;
     setTheme(value);
-    if (value === 'system') delete document.documentElement.dataset.theme;
-    else document.documentElement.dataset.theme = value;
+    const apply = () => {
+      if (value === 'system') delete document.documentElement.dataset.theme;
+      else document.documentElement.dataset.theme = value;
+    };
+    // A soft cross-fade where the browser supports it, instead of a hard flash.
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !reduce) document.startViewTransition(apply);
+    else apply();
     document.cookie = `${THEME_COOKIE}=${value}; path=/; max-age=31536000; samesite=lax`;
   }
 

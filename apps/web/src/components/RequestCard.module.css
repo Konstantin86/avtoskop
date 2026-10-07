@@ -6,6 +6,18 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 16px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow);
+  }
 }
 
 .top {

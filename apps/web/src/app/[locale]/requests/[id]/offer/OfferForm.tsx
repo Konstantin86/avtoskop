@@ -1,7 +1,8 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useFocusFirstError } from '@/components/useFocusFirstError';
 import { AVAILABILITY, OFFER_FEATURES, SOURCE_COUNTRIES, WISHES } from '@avtoskop/core';
 import type { OfferTemplate } from '@/server/offers';
 import { saveOfferAction, type FormState } from '../../../sellers/actions';
@@ -23,6 +24,8 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
     errors: [],
     values: defaults,
   });
+  const formRef = useRef<HTMLFormElement>(null);
+  useFocusFirstError(formRef, state, Boolean(state.formError) || state.errors.length > 0);
   // A copied offer fills the form until the next submit; after that the server's values win.
   const [copied, setCopied] = useState<{ values: Record<string, string>; for: FormState } | null>(
     null,
@@ -35,7 +38,13 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
   const invalid = (name: string) => (bad(name) ? { 'aria-invalid': true as const } : {});
 
   return (
-    <form action={action} className={`card ${styles.formCard}`} key={JSON.stringify(v)} noValidate>
+    <form
+      ref={formRef}
+      action={action}
+      className={`card ${styles.formCard}`}
+      key={JSON.stringify(v)}
+      noValidate
+    >
       <input type="hidden" name="requestId" value={requestId} />
       {templates.length > 0 && (
         <label className="label">

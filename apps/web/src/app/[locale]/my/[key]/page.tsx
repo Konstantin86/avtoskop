@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { BrandLogo } from '@/components/BrandLogo';
+import { OfferCard, OfferDeclineActions } from '@/components/OfferCard';
 import { ShareNumberButton } from '@/components/ShareNumberButton';
+import { SubmitButton } from '@/components/SubmitButton';
 import {
   makeMatchesBrand,
   MIN_SELLERS_TO_SHOW,
@@ -103,9 +105,7 @@ export default async function MyRequestPage({ params }: Props) {
             {request.expiresAt.getTime() - Date.now() < 7 * 86_400_000 && (
               <form action={extendRequestAction}>
                 <input type="hidden" name="key" value={key} />
-                <button type="submit" className="btn btn-secondary btn-sm">
-                  {t('extend')}
-                </button>
+                <SubmitButton className="btn btn-secondary btn-sm">{t('extend')}</SubmitButton>
               </form>
             )}
           </div>
@@ -156,9 +156,11 @@ export default async function MyRequestPage({ params }: Props) {
               .filter(Boolean)
               .join(' · ');
             return (
-              <article
+              <OfferCard
                 key={offer.id}
-                className={`card ${styles.offer} ${declined ? styles.declined : ''}`}
+                declined={declined}
+                className={`card ${styles.offer}`}
+                declinedClassName={styles.declined ?? ''}
               >
                 <div className={styles.offerTop}>
                   <div>
@@ -278,37 +280,33 @@ export default async function MyRequestPage({ params }: Props) {
                     <div className={forms.success}>{t('shared')}</div>
                   ) : offer.reported ? (
                     <span className={styles.facts}>{t('reported')}</span>
-                  ) : declined ? (
-                    <form action={restoreOfferAction} className={styles.inline}>
-                      <span className={styles.facts}>{t('declined')}</span>
-                      <input type="hidden" name="key" value={key} />
-                      <input type="hidden" name="offerId" value={offer.id} />
-                      <button type="submit" className="btn btn-secondary btn-sm">
-                        {t('restore')}
-                      </button>
-                    </form>
                   ) : (
-                    <>
-                      <ShareNumberButton
-                        action={shareContactAction}
-                        fields={{ key, offerId: offer.id }}
-                        labels={{
-                          open: t('share'),
-                          title: t('shareTitle', { seller: offer.seller.name }),
-                          text: t('shareText'),
-                          safety: t('shareSafety'),
-                          confirm: t('shareYes'),
-                          cancel: t('shareCancel'),
-                        }}
-                      />
-                      <form action={declineOfferAction}>
-                        <input type="hidden" name="key" value={key} />
-                        <input type="hidden" name="offerId" value={offer.id} />
-                        <button type="submit" className="btn btn-secondary">
-                          {t('decline')}
-                        </button>
-                      </form>
-                    </>
+                    <OfferDeclineActions
+                      fields={{ key, offerId: offer.id }}
+                      decline={declineOfferAction}
+                      restore={restoreOfferAction}
+                      inlineClassName={styles.inline ?? ''}
+                      noteClassName={styles.facts ?? ''}
+                      labels={{
+                        decline: t('decline'),
+                        declined: t('declined'),
+                        restore: t('restore'),
+                      }}
+                      share={
+                        <ShareNumberButton
+                          action={shareContactAction}
+                          fields={{ key, offerId: offer.id }}
+                          labels={{
+                            open: t('share'),
+                            title: t('shareTitle', { seller: offer.seller.name }),
+                            text: t('shareText'),
+                            safety: t('shareSafety'),
+                            confirm: t('shareYes'),
+                            cancel: t('shareCancel'),
+                          }}
+                        />
+                      }
+                    />
                   )}
                 </div>
                 {!offer.reported && (
@@ -331,13 +329,13 @@ export default async function MyRequestPage({ params }: Props) {
                         maxLength={500}
                         placeholder={t('reportComment')}
                       />
-                      <button type="submit" className="btn btn-secondary btn-sm">
+                      <SubmitButton className="btn btn-secondary btn-sm">
                         {t('reportSend')}
-                      </button>
+                      </SubmitButton>
                     </form>
                   </details>
                 )}
-              </article>
+              </OfferCard>
             );
           })}
         </section>
@@ -350,9 +348,9 @@ export default async function MyRequestPage({ params }: Props) {
           <form action={setRequestOpenAction}>
             <input type="hidden" name="key" value={key} />
             <input type="hidden" name="open" value={closed ? '1' : '0'} />
-            <button type="submit" className="btn btn-secondary">
+            <SubmitButton className="btn btn-secondary">
               {closed ? t('reopen') : t('close')}
-            </button>
+            </SubmitButton>
           </form>
         </section>
         <p className={styles.keep}>{t('keepLink')}</p>

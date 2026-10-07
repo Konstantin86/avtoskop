@@ -1,7 +1,8 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useFocusFirstError } from '@/components/useFocusFirstError';
 import { SELLER_TYPES, SOURCE_COUNTRIES } from '@avtoskop/core';
 import { BrandLogo } from '@/components/BrandLogo';
 import { MultiSelect, type Option } from '@/components/MultiSelect';
@@ -22,6 +23,8 @@ export function ProfileForm({ defaults, regionNames, returnTo, brands }: Props) 
     errors: [],
     values: defaults,
   });
+  const formRef = useRef<HTMLFormElement>(null);
+  useFocusFirstError(formRef, state, Boolean(state.formError) || state.errors.length > 0);
   const v = state.values;
   const [type, setType] = useState(v['type'] ?? 'importer');
   const bad = (name: string) => state.errors.includes(name);
@@ -33,7 +36,13 @@ export function ProfileForm({ defaults, regionNames, returnTo, brands }: Props) 
     bad(name) ? <span className="error-text">{t(`error_${name}` as 'error_name')}</span> : null;
 
   return (
-    <form action={action} className={`card ${styles.formCard}`} key={JSON.stringify(v)} noValidate>
+    <form
+      ref={formRef}
+      action={action}
+      className={`card ${styles.formCard}`}
+      key={JSON.stringify(v)}
+      noValidate
+    >
       <input type="hidden" name="return" value={returnTo} />
       {state.formError && (
         <div className={styles.alert} role="alert">
