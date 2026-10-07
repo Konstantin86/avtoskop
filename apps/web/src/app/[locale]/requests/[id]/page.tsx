@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ViewTransition } from 'react';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { BrandLogo } from '@/components/BrandLogo';
 import { FlagEU, FlagUS } from '@/components/icons';
@@ -72,8 +73,14 @@ export default async function RequestDetailPage({ params }: Props) {
             {t('posted', { when: timeAgo(locale, r.createdAt) })}
           </span>
           <h1 className={styles.title}>
-            <BrandLogo name={r.brand} size={44} />
-            {r.brand} {r.model}
+            <ViewTransition name={`req-logo-${r.id}`} share="morph" default="none">
+              <BrandLogo name={r.brand} size={44} />
+            </ViewTransition>
+            <ViewTransition name={`req-title-${r.id}`} share="morph" default="none">
+              <span>
+                {r.brand} {r.model}
+              </span>
+            </ViewTransition>
           </h1>
           <div className={styles.budget}>
             {t('budget', { amount: formatNumber(locale, r.budgetUsd) })}

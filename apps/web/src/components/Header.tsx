@@ -31,7 +31,8 @@ export async function Header() {
   );
 
   return (
-    <header className={styles.header}>
+    // Named so page transitions leave the header in place instead of fading it.
+    <header className={styles.header} style={{ viewTransitionName: 'site-header' }}>
       <div className={`container ${styles.inner}`}>
         <Link href="/" className={styles.logo}>
           <LogoMark />

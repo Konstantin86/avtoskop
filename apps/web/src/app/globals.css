@@ -412,3 +412,36 @@ textarea.field {
     scroll-behavior: auto !important;
   }
 }
+
+/* Page transitions (React <ViewTransition> + the browser View Transitions API). */
+::view-transition {
+  /* Clicks during the short animation reach the live page. */
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-old(.page),
+::view-transition-new(.page) {
+  animation-duration: 160ms;
+}
+
+::view-transition-group(site-header),
+::view-transition-old(site-header),
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-group(.morph) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

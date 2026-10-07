@@ -1,3 +1,4 @@
+import { ViewTransition } from 'react';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { PublicRequest } from '@/server/requests';
@@ -27,10 +28,17 @@ export async function RequestCard({ request: r }: { request: PublicRequest }) {
         <span className={styles.region}>{regions[r.region]}</span>
       </div>
       <div className={styles.titleRow}>
-        <BrandLogo name={r.brand} size={40} />
+        {/* Named so the logo and title glide into the request page (see requests/[id]). */}
+        <ViewTransition name={`req-logo-${r.id}`} share="morph" default="none">
+          <BrandLogo name={r.brand} size={40} />
+        </ViewTransition>
         <h3 className={styles.title}>
           <Link href={`/requests/${r.id}`}>
-            {r.brand} {r.model}
+            <ViewTransition name={`req-title-${r.id}`} share="morph" default="none">
+              <span>
+                {r.brand} {r.model}
+              </span>
+            </ViewTransition>
           </Link>
         </h3>
       </div>
