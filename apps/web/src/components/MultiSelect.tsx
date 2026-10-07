@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import styles from './MultiSelect.module.css';
 
 export interface Option {
@@ -17,6 +17,8 @@ interface Props {
   emptyLabel: string;
   removeLabel: string;
   max?: number;
+  // Optional picture before each chosen item, e.g. a brand logo.
+  iconFor?: (value: string) => ReactNode;
 }
 
 // A select that adds chips; each chosen value is posted as a hidden input with the same name.
@@ -29,6 +31,7 @@ export function MultiSelect({
   emptyLabel,
   removeLabel,
   max = 40,
+  iconFor,
 }: Props) {
   const [selected, setSelected] = useState(defaultValues);
   const labels = new Map(options.map((o) => [o.value, o.label]));
@@ -39,6 +42,7 @@ export function MultiSelect({
         {selected.length === 0 && <span className={styles.empty}>{emptyLabel}</span>}
         {selected.map((v) => (
           <span key={v} className={styles.chip}>
+            {iconFor?.(v)}
             {labels.get(v) ?? v}
             <button
               type="button"

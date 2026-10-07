@@ -1,5 +1,6 @@
 import { getLocale, getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { sellerTypeAllowed } from '@avtoskop/core';
+import { BrandLogo } from '@/components/BrandLogo';
 import { formatNumber, fuelsLabel, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
@@ -102,6 +103,7 @@ export default async function OfferPage({ params }: Props) {
         <div className={styles.summary}>
           <span className={styles.summaryLabel}>{t('forRequest')}</span>
           <span className={styles.summaryTitle}>
+            <BrandLogo name={request.brand} size={28} />
             {request.brand} {request.model}
           </span>
           <span className={styles.summaryMeta}>{meta}</span>

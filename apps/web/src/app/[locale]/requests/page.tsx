@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { REGION_CODES } from '@avtoskop/core';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { BrandPicker } from '@/components/BrandPicker';
 import { RequestCard } from '@/components/RequestCard';
 import { Link } from '@/i18n/navigation';
 import { getBrandOptions } from '@/server/brands';
@@ -27,6 +28,7 @@ export default async function BoardPage({ params, searchParams }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('board');
+  const f = await getTranslations('fields');
   const regions = (await getMessages()).regions as Record<string, string>;
   const brands = await getBrandOptions();
   const query = await searchParams;
@@ -51,22 +53,21 @@ export default async function BoardPage({ params, searchParams }: Props) {
       </div>
 
       <form method="get" className={`card ${styles.filters}`}>
-        <label className="label">
+        <label className="label" htmlFor="filter-brand">
           {t('filterBrand')}
-          <select name="brand" className="field" defaultValue={brandId ? String(brandId) : ''}>
-            <option value="">{t('allBrands')}</option>
-            {brands.popular.map((b) => (
-              <option key={`p${b.id}`} value={b.id}>
-                {b.name}
-              </option>
-            ))}
-            <option disabled>──────────</option>
-            {brands.all.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name}
-              </option>
-            ))}
-          </select>
+          <BrandPicker
+            id="filter-brand"
+            name="brand"
+            brands={brands}
+            labels={{
+              placeholder: t('allBrands'),
+              popular: f('popularBrands'),
+              all: f('allBrands'),
+              noMatches: f('brandNoMatches'),
+            }}
+            defaultValue={brandId ? String(brandId) : undefined}
+            allowEmpty
+          />
         </label>
         <label className="label">
           {t('filterRegion')}

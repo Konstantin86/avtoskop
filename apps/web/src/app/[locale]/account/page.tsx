@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getLocale, getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { BrandLogo } from '@/components/BrandLogo';
 import { formatNumber, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
@@ -70,6 +71,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
             <li key={r.id} className={`card ${me.item}`}>
               <div>
                 <div className={me.itemTitle}>
+                  <BrandLogo name={r.brand} size={28} />
                   {r.brand} {r.model} {yearsLabel(r)}
                 </div>
                 <div className={me.meta}>
@@ -120,6 +122,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
               <li key={r.id} className={`card ${me.item}`}>
                 <div>
                   <Link href={`/requests/${r.id}`} className={me.itemTitle}>
+                    <BrandLogo name={r.brand} size={28} />
                     {r.brand} {r.model} {yearsLabel(r)}
                   </Link>
                   <div className={me.meta}>
@@ -175,6 +178,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
               <li key={o.id} className={`card ${me.item}`}>
                 <div>
                   <Link href={`/requests/${o.requestId}`} className={me.itemTitle}>
+                    <BrandLogo name={o.requestBrand} size={28} />
                     {o.requestBrand} {o.requestModel}
                   </Link>
                   <div className={me.meta}>

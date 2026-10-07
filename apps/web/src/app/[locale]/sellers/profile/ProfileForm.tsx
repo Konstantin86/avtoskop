@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { SELLER_TYPES, SOURCE_COUNTRIES } from '@avtoskop/core';
+import { BrandLogo } from '@/components/BrandLogo';
 import { MultiSelect, type Option } from '@/components/MultiSelect';
 import { RegionSelect } from '@/components/RegionSelect';
 import { saveProfileAction, type FormState } from '../actions';
@@ -116,6 +117,9 @@ export function ProfileForm({ defaults, regionNames, returnTo, brands }: Props) 
             id="brandIds"
             name="brandIds"
             options={brands}
+            iconFor={(value) => (
+              <BrandLogo name={brands.find((b) => b.value === value)?.label ?? ''} size={22} />
+            )}
             defaultValues={list('brandIds')}
             placeholder={t('addBrand')}
             emptyLabel={t('allBrands')}

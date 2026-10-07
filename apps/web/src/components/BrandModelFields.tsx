@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { BrandOption } from '@/server/brands';
-import { BrandSelect } from './BrandSelect';
+import { BrandPicker } from './BrandPicker';
 import { ModelInput } from './ModelInput';
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
     brandPlaceholder: string;
     modelPlaceholder: string;
     noMatches: string;
+    brandNoMatches: string;
     popular: string;
     all: string;
   };
@@ -26,13 +27,14 @@ export function BrandModelFields({ idPrefix, brands, labels }: Props) {
     <>
       <label className="label" htmlFor={`${idPrefix}-brand`}>
         {labels.brand}
-        <BrandSelect
+        <BrandPicker
           id={`${idPrefix}-brand`}
           brands={brands}
           labels={{
             placeholder: labels.brandPlaceholder,
             popular: labels.popular,
             all: labels.all,
+            noMatches: labels.brandNoMatches,
           }}
           onChange={setBrandId}
         />

@@ -17,7 +17,10 @@ export async function Footer() {
           color: 'var(--muted)',
         }}
       >
-        <span>{t('copyright', { year: new Date().getFullYear() })}</span>
+        <span>
+          {t('copyright', { year: new Date().getFullYear() })}
+          <span style={{ display: 'block', fontSize: 12, marginTop: 4 }}>{t('trademarks')}</span>
+        </span>
         <span style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <Link href="/terms" style={{ color: 'inherit' }}>
             {t('terms')}

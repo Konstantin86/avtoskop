@@ -42,3 +42,34 @@
 .empty {
   color: var(--muted);
 }
+
+.group {
+  padding: 10px 12px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.brandOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.withLogo {
+  position: relative;
+}
+
+.fieldLogo {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.hasLogo {
+  padding-left: 48px;
+}

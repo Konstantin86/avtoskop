@@ -1,7 +1,8 @@
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import type { PublicRequest } from '@/server/requests';
-import { CarIcon, FlagEU, FlagUS } from './icons';
+import { BrandLogo } from './BrandLogo';
+import { FlagEU, FlagUS } from './icons';
 import { formatNumber, fuelsLabel, timeAgo, yearsLabel } from './requestFormat';
 import styles from './RequestCard.module.css';
 
@@ -26,9 +27,7 @@ export async function RequestCard({ request: r }: { request: PublicRequest }) {
         <span className={styles.region}>{regions[r.region]}</span>
       </div>
       <div className={styles.titleRow}>
-        <span className={styles.badge} aria-hidden="true">
-          <CarIcon size={20} />
-        </span>
+        <BrandLogo name={r.brand} size={40} />
         <h3 className={styles.title}>
           <Link href={`/requests/${r.id}`}>
             {r.brand} {r.model}

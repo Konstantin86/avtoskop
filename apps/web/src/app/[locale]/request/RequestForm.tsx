@@ -3,7 +3,7 @@
 import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FUELS, GEARBOXES, localePath, WISHES } from '@avtoskop/core';
-import { BrandSelect } from '@/components/BrandSelect';
+import { BrandPicker } from '@/components/BrandPicker';
 import { ModelInput } from '@/components/ModelInput';
 import { PhoneInput } from '@/components/PhoneInput';
 import { TelegramIcon } from '@/components/icons';
@@ -59,13 +59,14 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
         <div className={styles.pair}>
           <label className="label" htmlFor="brandId">
             {f('brand')}
-            <BrandSelect
+            <BrandPicker
               id="brandId"
               brands={brands}
               labels={{
                 placeholder: f('brandPlaceholder'),
                 popular: f('popularBrands'),
                 all: f('allBrands'),
+                noMatches: f('brandNoMatches'),
               }}
               defaultValue={v['brandId']}
               invalid={bad('brandId')}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { BrandLogo } from '@/components/BrandLogo';
 import { ShareNumberButton } from '@/components/ShareNumberButton';
 import {
   makeMatchesBrand,
@@ -90,6 +91,7 @@ export default async function MyRequestPage({ params }: Props) {
             {t('posted', { time: timeAgo(locale, request.createdAt) })}
           </span>
           <span className={forms.summaryTitle}>
+            <BrandLogo name={request.brand} size={28} />
             {request.brand} {request.model}
           </span>
           <span className={forms.summaryMeta}>{meta}</span>

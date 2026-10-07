@@ -104,7 +104,8 @@
     "consent": "I agree to the <terms>terms</terms> and <privacy>privacy policy</privacy>",
     "notifyNote": "After posting, confirm your number in our Telegram bot: offers will arrive there too. Sellers don't see your number.",
     "modelNoMatches": "No such model in the list",
-    "fuelsHint": "You can choose several. If none is chosen, any fuel is fine."
+    "fuelsHint": "You can choose several. If none is chosen, any fuel is fine.",
+    "brandNoMatches": "No such brand in the list"
   },
   "request": {
     "back": "← Home",
@@ -167,7 +168,8 @@
   "footer": {
     "copyright": "© Avtoskop, {year}",
     "terms": "Terms",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "trademarks": "Trademarks and logos belong to their owners."
   },
   "regions": {
     "all": "All Ukraine",

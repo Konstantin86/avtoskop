@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { BrandLogo } from '@/components/BrandLogo';
 import { FlagEU, FlagUS } from '@/components/icons';
 import { formatNumber, fuelsLabel, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { Link } from '@/i18n/navigation';
@@ -71,6 +72,7 @@ export default async function RequestDetailPage({ params }: Props) {
             {t('posted', { when: timeAgo(locale, r.createdAt) })}
           </span>
           <h1 className={styles.title}>
+            <BrandLogo name={r.brand} size={44} />
             {r.brand} {r.model}
           </h1>
           <div className={styles.budget}>
