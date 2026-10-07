@@ -81,18 +81,31 @@ export async function ogCard({ eyebrow, title, lines, footer, brand }: Card) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <svg width="60" height="60" viewBox="0 0 64 64">
           <rect width="64" height="64" rx="16" fill={C.blue} />
+          <circle cx="29.3" cy="29.3" r="16" fill="none" stroke="#F59E0B" strokeWidth="5" />
+          <path d="M42.3 42.3l10 10" stroke="#F59E0B" strokeWidth="6.4" strokeLinecap="round" />
           <circle cx="28" cy="28" r="16" fill={C.blue} stroke={C.yellow} strokeWidth="5" />
-          <path d="M41 41l11 11" stroke={C.yellow} strokeWidth="6" strokeLinecap="round" />
-          <path
-            d="M19 29l2.6-6.2a2.4 2.4 0 0 1 2.2-1.5h8.4a2.4 2.4 0 0 1 2.2 1.5l2.6 6.2"
-            fill="none"
-            stroke={C.white}
-            strokeWidth="2.6"
-            strokeLinejoin="round"
-          />
-          <rect x="17.5" y="28.5" width="21" height="7" rx="2.2" fill={C.white} />
-          <circle cx="21.8" cy="32" r="1.7" fill={C.yellow} />
-          <circle cx="34.2" cy="32" r="1.7" fill={C.yellow} />
+          <path d="M41 41l10 10" stroke={C.yellow} strokeWidth="6.4" strokeLinecap="round" />
+          <g transform="translate(0 -0.6)">
+            <rect x="19.2" y="33.4" width="3.8" height="3.8" rx="1.2" fill="#0A2C5E" />
+            <rect x="33" y="33.4" width="3.8" height="3.8" rx="1.2" fill="#0A2C5E" />
+            <path
+              d="M23.8 20.4h8.4a1.6 1.6 0 0 1 1.5 1l2.2 5.2h1.3a1.6 1.6 0 0 1 1.6 1.6v5.2a1.6 1.6 0 0 1-1.6 1.6H19a1.6 1.6 0 0 1-1.6-1.6v-5.2a1.6 1.6 0 0 1 1.6-1.6h1.3l2.2-5.2a1.6 1.6 0 0 1 1.5-1z"
+              fill={C.white}
+            />
+            <rect x="15.8" y="25.2" width="2.6" height="1.7" rx="0.7" fill={C.white} />
+            <rect x="37.6" y="25.2" width="2.6" height="1.7" rx="0.7" fill={C.white} />
+            <path
+              d="M24.6 22.1h6.8l1.9 4.5H22.7z"
+              fill={C.blue}
+              stroke={C.blue}
+              strokeWidth="0.8"
+              strokeLinejoin="round"
+            />
+            <rect x="19.2" y="28.3" width="4" height="2.1" rx="1" fill={C.yellow} />
+            <rect x="32.8" y="28.3" width="4" height="2.1" rx="1" fill={C.yellow} />
+            <rect x="24.8" y="28.6" width="6.4" height="1.6" rx="0.8" fill={C.blue} />
+            <path d="M21.5 32.6h13" stroke={C.blue} strokeWidth="0.9" strokeLinecap="round" />
+          </g>
         </svg>
         <div style={{ fontSize: 34, fontWeight: 700 }}>{brand}</div>
       </div>
