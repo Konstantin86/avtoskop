@@ -127,6 +127,8 @@ export function BrandPicker({
             setOpen(true);
             setActive(-1);
           }}
+          // The field keeps focus after a pick, so a second click must reopen the list itself.
+          onClick={() => setOpen(true)}
           onFocus={(e) => {
             e.target.select();
             setOpen(true);

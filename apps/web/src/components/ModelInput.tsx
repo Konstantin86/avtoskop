@@ -118,6 +118,7 @@ export function ModelInput({
           setUnknown(false);
         }}
         onFocus={() => setOpen(true)}
+        onClick={() => setOpen(true)}
         onBlur={settle}
         onKeyDown={(e) => {
           if (!strict) return;

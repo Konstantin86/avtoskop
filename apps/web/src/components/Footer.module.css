@@ -1,29 +1,29 @@
 .footer {
   margin-top: auto;
+  /* Vertical space lives here: the .container class sets its own padding shorthand. */
+  padding: 32px 0 36px;
   border-top: 1px solid var(--line);
-}
-
-.inner {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding-top: 24px;
-  padding-bottom: 28px;
   font-size: 14px;
   color: var(--muted);
 }
 
-.feedback {
-  align-self: flex-start;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.row {
+.inner {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
+  gap: 20px 40px;
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedback {
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .small {
@@ -35,9 +35,20 @@
 .links {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
+  gap: 8px 20px;
 }
 
 .links a {
   color: inherit;
+}
+
+@media (max-width: 720px) {
+  .footer {
+    padding: 28px 0 32px;
+  }
+
+  .inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
