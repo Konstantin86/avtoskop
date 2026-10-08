@@ -54,12 +54,14 @@ export function HowItWorks({ title, steps, minutes, outsideLabel }: Props) {
           return (
             <li key={step.title} className={styles.item} style={{ ['--i' as string]: i }}>
               <div className={`${styles.card} ${outside ? styles.outside : ''}`}>
-                <div className={styles.scene}>{art[i]}</div>
-                <div className={styles.top}>
-                  <span className={styles.num}>{i + 1}</span>
+                <div className={styles.scene}>
+                  {art[i]}
                   {outside && <span className={styles.badge}>{outsideLabel}</span>}
                 </div>
-                <h3 className={styles.stepTitle}>{step.title}</h3>
+                <div className={styles.top}>
+                  <span className={styles.num}>{i + 1}</span>
+                  <h3 className={styles.stepTitle}>{step.title}</h3>
+                </div>
                 <p className={styles.stepText}>{step.text}</p>
               </div>
               {i < steps.length - 1 && (
