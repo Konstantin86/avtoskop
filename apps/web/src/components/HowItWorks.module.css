@@ -112,13 +112,14 @@
   color: var(--muted);
 }
 
-/* Arrow in the gap to the right of each card but the last. */
+/* Arrow in the 38px gap to the right of each card but the last, about 2px clear of both
+   cards (the drawn line, with its rounded ends, spans 1.75–45.25 of the 48-unit box). */
 .arrow {
   position: absolute;
   top: 34%;
-  right: -41px;
-  width: 44px;
-  height: 24px;
+  right: -38px;
+  width: 37.5px;
+  height: 18.75px;
   overflow: visible;
 }
 
@@ -585,10 +586,11 @@
     margin: 0;
   }
 
+  /* Turned to point down, centred in the 40px gap between stacked cards. */
   .arrow {
     top: auto;
-    bottom: -34px;
-    left: calc(50% - 24px);
+    bottom: -29.4px;
+    left: calc(50% - 18.75px);
     right: auto;
     transform: rotate(90deg);
   }

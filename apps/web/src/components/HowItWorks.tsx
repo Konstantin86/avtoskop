@@ -60,8 +60,8 @@ export function HowItWorks({ title, steps, outsideLabel }: Props) {
               </div>
               {i < steps.length - 1 && (
                 <svg className={styles.arrow} viewBox="0 0 48 24" aria-hidden="true">
-                  <path className={styles.arrowLine} d="M2 12 H40" />
-                  <path className={styles.arrowHead} d="M34 5 L42 12 L34 19" />
+                  <path className={styles.arrowLine} d="M3 12 H43" />
+                  <path className={styles.arrowHead} d="M37 5 L44 12 L37 19" />
                 </svg>
               )}
             </li>
