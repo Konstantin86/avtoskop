@@ -13,6 +13,8 @@ export async function countReachableSellers(request: AlertRequest): Promise<numb
       alerts: sellers.alerts,
       brandIds: sellers.brandIds,
       serviceRegions: sellers.serviceRegions,
+      budgetMinUsd: sellers.budgetMinUsd,
+      yearMin: sellers.yearMin,
     })
     .from(sellers)
     .innerJoin(users, eq(sellers.userId, users.id))

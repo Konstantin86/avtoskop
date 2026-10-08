@@ -13,6 +13,7 @@ import {
   offerLimitPerDay,
   reportInput,
   requestMatchesSeller,
+  reviewInput,
   sellerProfileInput,
 } from './seller.ts';
 
@@ -303,5 +304,47 @@ describe('offerInput photos', () => {
     const eleven = Array.from({ length: 11 }, (_, i) => id(i)).join(',');
     expect(offerInput.safeParse({ ...base, photos: eleven }).success).toBe(false);
     expect(offerInput.safeParse({ ...base, photos: '../../etc/passwd' }).success).toBe(false);
+  });
+});
+
+describe('requestMatchesSeller alert filters', () => {
+  const seller = {
+    type: 'importer',
+    status: 'verified',
+    alerts: true,
+    brandIds: [],
+    serviceRegions: [],
+    budgetMinUsd: 20000,
+    yearMin: 2018,
+  };
+  const request = { brandId: 1, sellerTypes: [], region: 'kyiv', importOk: true };
+
+  it('skips budgets below the seller floor and requests only for older cars', () => {
+    expect(requestMatchesSeller({ ...request, budgetUsd: 25000, yearTo: null }, seller)).toBe(true);
+    expect(requestMatchesSeller({ ...request, budgetUsd: 15000, yearTo: null }, seller)).toBe(
+      false,
+    );
+    expect(requestMatchesSeller({ ...request, budgetUsd: 25000, yearTo: 2016 }, seller)).toBe(
+      false,
+    );
+    expect(requestMatchesSeller({ ...request, budgetUsd: 25000, yearTo: 2019 }, seller)).toBe(true);
+  });
+
+  it('ignores the filters when the request leaves budget and years out', () => {
+    expect(requestMatchesSeller(request, seller)).toBe(true);
+  });
+});
+
+describe('reviewInput', () => {
+  it('takes a 1 to 5 rating and a short comment', () => {
+    const id = '00000000-0000-4000-8000-000000000001';
+    expect(reviewInput.parse({ offerId: id, rating: '5' })).toMatchObject({
+      rating: 5,
+      comment: '',
+    });
+    expect(reviewInput.safeParse({ offerId: id, rating: '6' }).success).toBe(false);
+    expect(
+      reviewInput.safeParse({ offerId: id, rating: '4', comment: 'x'.repeat(301) }).success,
+    ).toBe(false);
   });
 });

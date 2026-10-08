@@ -147,6 +147,31 @@ export function ProfileForm({ defaults, regionNames, returnTo, brands }: Props) 
             removeLabel={t('remove')}
           />
         </label>
+        <div className={styles.pair}>
+          <label className="label">
+            {t('alertBudgetMin')}
+            <input
+              name="budgetMinUsd"
+              className="field"
+              inputMode="numeric"
+              defaultValue={v['budgetMinUsd']}
+              placeholder={t('alertAny')}
+              aria-invalid={bad('budgetMinUsd') || undefined}
+            />
+          </label>
+          <label className="label">
+            {t('alertYearMin')}
+            <input
+              name="yearMin"
+              className="field"
+              inputMode="numeric"
+              defaultValue={v['yearMin']}
+              placeholder={t('alertAny')}
+              aria-invalid={bad('yearMin') || undefined}
+            />
+          </label>
+        </div>
+        <span className="hint">{t('alertFiltersHint')}</span>
         <label className={styles.checkRow}>
           <input type="checkbox" name="alerts" defaultChecked={v['alerts'] === 'on'} />
           <span>{t('alertsOn')}</span>

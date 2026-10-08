@@ -325,7 +325,8 @@
     "typeOf_dealer": "dealers",
     "typeOf_buyout": "buyout firms",
     "typeOf_owner": "owners",
-    "edited": "Updated {date}"
+    "edited": "Updated {date}",
+    "offersSoFar": "{count, plural, =0 {No offers yet: be the first} other {Offers so far: #}}"
   },
   "auth": {
     "title": "Sign in to Avtoskop",
@@ -378,7 +379,13 @@
     "addRegion": "Add a region…",
     "allRegions": "All of Ukraine",
     "remove": "Remove",
-    "alertsOn": "Send alerts in Telegram"
+    "alertsOn": "Send alerts in Telegram",
+    "alertBudgetMin": "Request budget from, $",
+    "alertYearMin": "Your cars from year",
+    "alertAny": "Any",
+    "alertFiltersHint": "Don't send requests with a lower budget or only for older cars. Leave empty to get them all.",
+    "error_budgetMinUsd": "Enter at least $500",
+    "error_yearMin": "Check the year"
   },
   "offer": {
     "title": "Your offer",
@@ -516,7 +523,14 @@
     "requestClosed": "Request closed",
     "closedBecause_found_here": "The buyer found a car through Avtoskop",
     "closedBecause_found_elsewhere": "The buyer found a car elsewhere",
-    "closedBecause_not_looking": "The buyer is no longer looking"
+    "closedBecause_not_looking": "The buyer is no longer looking",
+    "withdraw": "Withdraw offer",
+    "withdrawSold": "Car sold",
+    "withdrawOther": "Other reason",
+    "withdrawn": "Withdrawn",
+    "withdrawnSold": "Withdrawn: car sold",
+    "restoreOffer": "Put back",
+    "yourRating": "Your rating: ★ {average} · {count, plural, one {# review} other {# reviews}}"
   },
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call or message the buyer soon.",
@@ -533,7 +547,9 @@
     "changeYears": "Years: {from} → {to}",
     "changeRegion": "Region: {from} → {to}",
     "changeImport": "Import: {to, select, yes {now fine} other {cars in Ukraine only}}",
-    "requestClosed": "🔒 The buyer closed the request {request}.{reason, select, found_here {\nThey found a car through Avtoskop.} found_elsewhere {\nThey found a car elsewhere.} not_looking {\nThey are no longer looking.} other {}}\n\nYour offer: {offer}\nThanks for replying. New requests for your brands will keep coming here."
+    "requestClosed": "🔒 The buyer closed the request {request}.{reason, select, found_here {\nThey found a car through Avtoskop.} found_elsewhere {\nThey found a car elsewhere.} not_looking {\nThey are no longer looking.} other {}}\n\nYour offer: {offer}\nThanks for replying. New requests for your brands will keep coming here.",
+    "offerViewed": "👀 The buyer viewed your offer for the request {request}:\n{offer}\n\nIf they share their number with you, it will arrive here.",
+    "newReview": "⭐ A buyer reviewed you: {rating} out of 5 (request {request}).{comment}"
   },
   "my": {
     "title": "Your request",
@@ -626,7 +642,16 @@
     "part_priceCustomsUsd": "customs",
     "part_serviceFeeUsd": "seller fee",
     "part_other": "other",
-    "part_priceRepairUsd": "repairs"
+    "part_priceRepairUsd": "repairs",
+    "withdrawn": "The seller withdrew this offer.",
+    "withdrawnSold": "The seller withdrew this offer: the car has been sold.",
+    "reviews": "{count, plural, one {# review} other {# reviews}}",
+    "reviewTitle": "Rate the seller",
+    "reviewText": "You found a car through Avtoskop. Your rating helps other buyers choose a reliable seller.",
+    "reviewSeller": "Seller",
+    "reviewRating": "Rating",
+    "reviewComment": "Comment (optional): how did it go?",
+    "reviewSend": "Send review"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
@@ -654,7 +679,8 @@
     "requestExpired": "Your request \"{request}\" closed after 30 days. If you are still looking, open it again: {link}",
     "requestLimit": "You have already published 3 requests today. This one is saved: open the bot from its page tomorrow and it will be published.",
     "requestAutoria": "While you wait for offers, here are similar cars on AUTO.RIA with your filters: {link}",
-    "sellerRequestExpired": "🔒 The request {request} has closed: the buyer did not extend it after 30 days.\n\nYour offer: {offer}\nNew requests for your brands will keep coming here."
+    "sellerRequestExpired": "🔒 The request {request} has closed: the buyer did not extend it after 30 days.\n\nYour offer: {offer}\nNew requests for your brands will keep coming here.",
+    "alertCopyPrevious": "⚡ Reply with your previous offer for this car: {link}"
   },
   "legal": {
     "updated": "Updated: {date}",
@@ -720,7 +746,7 @@
         },
         {
           "title": "3. What others see",
-          "body": "A published request (car, years, budget, region, wishes and comment) is visible to everyone visiting the site, and we may share it on social networks. A buyer's phone number and Telegram account are never published. Buyers see a seller's profile (name, type, region, description) together with the offer. Offer photos are seen only by the buyer the offer was sent to and by the seller; they never appear on public pages."
+          "body": "A published request (car, years, budget, region, wishes and comment) is visible to everyone visiting the site, and we may share it on social networks. A buyer's phone number and Telegram account are never published. Buyers see a seller's profile (name, type, region, description) together with the offer. Offer photos are seen only by the buyer the offer was sent to and by the seller; they never appear on public pages. A buyer's rating and comment about a seller are shown to other buyers next to that seller's offers; the buyer's name and number are not shown."
         },
         {
           "title": "4. How we protect numbers",
@@ -859,8 +885,9 @@
   },
   "about": {
     "title": "About Avtoskop",
-    "lead": "A service where the buyer describes the car, and sellers come to them.",
+    "lead": "You describe the car once, and sellers find you, even while you sleep.",
     "p1": "Buying a car in Ukraine usually means hours of scrolling through listings, dozens of calls, and your number ending up with everyone. I wanted to turn that around: the buyer describes once what they want, sellers offer options, and nobody calls without your consent.",
+    "pSellers": "Selling your car? You don't have to list it on public sites: someone may already be looking for exactly that car here. Browse buyers' requests and send an offer only to someone it really suits. Only that buyer will see your car.",
     "p2": "Avtoskop is currently a pilot. I check sellers myself, read every report and answer messages. If something doesn't work, or you have an idea to make it better, write to me.",
     "signed": "{name}, founder of Avtoskop",
     "team": "The Avtoskop team",

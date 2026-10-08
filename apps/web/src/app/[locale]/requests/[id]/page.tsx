@@ -6,7 +6,7 @@ import { StickyCta } from '@/components/StickyCta';
 import { FlagEU, FlagUS } from '@/components/icons';
 import { formatNumber, fuelsLabel, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { Link } from '@/i18n/navigation';
-import { getPublicRequest } from '@/server/requests';
+import { countOffersOn, getPublicRequest } from '@/server/requests';
 import styles from './detail.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -47,6 +47,7 @@ export default async function RequestDetailPage({ params }: Props) {
       </div>
     );
   }
+  const offersSoFar = await countOffersOn(r.id);
 
   const rows: Array<[string, string]> = [
     [t('years'), yearsLabel(r)],
@@ -125,6 +126,7 @@ export default async function RequestDetailPage({ params }: Props) {
           )}
           <h2 className={styles.offerTitle}>{t('offerTitle')}</h2>
           <p className={styles.offerText}>{t('offerText')}</p>
+          <p className={styles.offerCount}>{t('offersSoFar', { count: offersSoFar })}</p>
           <Link
             id="offer-cta"
             href={`/requests/${r.id}/offer`}

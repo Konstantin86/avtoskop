@@ -387,6 +387,8 @@ function useSellerReach(form: React.RefObject<HTMLFormElement | null>, brandId: 
         brandId,
         region,
         importOk: data.get('importOk') === 'false' ? 'false' : 'true',
+        ...(Number(data.get('budgetUsd')) > 0 && { budgetUsd: String(data.get('budgetUsd')) }),
+        ...(Number(data.get('yearTo')) > 0 && { yearTo: String(data.get('yearTo')) }),
         sellerTypes: data.getAll('sellerTypes').join(','),
       });
       controller = new AbortController();
@@ -399,7 +401,7 @@ function useSellerReach(form: React.RefObject<HTMLFormElement | null>, brandId: 
     function onChange(e: Event) {
       const target = e.target as HTMLInputElement;
       if (
-        ['region', 'importOk', 'sellerTypes'].includes(target.name) &&
+        ['region', 'importOk', 'sellerTypes', 'budgetUsd', 'yearTo'].includes(target.name) &&
         target.form === form.current
       )
         update();

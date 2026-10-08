@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq, inArray, ne, notInArray } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
 import {
   changesWorthAMessage,
@@ -134,7 +134,7 @@ export async function recordOfferUpdate(
     Date.now() - before.changesSeenAt.getTime() > UPDATE_NOTE_MINUTES * 60_000;
   const unseen = mergeChanges(seenLongAgo ? [] : (before.changes as OfferChange[]), changes);
 
-  const quiet = before.status === 'declined';
+  const quiet = before.status === 'declined' || before.status === 'withdrawn';
   const lastToldPrice = before.notifiedPriceUsd ?? before.priceUsd;
   const newLow = !quiet && after.priceUsd < lastToldPrice;
   const recentlyTold =
@@ -208,7 +208,9 @@ export async function notifySellersOfRequestChange(
     .from(offers)
     .innerJoin(sellers, eq(offers.sellerId, sellers.id))
     .innerJoin(users, eq(sellers.userId, users.id))
-    .where(and(eq(offers.requestId, requestId), ne(offers.status, 'declined')));
+    .where(
+      and(eq(offers.requestId, requestId), notInArray(offers.status, ['declined', 'withdrawn'])),
+    );
   if (recipients.length === 0) return;
   await db
     .update(buyerRequests)
@@ -270,7 +272,9 @@ export async function notifySellersOfClose(
     .from(offers)
     .innerJoin(sellers, eq(offers.sellerId, sellers.id))
     .innerJoin(users, eq(sellers.userId, users.id))
-    .where(and(eq(offers.requestId, requestId), ne(offers.status, 'declined')));
+    .where(
+      and(eq(offers.requestId, requestId), notInArray(offers.status, ['declined', 'withdrawn'])),
+    );
   const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
   for (const s of recipients) {
     await sendTelegram(
@@ -279,6 +283,37 @@ export async function notifySellersOfClose(
         request: `${r.brand} ${r.model}`,
         reason: reason ?? 'none',
         offer: `${s.car}, ${s.year}, ${priceLabel('uk', s.priceUsd, s.priceMaxUsd)}`,
+      }),
+    );
+  }
+}
+
+// Tells each seller, once, that the buyer has opened their offer.
+export async function notifySellersOfView(offerIds: string[]): Promise<void> {
+  if (offerIds.length === 0) return;
+  const rows = await db
+    .select({
+      telegramId: users.telegramId,
+      car: offers.car,
+      year: offers.year,
+      priceUsd: offers.priceUsd,
+      priceMaxUsd: offers.priceMaxUsd,
+      brand: brands.name,
+      model: buyerRequests.model,
+    })
+    .from(offers)
+    .innerJoin(buyerRequests, eq(offers.requestId, buyerRequests.id))
+    .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
+    .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+    .innerJoin(users, eq(sellers.userId, users.id))
+    .where(inArray(offers.id, offerIds));
+  const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
+  for (const r of rows) {
+    await sendTelegram(
+      r.telegramId,
+      t('offerViewed', {
+        request: `${r.brand} ${r.model}`,
+        offer: `${r.car}, ${r.year}, ${priceLabel('uk', r.priceUsd, r.priceMaxUsd)}`,
       }),
     );
   }

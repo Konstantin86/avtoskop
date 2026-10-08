@@ -6,6 +6,8 @@ const Query = z.object({
   brandId: z.coerce.number().int().positive(),
   region: z.enum(REGION_CODES),
   importOk: z.enum(['true', 'false']).transform((v) => v === 'true'),
+  budgetUsd: z.coerce.number().int().positive().optional(),
+  yearTo: z.coerce.number().int().positive().optional(),
   sellerTypes: z
     .string()
     .transform((v) => (v ? v.split(',') : []))

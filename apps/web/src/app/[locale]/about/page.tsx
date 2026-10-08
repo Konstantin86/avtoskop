@@ -44,6 +44,7 @@ export default async function AboutPage({ params }: Props) {
 
         <section className={`card ${styles.story}`}>
           <p>{t('p1')}</p>
+          <p>{t('pSellers')}</p>
           <p>{t('p2')}</p>
           <div className={styles.person}>
             {hasPhoto() ? (

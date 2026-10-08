@@ -1,4 +1,4 @@
-import { and, eq, isNotNull, isNull, lte, ne } from 'drizzle-orm';
+import { and, eq, isNotNull, isNull, lte, ne, notInArray } from 'drizzle-orm';
 import { decryptContact, EXPIRY_REMINDER_DAYS, localePath } from '@avtoskop/core';
 import { brands, buyerRequests, offers, sellers, users, type Db } from '@avtoskop/db';
 import type { Telegram } from './telegram.ts';
@@ -64,7 +64,7 @@ export function createExpiryJob(db: Db, tg: Telegram, { contactKey, siteUrl, log
       .from(offers)
       .innerJoin(sellers, eq(offers.sellerId, sellers.id))
       .innerJoin(users, eq(sellers.userId, users.id))
-      .where(and(eq(offers.requestId, r.id), ne(offers.status, 'declined')));
+      .where(and(eq(offers.requestId, r.id), notInArray(offers.status, ['declined', 'withdrawn'])));
     for (const s of recipients) {
       if (s.telegramId <= 0) continue;
       const price = new Intl.NumberFormat('uk-UA').format(s.priceUsd);

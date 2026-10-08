@@ -37,6 +37,8 @@ export default async function ProfilePage({ params, searchParams }: Props) {
         brandIds: s.brandIds.join(','),
         serviceRegions: s.serviceRegions.join(','),
         alerts: s.alerts ? 'on' : '',
+        budgetMinUsd: s.budgetMinUsd ? String(s.budgetMinUsd) : '',
+        yearMin: s.yearMin ? String(s.yearMin) : '',
       }
     : { type: 'importer', name: user.name, region: 'kyiv', alerts: 'on' };
 

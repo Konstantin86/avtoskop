@@ -7,8 +7,10 @@ import { getCurrentUser } from '@/server/auth';
 import { listUserRequests } from '@/server/buyer';
 import { feedbackUrl } from '@/server/contactLinks';
 import { listOwnOffers } from '@/server/offers';
+import { sellerRatings } from '@/server/reviews';
 import { listRequestsForSeller } from '@/server/requests';
 import { signOutAction } from '../login/actions';
+import { setOfferWithdrawnAction } from '../sellers/actions';
 import styles from '../sellers/forms.module.css';
 import me from './account.module.css';
 
@@ -54,6 +56,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
     seller ? listRequestsForSeller(seller) : Promise.resolve([]),
   ]);
   const feedback = feedbackUrl();
+  const rating = seller ? (await sellerRatings([seller.id])).get(seller.id) : undefined;
   const regions = (await getMessages()).regions as Record<string, string>;
   const sent = (await searchParams)['sent'];
 
@@ -162,6 +165,11 @@ export default async function AccountPage({ params, searchParams }: Props) {
         >
           {t('editProfile')}
         </Link>
+        {rating && (
+          <div className={me.meta}>
+            {t('yourRating', { average: rating.average.toFixed(1), count: rating.count })}
+          </div>
+        )}
         <div className={me.meta}>{seller.alerts ? t('alertsOn') : t('alertsOff')}</div>
         {seller.status === 'pending' && feedback && (
           <p className={me.verify}>
@@ -208,6 +216,18 @@ export default async function AccountPage({ params, searchParams }: Props) {
                 <div className={me.itemRight}>
                   {o.requestStatus === 'closed' ? (
                     <span className="chip">{t('requestClosed')}</span>
+                  ) : o.status === 'withdrawn' ? (
+                    <>
+                      <span className="chip">
+                        {o.withdrawReason === 'sold' ? t('withdrawnSold') : t('withdrawn')}
+                      </span>
+                      <form action={setOfferWithdrawnAction}>
+                        <input type="hidden" name="offerId" value={o.id} />
+                        <button type="submit" className={me.linkButton}>
+                          {t('restoreOffer')}
+                        </button>
+                      </form>
+                    </>
                   ) : (
                     <>
                       <span
@@ -218,6 +238,30 @@ export default async function AccountPage({ params, searchParams }: Props) {
                       <Link href={`/requests/${o.requestId}/offer`} className={me.editLink}>
                         {t('edit')}
                       </Link>
+                      {/* Taking an offer back is rare, so it stays folded. */}
+                      <details className={me.withdraw}>
+                        <summary>{t('withdraw')}</summary>
+                        <form action={setOfferWithdrawnAction} className={me.withdrawForm}>
+                          <input type="hidden" name="offerId" value={o.id} />
+                          <input type="hidden" name="withdraw" value="1" />
+                          <button
+                            type="submit"
+                            name="reason"
+                            value="sold"
+                            className="btn btn-secondary btn-sm"
+                          >
+                            {t('withdrawSold')}
+                          </button>
+                          <button
+                            type="submit"
+                            name="reason"
+                            value=""
+                            className="btn btn-secondary btn-sm"
+                          >
+                            {t('withdrawOther')}
+                          </button>
+                        </form>
+                      </details>
                     </>
                   )}
                 </div>

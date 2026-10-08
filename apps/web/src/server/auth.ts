@@ -39,6 +39,8 @@ export const getCurrentUser = cache(async () => {
         brandIds: sellers.brandIds,
         serviceRegions: sellers.serviceRegions,
         alerts: sellers.alerts,
+        budgetMinUsd: sellers.budgetMinUsd,
+        yearMin: sellers.yearMin,
       },
     })
     .from(sessions)

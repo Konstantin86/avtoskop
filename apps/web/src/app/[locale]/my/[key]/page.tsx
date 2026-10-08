@@ -25,7 +25,10 @@ import {
   timeAgo,
   yearsLabel,
 } from '@/components/requestFormat';
+import { after } from 'next/server';
 import { RefreshOnce } from '@/components/RefreshOnce';
+import { notifySellersOfView } from '@/server/notify';
+import { hasReview, sellerRatings } from '@/server/reviews';
 import { Link } from '@/i18n/navigation';
 import { autoriaLinkFor } from '@/server/autoria';
 import { photosForOffers, photoUrl } from '@/server/photos';
@@ -39,6 +42,7 @@ import {
   reportOfferAction,
   restoreOfferAction,
   setRequestOpenAction,
+  submitReviewAction,
   shareContactAction,
 } from '../actions';
 import forms from '../../sellers/forms.module.css';
@@ -88,6 +92,14 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
 
   const offerList = await listRequestOffers(request.id);
   const loadedAt = Date.now();
+  const ratings = await sellerRatings(offerList.map((o) => o.seller.id));
+  // After "found through Avtoskop", the buyer can rate a seller they shared their number with.
+  const sharedOffers = offerList.filter((o) => o.status === 'contact_shared');
+  const askReview =
+    request.status === 'closed' &&
+    request.closeReason === 'found_here' &&
+    sharedOffers.length > 0 &&
+    !(await hasReview(request.id));
   const photos = await photosForOffers(offerList.map((o) => o.id));
   const autoria =
     request.status !== 'closed' && request.phoneVerified ? await autoriaLinkFor(request) : null;
@@ -97,7 +109,9 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
   ]);
   const shortDate = (d: Date) => d.toLocaleDateString(locale === 'uk' ? 'uk-UA' : 'en-GB');
   const hadNew = offerList.some((o) => o.status === 'sent');
-  await markOffersShown(request.id);
+  const firstSeen = await markOffersShown(request.id);
+  // Sellers hear about it after the page is sent, so the buyer doesn't wait for Telegram.
+  if (firstSeen.length > 0) after(() => notifySellersOfView(firstSeen));
   const regions = (await getMessages()).regions as Record<string, string>;
   const closed = request.status === 'closed';
   const meta = [
@@ -208,7 +222,9 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
             <p className={forms.lead}>{request.phoneVerified ? t('empty') : t('emptyPending')}</p>
           )}
           {offerList.map((offer) => {
-            const declined = offer.status === 'declined';
+            const withdrawn = offer.status === 'withdrawn';
+            // A withdrawn offer looks faded like a declined one and can't be acted on.
+            const declined = offer.status === 'declined' || withdrawn;
             const shared = offer.status === 'contact_shared';
             const order = offer.availability === 'to_order';
             const facts = [
@@ -381,7 +397,16 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                 )}
                 <div className={styles.seller}>
                   <div>
-                    <div className={styles.sellerName}>{offer.seller.name}</div>
+                    <div className={styles.sellerName}>
+                      {offer.seller.name}
+                      {ratings.get(offer.seller.id) && (
+                        <span className={styles.rating}>
+                          {' '}
+                          ★ {ratings.get(offer.seller.id)!.average.toFixed(1)} ·{' '}
+                          {t('reviews', { count: ratings.get(offer.seller.id)!.count })}
+                        </span>
+                      )}
+                    </div>
                     <div className={styles.facts}>
                       {p(`type_${offer.seller.type}` as 'type_importer')} ·{' '}
                       {regions[offer.seller.region]}
@@ -398,7 +423,11 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                 {offer.seller.about && <p className={styles.about}>{offer.seller.about}</p>}
 
                 <div className={styles.actions}>
-                  {shared ? (
+                  {withdrawn ? (
+                    <div className={forms.notice}>
+                      {offer.withdrawReason === 'sold' ? t('withdrawnSold') : t('withdrawn')}
+                    </div>
+                  ) : shared ? (
                     <div className={forms.success}>{t('shared')}</div>
                   ) : offer.reported ? (
                     <span className={styles.facts}>{t('reported')}</span>
@@ -478,6 +507,38 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
           </div>
         )}
 
+        {askReview && (
+          <form action={submitReviewAction} className={`card ${styles.review}`}>
+            <input type="hidden" name="key" value={key} />
+            <h2 className={styles.closeTitle}>{t('reviewTitle')}</h2>
+            <p className={styles.facts}>{t('reviewText')}</p>
+            <div className="choices" role="radiogroup" aria-label={t('reviewSeller')}>
+              {sharedOffers.map((o, i) => (
+                <label key={o.id}>
+                  <input type="radio" name="offerId" value={o.id} defaultChecked={i === 0} />
+                  <span>
+                    {o.seller.name} · {o.car}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <div className="choices" role="radiogroup" aria-label={t('reviewRating')}>
+              {[5, 4, 3, 2, 1].map((n) => (
+                <label key={n}>
+                  <input type="radio" name="rating" value={n} required />
+                  <span>{'★'.repeat(n)}</span>
+                </label>
+              ))}
+            </div>
+            <textarea
+              name="comment"
+              className="field"
+              maxLength={300}
+              placeholder={t('reviewComment')}
+            />
+            <SubmitButton className="btn btn-yellow">{t('reviewSend')}</SubmitButton>
+          </form>
+        )}
         <form action={setRequestOpenAction} className={`card ${styles.closeCard}`}>
           <input type="hidden" name="key" value={key} />
           <input type="hidden" name="open" value={closed ? '1' : '0'} />

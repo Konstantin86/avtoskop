@@ -9,6 +9,8 @@ export const AVAILABILITY = ['in_ukraine', 'in_transit', 'to_order'] as const;
 export const OFFER_EXTRAS = ['customs_cleared', 'inspection_ok', 'warranty', 'negotiable'] as const;
 export const OFFER_FEATURES = [...WISHES, ...OFFER_EXTRAS] as const;
 
+const currentYear = new Date().getUTCFullYear();
+
 const asArray = (v: unknown) => (typeof v === 'string' ? v.split(',').filter(Boolean) : (v ?? []));
 const optionalInt = (min: number, max: number) =>
   z.preprocess(
@@ -26,6 +28,9 @@ export const sellerProfileInput = z
     brandIds: z.preprocess(asArray, z.array(z.coerce.number().int().positive()).max(40)),
     serviceRegions: z.preprocess(asArray, z.array(z.enum(REGION_CODES)).max(30)),
     alerts: z.preprocess((v) => v === true || v === 'on', z.boolean()),
+    // Optional alert filters: skip requests with a lower budget, or for older cars only.
+    budgetMinUsd: optionalInt(500, 1_000_000),
+    yearMin: optionalInt(1990, currentYear + 1),
   })
   .transform((s) => ({
     ...s,
@@ -36,8 +41,6 @@ export const sellerProfileInput = z
   }));
 
 export type SellerProfileInput = z.infer<typeof sellerProfileInput>;
-
-const currentYear = new Date().getUTCFullYear();
 
 export const offerInput = z
   .object({
@@ -152,6 +155,9 @@ export interface AlertRequest {
   sellerTypes: string[];
   region: string;
   importOk: boolean;
+  // Left out where only the request type matters (e.g. the reach count on the form).
+  budgetUsd?: number | undefined;
+  yearTo?: number | null | undefined;
 }
 
 export interface AlertSeller {
@@ -160,6 +166,8 @@ export interface AlertSeller {
   alerts: boolean;
   brandIds: number[];
   serviceRegions: string[];
+  budgetMinUsd?: number | null;
+  yearMin?: number | null;
 }
 
 // Whether a newly published request should be sent to this seller in Telegram.
@@ -168,6 +176,16 @@ export function requestMatchesSeller(request: AlertRequest, seller: AlertSeller)
   if (!sellerTypeAllowed(request.sellerTypes, seller.type)) return false;
   if (seller.type === 'importer' && !request.importOk) return false;
   if (seller.brandIds.length > 0 && !seller.brandIds.includes(request.brandId)) return false;
+  // A buyer's budget is the most they'll pay, so only a budget below the seller's floor rules
+  // them out; likewise a request capped at years older than the seller's cars.
+  if (
+    seller.budgetMinUsd &&
+    request.budgetUsd !== undefined &&
+    request.budgetUsd < seller.budgetMinUsd
+  ) {
+    return false;
+  }
+  if (seller.yearMin && request.yearTo && request.yearTo < seller.yearMin) return false;
   // A buyer who accepts any region can be served from anywhere.
   if (request.region === 'all' || seller.serviceRegions.length === 0) return true;
   return seller.serviceRegions.includes(request.region);
@@ -177,3 +195,13 @@ export function requestMatchesSeller(request: AlertRequest, seller: AlertSeller)
 export function matchedWishes(wishes: readonly string[], features: readonly string[]): string[] {
   return wishes.filter((w) => features.includes(w));
 }
+
+// A seller can take an offer back, for example when the car has sold elsewhere.
+export const WITHDRAW_REASONS = ['sold'] as const;
+
+// A buyer's review of the seller they bought from, one per request.
+export const reviewInput = z.object({
+  offerId: z.uuid(),
+  rating: z.coerce.number().int().min(1).max(5),
+  comment: z.string().trim().max(300).optional().default(''),
+});

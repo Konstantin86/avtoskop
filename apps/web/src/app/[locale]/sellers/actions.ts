@@ -1,6 +1,7 @@
 'use server';
 
-import { and, count, eq, gt, sql } from 'drizzle-orm';
+import { and, count, eq, gt, ne, sql } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 import { getLocale, getTranslations } from 'next-intl/server';
 import {
   localePath,
@@ -9,6 +10,7 @@ import {
   offerLimitPerDay,
   sellerProfileInput,
   sellerTypeAllowed,
+  WITHDRAW_REASONS,
   vinMismatches,
 } from '@avtoskop/core';
 import { brands, buyerRequests, offers, sellers } from '@avtoskop/db';
@@ -53,10 +55,16 @@ export async function saveProfileAction(_prev: FormState, formData: FormData): P
       values,
     };
   }
+  // Empty filters are stored as null, so clearing a field really removes the filter.
+  const data = {
+    ...parsed.data,
+    budgetMinUsd: parsed.data.budgetMinUsd ?? null,
+    yearMin: parsed.data.yearMin ?? null,
+  };
   const [saved] = await db
     .insert(sellers)
-    .values({ userId: user.userId, ...parsed.data })
-    .onConflictDoUpdate({ target: sellers.userId, set: { ...parsed.data, updatedAt: new Date() } })
+    .values({ userId: user.userId, ...data })
+    .onConflictDoUpdate({ target: sellers.userId, set: { ...data, updatedAt: new Date() } })
     .returning({ isNew: sql<boolean>`(xmax = 0)` });
   // A new seller gets a short how-to from the bot.
   if (saved?.isNew) {
@@ -184,7 +192,12 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     .values({ requestId, sellerId: seller.id, ...row, notifiedPriceUsd: row.priceUsd })
     .onConflictDoUpdate({
       target: [offers.requestId, offers.sellerId],
-      set: { ...row, updatedAt: new Date() },
+      set: {
+        ...row,
+        updatedAt: new Date(),
+        // Updating a withdrawn offer puts it back in front of the buyer.
+        ...(existing?.status === 'withdrawn' && { status: 'shown', withdrawReason: null }),
+      },
     })
     // xmax is 0 only for a freshly inserted row, so edits don't notify the buyer again.
     .returning({ id: offers.id, isNew: sql<boolean>`(xmax = 0)` });
@@ -201,4 +214,30 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     locale: await getLocale(),
   });
   return { errors: [], values };
+}
+
+// The seller takes an offer back (or returns it) from their account.
+export async function setOfferWithdrawnAction(formData: FormData): Promise<void> {
+  const user = await getCurrentUser();
+  if (!user?.seller) return;
+  const offerId = String(formData.get('offerId') ?? '');
+  const withdraw = formData.get('withdraw') === '1';
+  const given = String(formData.get('reason') ?? '');
+  const reason = (WITHDRAW_REASONS as readonly string[]).includes(given) ? given : null;
+  if (!/^[0-9a-f-]{36}$/i.test(offerId)) return;
+  await db
+    .update(offers)
+    .set(
+      withdraw
+        ? { status: 'withdrawn', withdrawReason: reason }
+        : { status: 'shown', withdrawReason: null },
+    )
+    .where(
+      and(
+        eq(offers.id, offerId),
+        eq(offers.sellerId, user.seller.id),
+        withdraw ? ne(offers.status, 'withdrawn') : eq(offers.status, 'withdrawn'),
+      ),
+    );
+  revalidatePath('/[locale]/account', 'page');
 }

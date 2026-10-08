@@ -31,6 +31,7 @@ export async function getRequestByKey(key: string) {
       editedAt: buyerRequests.editedAt,
       recentEdits: buyerRequests.recentEdits,
       status: buyerRequests.status,
+      closeReason: buyerRequests.closeReason,
       phoneVerified: buyerRequests.phoneVerified,
       alertedSellers: buyerRequests.alertedSellers,
       expiresAt: buyerRequests.expiresAt,
@@ -68,11 +69,13 @@ export async function listRequestOffers(requestId: string) {
         vin: offers.vin,
         vinDecoded: offers.vinDecoded,
         status: offers.status,
+        withdrawReason: offers.withdrawReason,
         changes: offers.changes,
         changesSeenAt: offers.changesSeenAt,
         createdAt: offers.createdAt,
         reported: isNotNull(reports.id).mapWith(Boolean),
         seller: {
+          id: sellers.id,
           name: sellers.name,
           type: sellers.type,
           region: sellers.region,
@@ -90,11 +93,13 @@ export async function listRequestOffers(requestId: string) {
   );
 }
 
-export async function markOffersShown(requestId: string): Promise<void> {
-  await db
+// Returns the offers seen for the first time, so their sellers can be told.
+export async function markOffersShown(requestId: string): Promise<string[]> {
+  const seen = await db
     .update(offers)
     .set({ status: 'shown' })
-    .where(and(eq(offers.requestId, requestId), eq(offers.status, 'sent')));
+    .where(and(eq(offers.requestId, requestId), eq(offers.status, 'sent')))
+    .returning({ id: offers.id });
   // The buyer has now seen the "updated" notes; they fade a few minutes later.
   await db
     .update(offers)
@@ -106,6 +111,7 @@ export async function markOffersShown(requestId: string): Promise<void> {
         sql`${offers.changes} <> '[]'::jsonb`,
       ),
     );
+  return seen.map((o) => o.id);
 }
 
 // Requests the person confirmed in Telegram, which is how they are tied to an account.

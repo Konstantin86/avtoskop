@@ -54,6 +54,8 @@ export {
   REPORT_REASONS,
   reportInput,
   requestMatchesSeller,
+  reviewInput,
+  WITHDRAW_REASONS,
   sellerProfileInput,
   SELLER_TYPES,
   SOURCE_COUNTRIES,

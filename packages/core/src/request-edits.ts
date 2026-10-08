@@ -44,6 +44,8 @@ export function alertTargetsChanged(before: AlertRequest, after: AlertRequest): 
   return (
     before.region !== after.region ||
     before.importOk !== after.importOk ||
+    before.budgetUsd !== after.budgetUsd ||
+    (before.yearTo ?? null) !== (after.yearTo ?? null) ||
     [...before.sellerTypes].sort().join() !== [...after.sellerTypes].sort().join()
   );
 }

@@ -87,6 +87,8 @@ export function createSellerAlerts(
         alerts: sellers.alerts,
         brandIds: sellers.brandIds,
         serviceRegions: sellers.serviceRegions,
+        budgetMinUsd: sellers.budgetMinUsd,
+        yearMin: sellers.yearMin,
       })
       .from(sellers)
       .innerJoin(users, eq(sellers.userId, users.id))
@@ -112,13 +114,36 @@ export function createSellerAlerts(
             ).map((o) => o.telegramId),
           )
         : new Set<number>();
+      // Sellers who already offered on a request for the same car get a ready-made copy link.
+      const repeat = new Set(
+        (
+          await db
+            .selectDistinct({ telegramId: users.telegramId })
+            .from(offers)
+            .innerJoin(buyerRequests, eq(offers.requestId, buyerRequests.id))
+            .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+            .innerJoin(users, eq(sellers.userId, users.id))
+            .where(
+              and(
+                eq(buyerRequests.brandId, r.brandId),
+                sql`lower(${buyerRequests.model}) = lower(${r.model})`,
+              ),
+            )
+        ).map((row) => row.telegramId),
+      );
+      const copyLine = botText(SELLER_LOCALE, 'alertCopyPrevious', {
+        link: siteUrl + localePath(SELLER_LOCALE, `/requests/${r.id}/offer?from=last`),
+      });
       let sent = 0;
       for (const s of candidates) {
         // Never alert buyers about their own request.
         if (s.telegramId === r.buyerChatId || !requestMatchesSeller(r, s)) continue;
         if (before && (requestMatchesSeller(before, s) || offered.has(s.telegramId))) continue;
         try {
-          await tg.sendMessage(s.telegramId, text);
+          await tg.sendMessage(
+            s.telegramId,
+            repeat.has(s.telegramId) ? `${text}\n\n${copyLine}` : text,
+          );
           sent += 1;
         } catch (error) {
           // Usually the seller blocked the bot; the rest still get the alert.

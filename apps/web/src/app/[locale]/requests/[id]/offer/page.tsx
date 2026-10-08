@@ -12,9 +12,12 @@ import styles from '../../../sellers/forms.module.css';
 
 export const dynamic = 'force-dynamic';
 
-type Props = { params: Promise<{ locale: string; id: string }> };
+type Props = {
+  params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
+};
 
-export default async function OfferPage({ params }: Props) {
+export default async function OfferPage({ params, searchParams }: Props) {
   const { locale, id } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('offer');
@@ -73,9 +76,13 @@ export default async function OfferPage({ params }: Props) {
   const templates = existing
     ? []
     : await listOfferTemplates(user.seller.id, { brand: request.brand, model: request.model });
+  // "?from=last" (the link in a seller alert) starts from their latest offer for the same car.
+  const fromLast = (await searchParams)['from'] === 'last' ? templates[0] : undefined;
   const defaults: Record<string, string> = existing
     ? offerFormValues(existing)
-    : { car: `${request.brand} ${request.model}`, availability: 'in_ukraine' };
+    : fromLast
+      ? fromLast.values
+      : { car: `${request.brand} ${request.model}`, availability: 'in_ukraine' };
 
   const regions = (await getMessages()).regions as Record<string, string>;
   const meta = [

@@ -144,6 +144,8 @@ export const buyerRequests = pgTable(
       sellerTypes: string[];
       region: string;
       importOk: boolean;
+      budgetUsd?: number;
+      yearTo?: number | null;
     }>(),
     // Last "the buyer changed the request" message to sellers with offers (one a day).
     sellersNotifiedAt: timestamp('sellers_notified_at', { withTimezone: true }),
@@ -210,6 +212,9 @@ export const sellers = pgTable('sellers', {
   brandIds: integer('brand_ids').array().notNull().default([]),
   serviceRegions: text('service_regions').array().notNull().default([]),
   alerts: boolean('alerts').notNull().default(true),
+  // Optional alert filters: no requests below this budget, or only for cars older than this year.
+  budgetMinUsd: integer('budget_min_usd'),
+  yearMin: integer('year_min'),
   // pending -> verified by an admin; banned sellers can't send offers and their offers are hidden.
   status: text('status').notNull().default('pending'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -249,7 +254,10 @@ export const offers = pgTable(
     vinDecoded: jsonb('vin_decoded').$type<{ make: string; model: string; year: number | null }>(),
     // Seller's claims about the car: buyer wishes it meets plus offer extras (OFFER_FEATURES).
     features: text('features').array().notNull().default([]),
+    // sent -> shown -> contact_shared; or declined by the buyer, or withdrawn by the seller.
     status: text('status').notNull().default('sent'),
+    // Why the seller withdrew it (WITHDRAW_REASONS), if they said.
+    withdrawReason: text('withdraw_reason'),
     // Lowest price the buyer was told about; a price-drop message needs a new low.
     notifiedPriceUsd: integer('notified_price_usd'),
     // Edits the buyer hasn't seen yet (OfferChange[]), cleared when they open their offers.
@@ -290,6 +298,26 @@ export const offerPhotos = pgTable(
     index('offer_photos_offer_idx').on(t.offerId, t.position),
     index('offer_photos_seller_idx').on(t.sellerId, t.createdAt),
   ],
+);
+
+// A buyer's rating of the seller they bought from; one per request, only for a seller
+// the buyer shared their number with.
+export const sellerReviews = pgTable(
+  'seller_reviews',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sellerId: uuid('seller_id')
+      .notNull()
+      .references(() => sellers.id, { onDelete: 'cascade' }),
+    requestId: uuid('request_id')
+      .notNull()
+      .unique()
+      .references(() => buyerRequests.id, { onDelete: 'cascade' }),
+    rating: integer('rating').notNull(),
+    comment: text('comment').notNull().default(''),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('seller_reviews_seller_idx').on(t.sellerId, t.createdAt)],
 );
 
 // A buyer's complaint about an offer, reviewed on the admin page.

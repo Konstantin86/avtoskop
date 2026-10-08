@@ -1,10 +1,16 @@
 'use server';
 
-import { and, eq, inArray, ne } from 'drizzle-orm';
+import { and, eq, inArray, ne, notInArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { getTranslations } from 'next-intl/server';
-import { CLOSE_REASONS, reportInput, requestExpiry } from '@avtoskop/core';
-import { buyerRequests, offers, reports, sellers, users } from '@avtoskop/db';
+import {
+  CLOSE_REASONS,
+  redactContacts,
+  reportInput,
+  requestExpiry,
+  reviewInput,
+} from '@avtoskop/core';
+import { buyerRequests, offers, reports, sellerReviews, sellers, users } from '@avtoskop/db';
 import { formatNumber, yearsLabel } from '@/components/requestFormat';
 import { getRequestByKey } from '@/server/buyer';
 import { decryptContact } from '@/server/contact';
@@ -41,7 +47,9 @@ const refresh = () => revalidatePath('/[locale]/my/[key]', 'page');
 
 export async function shareContactAction(formData: FormData): Promise<void> {
   const found = await ownOffer(formData);
-  if (!found || found.offer.status === 'contact_shared') return;
+  // A withdrawn offer can't receive the number: the seller no longer has the car.
+  if (!found || found.offer.status === 'contact_shared' || found.offer.status === 'withdrawn')
+    return;
   const { request, offer } = found;
 
   const [row] = await db
@@ -53,7 +61,7 @@ export async function shareContactAction(formData: FormData): Promise<void> {
   const [updated] = await db
     .update(offers)
     .set({ status: 'contact_shared', contactSharedAt: new Date() })
-    .where(and(eq(offers.id, offer.id), ne(offers.status, 'contact_shared')))
+    .where(and(eq(offers.id, offer.id), notInArray(offers.status, ['contact_shared', 'withdrawn'])))
     .returning({ id: offers.id });
   if (!updated) return;
 
@@ -141,5 +149,54 @@ export async function reportOfferAction(formData: FormData): Promise<void> {
     .update(offers)
     .set({ status: 'declined' })
     .where(and(eq(offers.id, found.offer.id), inArray(offers.status, ['sent', 'shown'])));
+  refresh();
+}
+
+// After closing with "found through Avtoskop", the buyer rates the seller they shared their
+// number with. One review per request; the seller hears about it in Telegram.
+export async function submitReviewAction(formData: FormData): Promise<void> {
+  const request = await getRequestByKey(field(formData, 'key'));
+  if (!request || request.status !== 'closed') return;
+  const parsed = reviewInput.safeParse({
+    offerId: field(formData, 'offerId'),
+    rating: field(formData, 'rating'),
+    comment: field(formData, 'comment'),
+  });
+  if (!parsed.success) return;
+  const [offer] = await db
+    .select({ sellerId: offers.sellerId, telegramId: users.telegramId })
+    .from(offers)
+    .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+    .innerJoin(users, eq(sellers.userId, users.id))
+    .where(
+      and(
+        eq(offers.id, parsed.data.offerId),
+        eq(offers.requestId, request.id),
+        eq(offers.status, 'contact_shared'),
+      ),
+    );
+  if (!offer) return;
+  const comment = redactContacts(parsed.data.comment);
+  const [saved] = await db
+    .insert(sellerReviews)
+    .values({
+      sellerId: offer.sellerId,
+      requestId: request.id,
+      rating: parsed.data.rating,
+      comment,
+    })
+    .onConflictDoNothing({ target: sellerReviews.requestId })
+    .returning({ id: sellerReviews.id });
+  if (saved) {
+    const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
+    await sendTelegram(
+      offer.telegramId,
+      t('newReview', {
+        request: `${request.brand} ${request.model}`,
+        rating: parsed.data.rating,
+        comment: comment ? `\n«${comment}»` : '',
+      }),
+    );
+  }
   refresh();
 }

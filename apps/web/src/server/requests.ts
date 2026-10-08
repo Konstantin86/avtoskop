@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, count, desc, eq, inArray, notInArray, or } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, ne, notInArray, or } from 'drizzle-orm';
 import { redactContacts, requestMatchesSeller } from '@avtoskop/core';
 import { brands, buyerRequests, offers } from '@avtoskop/db';
 import { db } from './db';
@@ -97,4 +97,13 @@ export async function listRequestsForSeller(seller: SellerMatch, limit = 8) {
     .orderBy(desc(buyerRequests.createdAt))
     .limit(200);
   return rows.filter((r) => requestMatchesSeller(r, { ...seller, alerts: true })).slice(0, limit);
+}
+
+// Offers still standing on a request (withdrawn ones don't count); prices stay private.
+export async function countOffersOn(requestId: string): Promise<number> {
+  const [row] = await db
+    .select({ n: count() })
+    .from(offers)
+    .where(and(eq(offers.requestId, requestId), ne(offers.status, 'withdrawn')));
+  return row?.n ?? 0;
 }

@@ -171,11 +171,19 @@ export async function updateRequestAction(
   if (unchanged) redirect({ href: `/my/${key}`, locale });
 
   // Sellers who match only now are alerted by the bot, but only for a published request.
-  const targets = (r: { sellerTypes: string[]; region: string; importOk: boolean }) => ({
+  const targets = (r: {
+    sellerTypes: string[];
+    region: string;
+    importOk: boolean;
+    budgetUsd: number;
+    yearTo: number | null;
+  }) => ({
     brandId: request.brandId,
     sellerTypes: r.sellerTypes,
     region: r.region,
     importOk: r.importOk,
+    budgetUsd: r.budgetUsd,
+    yearTo: r.yearTo,
   });
   const realert =
     request.status === 'active' && alertTargetsChanged(targets(request), targets(after));

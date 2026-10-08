@@ -130,3 +130,29 @@
   color: inherit;
   font-weight: 700;
 }
+
+.linkButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--blue);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.withdraw summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.withdrawForm {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 8px;
+}
