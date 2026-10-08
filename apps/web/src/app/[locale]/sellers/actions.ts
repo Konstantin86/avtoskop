@@ -183,7 +183,11 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     etaWeeks: o.availability === 'in_ukraine' ? null : (o.etaWeeks ?? null),
     originCountry: o.originCountry ?? null,
     link: o.link ?? null,
-    description: o.description,
+    // Contacts are masked like in request notes; buyers reach sellers through Avtoskop.
+    description: o.description
+      .split('\n')
+      .map((line) => redactContacts(line))
+      .join('\n'),
     features: o.features,
     vin,
     vinDecoded,
