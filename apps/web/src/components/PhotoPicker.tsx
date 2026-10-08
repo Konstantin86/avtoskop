@@ -79,13 +79,23 @@ export function PhotoPicker({ photos, onChange, labels }: Props) {
   const hasFiles = (e: React.DragEvent) => e.dataTransfer.types.includes('Files');
 
   async function add(files: FileList | File[]) {
-    const picked = [...files]
-      .filter((f) => f.type === '' || f.type.startsWith('image/'))
-      .slice(0, Math.max(0, free));
+    const isImage = (f: File) => f.type === '' || f.type.startsWith('image/');
+    const picked = [...files].filter(isImage).slice(0, Math.max(0, free));
+    // Other files (say, a PDF dropped in) get a tile with the error, so nothing vanishes silently.
+    const rejected = [...files]
+      .filter((f) => !isImage(f))
+      .slice(0, Math.max(0, free - picked.length))
+      .map(() => ({
+        id: `tmp-${(nextTempId += 1)}`,
+        thumb: null,
+        progress: 0,
+        error: labels.errors['notImage'] ?? '',
+      }));
     const temp = picked.map((file) => ({ file, id: `tmp-${(nextTempId += 1)}` }));
     onChange((list) => [
       ...list,
       ...temp.map(({ id }) => ({ id, thumb: null, progress: 0, error: null })),
+      ...rejected,
     ]);
     for (const { file, id } of temp) {
       const set = (patch: Partial<PickedPhoto>) =>
