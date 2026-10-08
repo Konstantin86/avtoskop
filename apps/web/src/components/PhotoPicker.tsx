@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import { PHOTO_LIMITS } from '@avtoskop/core';
 import styles from './PhotoPicker.module.css';
 
@@ -19,6 +19,7 @@ interface Props {
     title: string;
     hint: string;
     add: string;
+    drop: string;
     main: string;
     makeMain: string;
     remove: string;
@@ -73,9 +74,14 @@ export function PhotoPicker({ photos, onChange, labels }: Props) {
   const input = useRef<HTMLInputElement>(null);
   const free = PHOTO_LIMITS.perOffer - photos.length;
   const ready = photos.filter((p) => p.thumb && !p.error);
+  // Counts enter/leave events, which also fire for child elements, so the highlight doesn't flicker.
+  const [dragDepth, setDragDepth] = useState(0);
+  const hasFiles = (e: React.DragEvent) => e.dataTransfer.types.includes('Files');
 
-  async function add(files: FileList) {
-    const picked = [...files].slice(0, Math.max(0, free));
+  async function add(files: FileList | File[]) {
+    const picked = [...files]
+      .filter((f) => f.type === '' || f.type.startsWith('image/'))
+      .slice(0, Math.max(0, free));
     const temp = picked.map((file) => ({ file, id: `tmp-${(nextTempId += 1)}` }));
     onChange((list) => [
       ...list,
@@ -98,7 +104,26 @@ export function PhotoPicker({ photos, onChange, labels }: Props) {
   }
 
   return (
-    <div className="label">
+    <div
+      className={`label ${dragDepth > 0 ? styles.dropping : ''}`}
+      onDragEnter={(e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        setDragDepth((d) => d + 1);
+      }}
+      onDragOver={(e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = free > 0 ? 'copy' : 'none';
+      }}
+      onDragLeave={(e) => hasFiles(e) && setDragDepth((d) => Math.max(0, d - 1))}
+      onDrop={(e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        setDragDepth(0);
+        void add(e.dataTransfer.files);
+      }}
+    >
       <span>{labels.title}</span>
       <input type="hidden" name="photos" value={ready.map((p) => p.id).join(',')} />
       <ul className={styles.grid}>
@@ -142,6 +167,7 @@ export function PhotoPicker({ photos, onChange, labels }: Props) {
             <label htmlFor={inputId} className={styles.add}>
               <span aria-hidden="true">+</span>
               {labels.add}
+              <small className={styles.dropHint}>{labels.drop}</small>
             </label>
             <input
               ref={input}

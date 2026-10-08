@@ -218,6 +218,7 @@ export function OfferForm({
           title: t('photos'),
           hint: t('photosHint'),
           add: t('photosAdd'),
+          drop: t('photosDrop'),
           main: t('photosMain'),
           makeMain: t('photosMakeMain'),
           remove: t('photosRemove'),

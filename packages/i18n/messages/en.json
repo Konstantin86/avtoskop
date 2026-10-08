@@ -439,7 +439,8 @@
     "photoError_notImage": "Couldn't read this photo. Try JPEG or PNG",
     "photoError_tooBig": "Photo is over 15 MB",
     "photoError_tooMany": "Too many unsaved photos. Send the offer or remove some",
-    "photoError_failed": "Upload failed. Try again"
+    "photoError_failed": "Upload failed. Try again",
+    "photosDrop": "or drop them here"
   },
   "account": {
     "title": "Account",
