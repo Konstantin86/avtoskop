@@ -964,6 +964,12 @@
     "v3Title": "Free for buyers",
     "v3Text": "No subscriptions, no hidden payments."
   },
+  "notFound": {
+    "title": "Page not found",
+    "text": "The link may be out of date, or there is a typo in the address.",
+    "home": "Go to the home page",
+    "requests": "Browse requests"
+  },
   "safety": {
     "title": "How to buy a car safely",
     "lead": "Avtoskop takes no part in the deal, so these steps are yours. They take a few hours and can save thousands of dollars.",
