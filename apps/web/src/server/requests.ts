@@ -25,6 +25,7 @@ const publicColumns = {
   region: buyerRequests.region,
   notes: buyerRequests.notes,
   createdAt: buyerRequests.createdAt,
+  editedAt: buyerRequests.editedAt,
 };
 
 export type PublicRequest = Awaited<ReturnType<typeof listPublicRequests>>[number];

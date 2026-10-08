@@ -74,6 +74,8 @@ export default async function RequestDetailPage({ params }: Props) {
         <article className={`card ${styles.main}`}>
           <span className={styles.posted}>
             {t('posted', { when: timeAgo(locale, r.createdAt) })}
+            {r.editedAt &&
+              ` · ${t('edited', { date: r.editedAt.toLocaleDateString(locale === 'uk' ? 'uk-UA' : 'en-GB') })}`}
           </span>
           <h1 className={styles.title}>
             <ViewTransition name={`req-logo-${r.id}`} share="morph" default="none">

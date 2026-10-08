@@ -9,7 +9,7 @@ import { ModelInput } from '@/components/ModelInput';
 import { CheckIcon, TelegramIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import type { BrandOption } from '@/server/brands';
-import { submitRequest, type RequestFormState } from './actions';
+import { submitRequest, updateRequestAction, type RequestFormState } from './actions';
 import styles from './request.module.css';
 
 interface Props {
@@ -17,15 +17,20 @@ interface Props {
   brands: { popular: BrandOption[]; all: BrandOption[] };
   regionNames: Record<string, string>;
   defaults: Record<string, string>;
+  // Editing an existing request: its private key and the car, which can't change.
+  edit?: { key: string; car: string };
 }
 
-export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
+export function RequestForm({ locale, brands, regionNames, defaults, edit }: Props) {
   const f = useTranslations('fields');
   const t = useTranslations('request');
-  const [state, action, pending] = useActionState<RequestFormState, FormData>(submitRequest, {
-    errors: [],
-    values: defaults,
-  });
+  const [state, action, pending] = useActionState<RequestFormState, FormData>(
+    edit ? updateRequestAction : submitRequest,
+    {
+      errors: [],
+      values: defaults,
+    },
+  );
   const formRef = useRef<HTMLFormElement>(null);
   useFocusFirstError(formRef, state, Boolean(state.formError) || state.errors.length > 0);
 
@@ -58,6 +63,7 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
       noValidate
     >
       <input type="hidden" name="locale" value={locale} />
+      {edit && <input type="hidden" name="key" value={edit.key} />}
       {state.formError && (
         <div className={styles.alert} role="alert">
           {t(`error_${state.formError}`)}
@@ -66,41 +72,48 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
 
       <fieldset className={styles.section}>
         <legend className="section-label">{t('sectionCar')}</legend>
-        <div className={styles.pair}>
-          <label className="label" htmlFor="brandId">
-            {f('brand')}
-            <BrandPicker
-              id="brandId"
-              brands={brands}
-              labels={{
-                placeholder: f('brandPlaceholder'),
-                popular: f('popularBrands'),
-                all: f('allBrands'),
-                noMatches: f('brandNoMatches'),
-              }}
-              defaultValue={v['brandId']}
-              invalid={bad('brandId')}
-              onChange={setBrandId}
-            />
-            {err('brandId')}
-          </label>
-          <label className="label">
-            {f('model')}
-            <ModelInput
-              brandId={brandId}
-              defaultValue={v['model']}
-              placeholders={{
-                none: f('modelPlaceholder'),
-                pick: f('modelPick'),
-                type: f('modelType'),
-              }}
-              invalid={bad('model') || bad('modelUnknown')}
-              unknownLabel={t('error_modelUnknown')}
-              noMatchesLabel={f('modelNoMatches')}
-            />
-            {err('model') ?? err('modelUnknown')}
-          </label>
-        </div>
+        {edit ? (
+          <div className={styles.lockedCar}>
+            <strong>{edit.car}</strong>
+            <span className="hint">{t('editCarHint')}</span>
+          </div>
+        ) : (
+          <div className={styles.pair}>
+            <label className="label" htmlFor="brandId">
+              {f('brand')}
+              <BrandPicker
+                id="brandId"
+                brands={brands}
+                labels={{
+                  placeholder: f('brandPlaceholder'),
+                  popular: f('popularBrands'),
+                  all: f('allBrands'),
+                  noMatches: f('brandNoMatches'),
+                }}
+                defaultValue={v['brandId']}
+                invalid={bad('brandId')}
+                onChange={setBrandId}
+              />
+              {err('brandId')}
+            </label>
+            <label className="label">
+              {f('model')}
+              <ModelInput
+                brandId={brandId}
+                defaultValue={v['model']}
+                placeholders={{
+                  none: f('modelPlaceholder'),
+                  pick: f('modelPick'),
+                  type: f('modelType'),
+                }}
+                invalid={bad('model') || bad('modelUnknown')}
+                unknownLabel={t('error_modelUnknown')}
+                noMatchesLabel={f('modelNoMatches')}
+              />
+              {err('model') ?? err('modelUnknown')}
+            </label>
+          </div>
+        )}
         <div className={styles.pair}>
           <label className="label">
             {f('yearFrom')}
@@ -262,43 +275,45 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
         </div>
       </details>
 
-      <fieldset className={styles.section}>
-        <legend className="section-label">{t('sectionContact')}</legend>
-        {/* Telegram is the only channel for now: the buyer confirms the phone through our bot. */}
-        <input type="hidden" name="notifyVia" value="telegram" />
-        <p className={styles.notifyNote}>
-          <TelegramIcon />
-          <span>
-            {f('notifyNote')} {/* New tab, so a half-filled form isn't lost. */}
-            <a href={localePath(locale, '/faq#telegram')} target="_blank" rel="noopener">
-              {t('whyTelegram')}
-            </a>
-          </span>
-        </p>
-        <label className={styles.consent}>
-          <input
-            type="checkbox"
-            name="consent"
-            defaultChecked={v['consent'] === 'on'}
-            {...invalid('consent')}
-          />
-          <span>
-            {f.rich('consent', {
-              terms: (c) => (
-                <a href={localePath(locale, '/terms')} target="_blank" rel="noopener">
-                  {c}
-                </a>
-              ),
-              privacy: (c) => (
-                <a href={localePath(locale, '/privacy')} target="_blank" rel="noopener">
-                  {c}
-                </a>
-              ),
-            })}
-          </span>
-        </label>
-        {err('consent')}
-      </fieldset>
+      {!edit && (
+        <fieldset className={styles.section}>
+          <legend className="section-label">{t('sectionContact')}</legend>
+          {/* Telegram is the only channel for now: the buyer confirms the phone through our bot. */}
+          <input type="hidden" name="notifyVia" value="telegram" />
+          <p className={styles.notifyNote}>
+            <TelegramIcon />
+            <span>
+              {f('notifyNote')} {/* New tab, so a half-filled form isn't lost. */}
+              <a href={localePath(locale, '/faq#telegram')} target="_blank" rel="noopener">
+                {t('whyTelegram')}
+              </a>
+            </span>
+          </p>
+          <label className={styles.consent}>
+            <input
+              type="checkbox"
+              name="consent"
+              defaultChecked={v['consent'] === 'on'}
+              {...invalid('consent')}
+            />
+            <span>
+              {f.rich('consent', {
+                terms: (c) => (
+                  <a href={localePath(locale, '/terms')} target="_blank" rel="noopener">
+                    {c}
+                  </a>
+                ),
+                privacy: (c) => (
+                  <a href={localePath(locale, '/privacy')} target="_blank" rel="noopener">
+                    {c}
+                  </a>
+                ),
+              })}
+            </span>
+          </label>
+          {err('consent')}
+        </fieldset>
+      )}
 
       {reach.count > 0 && brandName && (
         <p className={styles.reach} role="status">
@@ -311,9 +326,9 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
         </p>
       )}
       <button type="submit" className="btn btn-yellow btn-lg btn-block" disabled={pending}>
-        {pending ? t('submitting') : t('submit')}
+        {edit ? (pending ? t('saving') : t('save')) : pending ? t('submitting') : t('submit')}
       </button>
-      <p className={styles.publicNote}>{t('publicNote')}</p>
+      {!edit && <p className={styles.publicNote}>{t('publicNote')}</p>}
     </form>
   );
 }

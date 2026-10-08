@@ -162,6 +162,13 @@
       "when": 1791451110770,
       "tag": "0022_purple_serpent_society",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791451754268,
+      "tag": "0023_giant_carnage",
+      "breakpoints": true
     }
   ]
 }

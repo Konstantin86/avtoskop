@@ -233,3 +233,16 @@
   color: var(--muted);
   text-align: center;
 }
+
+.lockedCar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface-muted);
+}
+
+.lockedCar strong {
+  font-size: 18px;
+}

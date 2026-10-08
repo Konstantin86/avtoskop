@@ -24,6 +24,7 @@ import {
   yearsLabel,
 } from '@/components/requestFormat';
 import { RefreshOnce } from '@/components/RefreshOnce';
+import { Link } from '@/i18n/navigation';
 import { autoriaLinkFor } from '@/server/autoria';
 import { photosForOffers, photoUrl } from '@/server/photos';
 import { PhotoGallery } from '@/components/PhotoGallery';
@@ -49,9 +50,12 @@ export const metadata: Metadata = {
   referrer: 'no-referrer',
 };
 
-type Props = { params: Promise<{ locale: string; key: string }> };
+type Props = {
+  params: Promise<{ locale: string; key: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
+};
 
-export default async function MyRequestPage({ params }: Props) {
+export default async function MyRequestPage({ params, searchParams }: Props) {
   const { locale, key } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('my');
@@ -138,16 +142,28 @@ export default async function MyRequestPage({ params }: Props) {
             <span>{t('offersCount', { count: offerList.length })}</span>
           </span>
         </div>
+        {(await searchParams)['edited'] && !closed && (
+          <div className={forms.success} role="status">
+            {t('edited')}
+          </div>
+        )}
         {closed && <div className={forms.notice}>{t('closedNotice')}</div>}
-        {!closed && request.expiresAt && (
+        {!closed && (
           <div className={styles.expiry}>
-            <span>{t('activeUntil', { date: shortDate(request.expiresAt) })}</span>
-            {request.expiresAt.getTime() - Date.now() < 7 * 86_400_000 && (
-              <form action={extendRequestAction}>
-                <input type="hidden" name="key" value={key} />
-                <SubmitButton className="btn btn-secondary btn-sm">{t('extend')}</SubmitButton>
-              </form>
-            )}
+            <span>
+              {request.expiresAt && t('activeUntil', { date: shortDate(request.expiresAt) })}
+            </span>
+            <div className={styles.expiryActions}>
+              <Link href={`/my/${key}/edit`} className="btn btn-secondary btn-sm">
+                {t('edit')}
+              </Link>
+              {request.expiresAt && request.expiresAt.getTime() - Date.now() < 7 * 86_400_000 && (
+                <form action={extendRequestAction}>
+                  <input type="hidden" name="key" value={key} />
+                  <SubmitButton className="btn btn-secondary btn-sm">{t('extend')}</SubmitButton>
+                </form>
+              )}
+            </div>
           </div>
         )}
         {!closed && !request.phoneVerified && (

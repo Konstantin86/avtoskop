@@ -130,6 +130,19 @@ export const buyerRequests = pgTable(
     expiryRemindedAt: timestamp('expiry_reminded_at', { withTimezone: true }),
     // When the request was last closed; offer photos are removed some time after.
     closedAt: timestamp('closed_at', { withTimezone: true }),
+    // Buyer edits: the last one (shown to sellers), and recent ones for the daily limit.
+    editedAt: timestamp('edited_at', { withTimezone: true }),
+    recentEdits: timestamp('recent_edits', { withTimezone: true }).array().notNull().default([]),
+    // Region, import and seller types before an edit, until the bot alerts sellers who
+    // match only now. Empty when there is nothing to send.
+    realertFrom: jsonb('realert_from').$type<{
+      brandId: number;
+      sellerTypes: string[];
+      region: string;
+      importOk: boolean;
+    }>(),
+    // Last "the buyer changed the request" message to sellers with offers (one a day).
+    sellersNotifiedAt: timestamp('sellers_notified_at', { withTimezone: true }),
     notifyVia: text('notify_via').notNull(),
     locale: text('locale').notNull(),
     status: text('status').notNull().default('new'),

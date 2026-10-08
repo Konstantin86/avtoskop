@@ -1,5 +1,6 @@
 import { contactKey } from '@avtoskop/core';
-import { createDb } from '@avtoskop/db';
+import { buyerRequests, createDb } from '@avtoskop/db';
+import { isNotNull } from 'drizzle-orm';
 import { importWanted } from '../mvs/wanted.ts';
 import { cleanUpPhotos } from '../photos/cleanup.ts';
 import { createSellerAlerts } from './alerts.ts';
@@ -72,6 +73,21 @@ const checkExpiry = () =>
 void checkExpiry();
 const expiryTimer = setInterval(checkExpiry, 60 * 60 * 1000);
 
+// Every minute: after a buyer edits a request, alert sellers who match only now.
+const runRealerts = async () => {
+  const pending = await db
+    .update(buyerRequests)
+    .set({ realertFrom: null })
+    .where(isNotNull(buyerRequests.realertFrom))
+    .returning({ id: buyerRequests.id, before: buyerRequests.realertFrom });
+  // Taken off the queue first, so a slow send never alerts the same sellers twice.
+  const previous = new Map(pending.flatMap((p) => (p.before ? [[p.id, p.before] as const] : [])));
+  if (previous.size > 0) await alertSellers([...previous.keys()], previous);
+};
+const checkRealerts = () =>
+  runRealerts().catch((error: Error) => log(`Re-alerts failed: ${error.message}`));
+const realertTimer = setInterval(checkRealerts, 60 * 1000);
+
 // Hourly: remove photos that were never sent with an offer, or belong to long-closed requests.
 const runPhotoCleanup = () =>
   cleanUpPhotos(db, log).catch((error: Error) => log(`Photo cleanup failed: ${error.message}`));
@@ -101,5 +117,6 @@ while (running) {
 clearInterval(wantedTimer);
 clearInterval(expiryTimer);
 clearInterval(photoTimer);
+clearInterval(realertTimer);
 await close();
 log('Bot stopped');

@@ -1,4 +1,12 @@
 export {
+  alertTargetsChanged,
+  editsInLastDay,
+  REQUEST_EDITS_PER_DAY,
+  requestChanges,
+  type EditableRequest,
+  type RequestChange,
+} from './request-edits.ts';
+export {
   changesWorthAMessage,
   diffOffer,
   mergeChanges,

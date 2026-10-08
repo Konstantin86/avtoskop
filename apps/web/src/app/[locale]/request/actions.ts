@@ -1,24 +1,33 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
-import { buyerRequestInput, canonicalModel, hashSecret, newSecret } from '@avtoskop/core';
+import { eq, sql } from 'drizzle-orm';
+import { getLocale } from 'next-intl/server';
+import {
+  alertTargetsChanged,
+  buyerRequestInput,
+  canonicalModel,
+  editsInLastDay,
+  hashSecret,
+  newSecret,
+  REQUEST_EDITS_PER_DAY,
+  requestChanges,
+} from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
 import { encryptContact } from '@/server/contact';
+import { getRequestByKey } from '@/server/buyer';
 import { db } from '@/server/db';
 import { modelNames } from '@/server/models';
+import { notifySellersOfRequestChange } from '@/server/notify';
 
 export interface RequestFormState {
   errors: string[];
-  formError?: 'generic' | 'server';
+  formError?: 'generic' | 'server' | 'editLimit' | 'closed';
   values: Record<string, string>;
 }
 
-export async function submitRequest(
-  _prev: RequestFormState,
-  formData: FormData,
-): Promise<RequestFormState> {
+function formValues(formData: FormData): Record<string, string> {
   const values = Object.fromEntries(
     [...formData.entries()].filter(([k, v]) => !k.startsWith('$') && typeof v === 'string'),
   ) as Record<string, string>;
@@ -29,6 +38,14 @@ export async function submitRequest(
       .filter((v) => typeof v === 'string')
       .join(',');
   }
+  return values;
+}
+
+export async function submitRequest(
+  _prev: RequestFormState,
+  formData: FormData,
+): Promise<RequestFormState> {
+  const values = formValues(formData);
   const locale: Locale = (routing.locales as readonly string[]).includes(values['locale'] ?? '')
     ? (values['locale'] as Locale)
     : routing.defaultLocale;
@@ -102,4 +119,82 @@ export async function requestConfirmedAction(id: string): Promise<boolean> {
     .from(buyerRequests)
     .where(eq(buyerRequests.id, id));
   return row?.verified ?? false;
+}
+
+// The buyer changes their own request. Brand and model stay: another car is a new request.
+export async function updateRequestAction(
+  _prev: RequestFormState,
+  formData: FormData,
+): Promise<RequestFormState> {
+  const values = formValues(formData);
+  const key = values['key'] ?? '';
+  const request = await getRequestByKey(key);
+  if (!request) return { errors: [], formError: 'closed', values };
+  if (request.status === 'closed') return { errors: [], formError: 'closed', values };
+
+  const parsed = buyerRequestInput.safeParse({
+    ...values,
+    brandId: String(request.brandId),
+    model: request.model,
+    consent: 'on',
+    notifyVia: 'telegram',
+  });
+  if (!parsed.success) {
+    const errors = [...new Set(parsed.error.issues.map((i) => String(i.path[0])))];
+    return { errors, formError: 'generic', values };
+  }
+  const input = parsed.data;
+  const now = new Date();
+  if (editsInLastDay(request.recentEdits, now) >= REQUEST_EDITS_PER_DAY) {
+    return { errors: [], formError: 'editLimit', values };
+  }
+
+  const after = {
+    yearFrom: input.yearFrom,
+    yearTo: input.yearTo ?? null,
+    budgetUsd: input.budgetUsd,
+    mileageMaxKm: input.mileageMaxKm ?? null,
+    fuels: input.fuels,
+    sellerTypes: input.sellerTypes,
+    gearbox: input.gearbox,
+    wishes: input.wishes,
+    importOk: input.importOk,
+    region: input.region,
+    notes: input.notes,
+  };
+  const unchanged = (Object.keys(after) as (keyof typeof after)[]).every(
+    (k) => JSON.stringify(after[k]) === JSON.stringify(request[k]),
+  );
+  const locale = (await getLocale()) as Locale;
+  if (unchanged) redirect({ href: `/my/${key}`, locale });
+
+  // Sellers who match only now are alerted by the bot, but only for a published request.
+  const targets = (r: { sellerTypes: string[]; region: string; importOk: boolean }) => ({
+    brandId: request.brandId,
+    sellerTypes: r.sellerTypes,
+    region: r.region,
+    importOk: r.importOk,
+  });
+  const realert =
+    request.status === 'active' && alertTargetsChanged(targets(request), targets(after));
+  await db
+    .update(buyerRequests)
+    .set({
+      ...after,
+      editedAt: now,
+      recentEdits: [
+        ...request.recentEdits.filter((t) => now.getTime() - t.getTime() < 86_400_000),
+        now,
+      ],
+      ...(realert && {
+        realertFrom: sql`coalesce(${buyerRequests.realertFrom}, ${JSON.stringify(targets(request))}::jsonb)`,
+      }),
+    })
+    .where(eq(buyerRequests.id, request.id));
+
+  if (request.status === 'active') {
+    await notifySellersOfRequestChange(request.id, requestChanges(request, after));
+  }
+  redirect({ href: { pathname: `/my/${key}`, query: { edited: '1' } }, locale });
+  return { errors: [], values };
 }

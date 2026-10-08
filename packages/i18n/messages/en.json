@@ -147,7 +147,15 @@
     "sellerType_owner": "Owners",
     "moreParams": "More options",
     "moreHint": "Fuel, gearbox, mileage, wishes, comment",
-    "whyTelegram": "Why Telegram?"
+    "whyTelegram": "Why Telegram?",
+    "editTitle": "Edit request",
+    "editLead": "Change the budget, years, region or wishes. Sellers will see the updated request.",
+    "editBack": "← Back to the request",
+    "editCarHint": "The make and model can't change. Looking for another car? Close this request and post a new one.",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "error_editLimit": "This request was already edited 3 times today. Try again tomorrow.",
+    "error_closed": "This request is closed and can no longer be edited."
   },
   "sent": {
     "title": "Request published",
@@ -301,7 +309,8 @@
     "typeOf_importer": "importers",
     "typeOf_dealer": "dealers",
     "typeOf_buyout": "buyout firms",
-    "typeOf_owner": "owners"
+    "typeOf_owner": "owners",
+    "edited": "Updated {date}"
   },
   "auth": {
     "title": "Sign in to Avtoskop",
@@ -493,7 +502,12 @@
     "offerUpdate": "🔔 An offer for your request {request} was updated:\n{car}\n{changes}\n\nView offers: {link}",
     "updatePrice": "💰 Price: {oldPrice} → {newPrice}",
     "updateArrived": "🇺🇦 The car is now in Ukraine",
-    "updatePhotos": "📷 Photos added: {count}"
+    "updatePhotos": "📷 Photos added: {count}",
+    "requestChanged": "✏️ The buyer changed the request {request}:\n{changes}\n\nYour offer: {offer}\nUpdate it if needed: {link}",
+    "changeBudget": "Budget: up to ${from} → up to ${to}",
+    "changeYears": "Years: {from} → {to}",
+    "changeRegion": "Region: {from} → {to}",
+    "changeImport": "Import: {to, select, yes {now fine} other {cars in Ukraine only}}"
   },
   "my": {
     "title": "Your request",
@@ -574,7 +588,9 @@
     "change_price": "price {from} → {to}",
     "change_photos": "photos added: {count}",
     "change_arrived": "the car is now in Ukraine",
-    "change_details": "details changed"
+    "change_details": "details changed",
+    "edit": "Edit request",
+    "edited": "Request updated. Sellers who already sent offers will be told about important changes."
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",

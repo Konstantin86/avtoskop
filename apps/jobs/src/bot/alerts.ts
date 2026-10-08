@@ -1,6 +1,12 @@
-import { and, eq, gt, inArray, ne } from 'drizzle-orm';
-import { localePath, MIN_SELLERS_TO_SHOW, pluralUk, requestMatchesSeller } from '@avtoskop/core';
-import { brands, buyerRequests, sellers, users, type Db } from '@avtoskop/db';
+import { and, eq, gt, inArray, ne, sql } from 'drizzle-orm';
+import {
+  localePath,
+  MIN_SELLERS_TO_SHOW,
+  pluralUk,
+  requestMatchesSeller,
+  type AlertRequest,
+} from '@avtoskop/core';
+import { brands, buyerRequests, offers, sellers, users, type Db } from '@avtoskop/db';
 import en from '@avtoskop/i18n/messages/en.json' with { type: 'json' };
 import uk from '@avtoskop/i18n/messages/uk.json' with { type: 'json' };
 import type { Telegram } from './telegram.ts';
@@ -41,7 +47,12 @@ export function createSellerAlerts(
   siteUrl: string,
   log: (m: string) => void,
 ) {
-  return async function alertSellers(requestIds: string[]): Promise<void> {
+  // `previous` holds a request's alert settings before a buyer's edit: then only sellers
+  // who match now but didn't before (and haven't sent an offer) are alerted.
+  return async function alertSellers(
+    requestIds: string[],
+    previous?: Map<string, AlertRequest>,
+  ): Promise<void> {
     if (requestIds.length === 0) return;
     const requests = await db
       .select({
@@ -85,10 +96,24 @@ export function createSellerAlerts(
         link: siteUrl + localePath(SELLER_LOCALE, `/requests/${r.id}/offer`),
         settings: siteUrl + localePath(SELLER_LOCALE, '/sellers/profile'),
       });
+      const before = previous?.get(r.id);
+      const offered = before
+        ? new Set(
+            (
+              await db
+                .select({ telegramId: users.telegramId })
+                .from(offers)
+                .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+                .innerJoin(users, eq(sellers.userId, users.id))
+                .where(eq(offers.requestId, r.id))
+            ).map((o) => o.telegramId),
+          )
+        : new Set<number>();
       let sent = 0;
       for (const s of candidates) {
         // Never alert buyers about their own request.
         if (s.telegramId === r.buyerChatId || !requestMatchesSeller(r, s)) continue;
+        if (before && (requestMatchesSeller(before, s) || offered.has(s.telegramId))) continue;
         try {
           await tg.sendMessage(s.telegramId, text);
           sent += 1;
@@ -98,12 +123,12 @@ export function createSellerAlerts(
         }
         await new Promise((resolve) => setTimeout(resolve, SEND_GAP_MS));
       }
-      log(`Request ${r.id}: alerted ${sent} seller(s)`);
+      log(`Request ${r.id}: alerted ${sent} seller(s)${before ? ' after an edit' : ''}`);
       await db
         .update(buyerRequests)
-        .set({ alertedSellers: sent })
+        .set({ alertedSellers: before ? sql`${buyerRequests.alertedSellers} + ${sent}` : sent })
         .where(eq(buyerRequests.id, r.id));
-      if (r.buyerChatId && sent >= MIN_SELLERS_TO_SHOW) {
+      if (!before && r.buyerChatId && sent >= MIN_SELLERS_TO_SHOW) {
         const sellers =
           r.locale === 'en'
             ? `${sent} sellers`

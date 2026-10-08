@@ -1,5 +1,5 @@
 import 'server-only';
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
 import {
   changesWorthAMessage,
@@ -9,9 +9,10 @@ import {
   photoFileNames,
   type OfferChange,
   type OfferSnapshot,
+  type RequestChange,
   UPDATE_NOTE_MINUTES,
 } from '@avtoskop/core';
-import { brands, buyerRequests, offers } from '@avtoskop/db';
+import { brands, buyerRequests, offers, sellers, users } from '@avtoskop/db';
 import { formatNumber, priceLabel, yearsLabel } from '@/components/requestFormat';
 import { decryptContact } from './contact';
 import { db } from './db';
@@ -167,4 +168,73 @@ export async function recordOfferUpdate(
   const file = main ? await readPhotoFile(photoFileNames(main.key).full) : null;
   if (file) await sendTelegramPhoto(b.chatId, file, text);
   else await sendTelegram(b.chatId, text);
+}
+
+// Tells sellers who sent an offer that the buyer changed what matters for it (budget, years,
+// region, import), so they can adjust. One message a day per request; declined offers skipped.
+export async function notifySellersOfRequestChange(
+  requestId: string,
+  changes: RequestChange[],
+): Promise<void> {
+  if (changes.length === 0) return;
+  const [r] = await db
+    .select({
+      brand: brands.name,
+      model: buyerRequests.model,
+      yearFrom: buyerRequests.yearFrom,
+      yearTo: buyerRequests.yearTo,
+      notifiedAt: buyerRequests.sellersNotifiedAt,
+    })
+    .from(buyerRequests)
+    .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
+    .where(eq(buyerRequests.id, requestId));
+  if (!r || (r.notifiedAt && Date.now() - r.notifiedAt.getTime() < DAY_MS)) return;
+  const recipients = await db
+    .select({
+      telegramId: users.telegramId,
+      car: offers.car,
+      year: offers.year,
+      priceUsd: offers.priceUsd,
+      priceMaxUsd: offers.priceMaxUsd,
+    })
+    .from(offers)
+    .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+    .innerJoin(users, eq(sellers.userId, users.id))
+    .where(and(eq(offers.requestId, requestId), ne(offers.status, 'declined')));
+  if (recipients.length === 0) return;
+  await db
+    .update(buyerRequests)
+    .set({ sellersNotifiedAt: new Date() })
+    .where(eq(buyerRequests.id, requestId));
+
+  // Sellers read the bot in Ukrainian.
+  const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
+  const regions = await getTranslations({ locale: 'uk', namespace: 'regions' });
+  const years = ([from, to]: [number, number | null]) => yearsLabel({ yearFrom: from, yearTo: to });
+  const lines = changes.map((c) =>
+    c.field === 'budget'
+      ? t('changeBudget', {
+          from: formatNumber('uk', c.from),
+          to: formatNumber('uk', c.to),
+        })
+      : c.field === 'years'
+        ? t('changeYears', { from: years(c.from), to: years(c.to) })
+        : c.field === 'region'
+          ? t('changeRegion', {
+              from: regions(c.from as 'kyiv'),
+              to: regions(c.to as 'kyiv'),
+            })
+          : t('changeImport', { to: c.to ? 'yes' : 'no' }),
+  );
+  for (const s of recipients) {
+    await sendTelegram(
+      s.telegramId,
+      t('requestChanged', {
+        request: `${r.brand} ${r.model}`,
+        changes: lines.join('\n'),
+        offer: `${s.car}, ${s.year}, ${priceLabel('uk', s.priceUsd, s.priceMaxUsd)}`,
+        link: siteUrl() + localePath('uk', `/requests/${requestId}/offer`),
+      }),
+    );
+  }
 }
