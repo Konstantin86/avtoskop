@@ -331,6 +331,43 @@
   fill: var(--ink);
 }
 
+.lens {
+  fill: var(--surface);
+  stroke: var(--blue);
+  stroke-width: 5;
+}
+
+.lensHandle {
+  stroke: var(--blue);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.photo {
+  fill: var(--blue-soft);
+}
+
+.hill {
+  fill: var(--blue);
+  opacity: 0.55;
+}
+
+.sun {
+  fill: var(--yellow);
+}
+
+.trail {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2;
+  stroke-dasharray: 3 5;
+  stroke-linecap: round;
+}
+
+.handset {
+  fill: var(--on-yellow);
+}
+
 /* Motion: steps appear one after another, each arrow draws towards the next step. */
 .item {
   opacity: 0;

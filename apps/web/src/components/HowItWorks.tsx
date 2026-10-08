@@ -1,24 +1,25 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ChooseArt, DealArt, DescribeArt, OffersArt } from './HowItWorksArt';
 import styles from './HowItWorks.module.css';
 
-interface Step {
+export interface HowStep {
   title: string;
   text: string;
+  art: ReactNode;
+  // A step that happens outside Avtoskop gets a quieter card and a label.
+  outside?: boolean;
 }
 
 interface Props {
   title: string;
-  steps: [Step, Step, Step, Step];
-  minutes: string;
+  steps: HowStep[];
   outsideLabel: string;
 }
 
 // Four steps joined by arrows. The cards, arrows and scenes play in order once the
 // section scrolls into view; with reduced motion everything is simply shown.
-export function HowItWorks({ title, steps, minutes, outsideLabel }: Props) {
+export function HowItWorks({ title, steps, outsideLabel }: Props) {
   const ref = useRef<HTMLElement>(null);
   const [shown, setShown] = useState(false);
 
@@ -38,24 +39,17 @@ export function HowItWorks({ title, steps, minutes, outsideLabel }: Props) {
     return () => observer.disconnect();
   }, []);
 
-  const art: ReactNode[] = [
-    <DescribeArt key="1" minutes={minutes} />,
-    <OffersArt key="2" />,
-    <ChooseArt key="3" />,
-    <DealArt key="4" />,
-  ];
-
   return (
     <section id="how" ref={ref} className={`${styles.how} ${shown ? styles.shown : ''}`}>
       <h2 className={styles.title}>{title}</h2>
       <ol className={styles.steps}>
         {steps.map((step, i) => {
-          const outside = i === 3;
+          const outside = step.outside === true;
           return (
             <li key={step.title} className={styles.item} style={{ ['--i' as string]: i }}>
               <div className={`${styles.card} ${outside ? styles.outside : ''}`}>
                 <div className={styles.scene}>
-                  {art[i]}
+                  {step.art}
                   {outside && <span className={styles.badge}>{outsideLabel}</span>}
                 </div>
                 <div className={styles.top}>

@@ -126,3 +126,75 @@ export function DealArt() {
     </svg>
   );
 }
+
+// Sellers: a matching request arrives in Telegram, and the full list can be searched.
+export function RequestAlertArt() {
+  return (
+    <svg viewBox="0 0 240 150" className={styles.art} aria-hidden="true" focusable="false">
+      <rect className={styles.paper} x="28" y="10" width="100" height="134" rx="16" />
+      <rect className={styles.soft} x="62" y="18" width="32" height="5" rx="2.5" />
+      {[0, 1, 2].map((i) => (
+        <g key={i} className={styles.bubble} style={{ animationDelay: `${0.5 + i * 0.3}s` }}>
+          <rect className={styles.field} x="38" y={32 + i * 36} width="80" height="28" rx="8" />
+          <circle className={styles.carDot} cx="51" cy={46 + i * 36} r="7" />
+          <rect className={styles.ink} x="63" y={39 + i * 36} width="42" height="5" rx="2.5" />
+          <rect className={styles.price} x="63" y={49 + i * 36} width="28" height="5" rx="2.5" />
+        </g>
+      ))}
+      <circle className={styles.newDot} cx="124" cy="34" r="7" />
+      {/* Search over the list of requests */}
+      <g className={styles.plane}>
+        <circle className={styles.lens} cx="172" cy="74" r="26" />
+        <path className={styles.lensHandle} d="M191 93 L212 114" />
+        <rect className={styles.price} x="158" y="68" width="28" height="5" rx="2.5" />
+        <rect className={styles.ink} x="158" y="78" width="20" height="5" rx="2.5" />
+      </g>
+    </svg>
+  );
+}
+
+// Sellers: an offer card with a photo and an all-in price, flying off to the buyer.
+export function SendOfferArt() {
+  return (
+    <svg viewBox="0 0 240 150" className={styles.art} aria-hidden="true" focusable="false">
+      <g className={styles.chosen}>
+        <rect className={styles.paper} x="34" y="18" width="116" height="116" rx="12" />
+        <rect className={styles.photo} x="46" y="30" width="92" height="52" rx="8" />
+        <path className={styles.hill} d="M46 74 L70 54 L88 68 L104 56 L138 80 L138 82 L46 82 Z" />
+        <circle className={styles.sun} cx="122" cy="44" r="7" />
+        <rect className={styles.ink} x="46" y="92" width="60" height="6" rx="3" />
+        <rect className={styles.numberPill} x="46" y="106" width="52" height="16" rx="8" />
+        <rect className={styles.numberText} x="54" y="111" width="36" height="6" rx="3" />
+      </g>
+      <g className={styles.plane}>
+        <path className={styles.planeBody} d="M164 66 L214 46 L200 96 L186 82 Z" />
+        <path className={styles.planeFold} d="M186 82 L214 46 L182 90 Z" />
+      </g>
+      <path className={styles.trail} d="M150 104 Q168 100 180 90" />
+    </svg>
+  );
+}
+
+// Sellers: the buyer's number arrives as a message.
+export function NumberArt() {
+  return (
+    <svg viewBox="0 0 240 150" className={styles.art} aria-hidden="true" focusable="false">
+      <rect className={styles.paper} x="70" y="10" width="100" height="134" rx="16" />
+      <rect className={styles.soft} x="104" y="18" width="32" height="5" rx="2.5" />
+      <rect className={styles.field} x="80" y="34" width="70" height="22" rx="8" />
+      <rect className={styles.ink} x="88" y="42" width="40" height="5" rx="2.5" />
+      <g className={styles.number}>
+        <rect className={styles.numberPill} x="80" y="66" width="80" height="34" rx="10" />
+        <path
+          className={styles.handset}
+          d="M92 76 q-2 6 4 12 q6 6 12 4 l2 -4 l-5 -4 l-3 2 q-4 -2 -6 -6 l2 -3 l-4 -5 Z"
+        />
+        <rect className={styles.numberText} x="116" y="80" width="36" height="6" rx="3" />
+      </g>
+      {/* Ringing */}
+      <g className={styles.sparks}>
+        <path d="M178 70 q8 13 0 26 M188 62 q14 21 0 42" />
+      </g>
+    </svg>
+  );
+}

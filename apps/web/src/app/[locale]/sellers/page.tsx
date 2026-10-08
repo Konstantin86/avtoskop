@@ -2,16 +2,15 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { LIVE_STATS_MIN } from '@avtoskop/core';
 import { RoadScene } from '@/components/CarScene';
+import { HowItWorks } from '@/components/HowItWorks';
+import { DealArt, NumberArt, RequestAlertArt, SendOfferArt } from '@/components/HowItWorksArt';
 import { Compare } from '@/components/Compare';
 import {
   CheckIcon,
   FlagEU,
   FlagUS,
   KeyIcon,
-  OffersIcon,
   PersonIcon,
-  PhoneCheckIcon,
-  SearchListIcon,
   StoreIcon,
   TelegramIcon,
 } from '@/components/icons';
@@ -53,11 +52,6 @@ export default async function SellersPage({ params }: Props) {
     [<KeyIcon key="key" />, 'whoBuyout'],
     [<PersonIcon key="person" />, 'whoOwners'],
   ] as const;
-  const stepIcons = {
-    1: <SearchListIcon size={30} />,
-    2: <OffersIcon size={30} />,
-    3: <PhoneCheckIcon size={30} />,
-  };
   const rules = ['rule1', 'rule2', 'rule3', 'rule4'] as const;
 
   return (
@@ -89,21 +83,16 @@ export default async function SellersPage({ params }: Props) {
 
       <RoadScene />
 
-      <section id="how" className={styles.section}>
-        <h2 className={styles.sectionTitle}>{t('howTitle')}</h2>
-        <div className={styles.steps}>
-          {([1, 2, 3] as const).map((n) => (
-            <div key={n} className={`card ${styles.step}`}>
-              <div className={styles.stepTop}>
-                <span className={styles.stepNum}>{n}</span>
-                <span className={styles.stepIcon}>{stepIcons[n]}</span>
-              </div>
-              <h3 className={styles.stepTitle}>{t(`step${n}Title`)}</h3>
-              <p className={styles.muted}>{t(`step${n}Text`)}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <HowItWorks
+        title={t('howTitle')}
+        steps={[
+          { title: t('step1Title'), text: t('step1Text'), art: <RequestAlertArt /> },
+          { title: t('step2Title'), text: t('step2Text'), art: <SendOfferArt /> },
+          { title: t('step3Title'), text: t('step3Text'), art: <NumberArt /> },
+          { title: t('step4Title'), text: t('step4Text'), art: <DealArt />, outside: true },
+        ]}
+        outsideLabel={t('step4Badge')}
+      />
 
       <Compare
         title={t('whyTitle')}

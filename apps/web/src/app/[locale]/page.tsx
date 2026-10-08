@@ -6,6 +6,7 @@ import { Compare } from '@/components/Compare';
 import { Faq, type FaqItem } from '@/components/Faq';
 import { SampleOffer } from '@/components/SampleOffer';
 import { HowItWorks } from '@/components/HowItWorks';
+import { ChooseArt, DealArt, DescribeArt, OffersArt } from '@/components/HowItWorksArt';
 import { StickyCta } from '@/components/StickyCta';
 import { CheckIcon, LockIcon, PersonIcon, TelegramIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
@@ -118,12 +119,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <HowItWorks
         title={t('howTitle')}
         steps={[
-          { title: t('step1Title'), text: t('step1Text') },
-          { title: t('step2Title'), text: t('step2Text') },
-          { title: t('step3Title'), text: t('step3Text') },
-          { title: t('step4Title'), text: t('step4Text') },
+          {
+            title: t('step1Title'),
+            text: t('step1Text'),
+            art: <DescribeArt minutes={t('stepMinutes')} />,
+          },
+          { title: t('step2Title'), text: t('step2Text'), art: <OffersArt /> },
+          { title: t('step3Title'), text: t('step3Text'), art: <ChooseArt /> },
+          { title: t('step4Title'), text: t('step4Text'), art: <DealArt />, outside: true },
         ]}
-        minutes={t('stepMinutes')}
         outsideLabel={t('step4Badge')}
       />
 
