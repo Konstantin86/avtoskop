@@ -20,6 +20,7 @@ const publicColumns = {
   fuels: buyerRequests.fuels,
   sellerTypes: buyerRequests.sellerTypes,
   gearbox: buyerRequests.gearbox,
+  condition: buyerRequests.condition,
   wishes: buyerRequests.wishes,
   importOk: buyerRequests.importOk,
   region: buyerRequests.region,

@@ -87,6 +87,10 @@
     "fuel_petrol": "Petrol",
     "fuel_diesel": "Diesel",
     "fuel_electric": "Electric",
+    "condition": "Condition",
+    "condition_any": "Any",
+    "condition_new": "New",
+    "condition_used": "Used",
     "gearbox": "Gearbox",
     "gearbox_any": "Any",
     "gearbox_automatic": "Automatic",
@@ -155,7 +159,8 @@
     "save": "Save changes",
     "saving": "Saving…",
     "error_editLimit": "This request was already edited 3 times today. Try again tomorrow.",
-    "error_closed": "This request is closed and can no longer be edited."
+    "error_closed": "This request is closed and can no longer be edited.",
+    "conditionNewHint": "For a new car we kept importers and dealers and removed the mileage limit. Change it if needed."
   },
   "sent": {
     "title": "Request published",

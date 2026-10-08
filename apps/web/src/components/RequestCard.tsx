@@ -15,6 +15,7 @@ export async function RequestCard({ request: r }: { request: PublicRequest }) {
 
   const specs = [
     fuelsLabel(r.fuels, (x) => f(`fuel_${x}` as 'fuel_hybrid')),
+    r.condition !== 'any' ? f(`condition_${r.condition}` as 'condition_new') : null,
     r.gearbox !== 'any' ? f(`gearbox_${r.gearbox}` as 'gearbox_any') : null,
     r.mileageMaxKm
       ? `≤ ${formatNumber(locale, r.mileageMaxKm)} ${locale === 'uk' ? 'км' : 'km'}`

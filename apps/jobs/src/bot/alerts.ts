@@ -21,6 +21,7 @@ export interface RequestDetails {
   region: string;
   fuels: string[];
   gearbox: string;
+  condition: string;
   importOk: boolean;
 }
 
@@ -33,6 +34,7 @@ export function requestDetails(locale: string, r: RequestDetails): string {
     botText(locale, 'alertBudget', { amount: budget }),
     regions[r.region],
     r.fuels.length > 0 ? r.fuels.map((x) => fields[`fuel_${x}`]).join(', ') : null,
+    r.condition !== 'any' ? fields[`condition_${r.condition}`] : null,
     r.gearbox !== 'any' ? fields[`gearbox_${r.gearbox}`] : null,
     botText(locale, r.importOk ? 'alertImportOk' : 'alertImportNo'),
   ]
@@ -66,6 +68,7 @@ export function createSellerAlerts(
         region: buyerRequests.region,
         fuels: buyerRequests.fuels,
         gearbox: buyerRequests.gearbox,
+        condition: buyerRequests.condition,
         importOk: buyerRequests.importOk,
         sellerTypes: buyerRequests.sellerTypes,
         buyerChatId: buyerRequests.telegramChatId,

@@ -81,6 +81,7 @@ export default async function OfferPage({ params }: Props) {
   const meta = [
     yearsLabel(request),
     fuelsLabel(request.fuels, (x) => f(`fuel_${x}` as 'fuel_hybrid')),
+    request.condition !== 'any' ? f(`condition_${request.condition}` as 'condition_new') : null,
     request.gearbox !== 'any' ? f(`gearbox_${request.gearbox}` as 'gearbox_any') : null,
     b('budget', { amount: formatNumber(locale, request.budgetUsd) }),
     regions[request.region],

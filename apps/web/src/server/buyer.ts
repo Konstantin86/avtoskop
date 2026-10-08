@@ -22,6 +22,7 @@ export async function getRequestByKey(key: string) {
       mileageMaxKm: buyerRequests.mileageMaxKm,
       fuels: buyerRequests.fuels,
       gearbox: buyerRequests.gearbox,
+      condition: buyerRequests.condition,
       wishes: buyerRequests.wishes,
       region: buyerRequests.region,
       importOk: buyerRequests.importOk,

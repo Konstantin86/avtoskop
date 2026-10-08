@@ -237,3 +237,27 @@ describe('telegramPhone', () => {
     expect(telegramPhone('1234567890123456')).toBeNull();
   });
 });
+
+describe('buyerRequestInput condition', () => {
+  const base = {
+    brandId: '1',
+    model: 'RAV4',
+    yearFrom: '2025',
+    budgetUsd: '40000',
+    region: 'kyiv',
+    importOk: 'on',
+    notifyVia: 'telegram',
+    consent: 'on',
+  };
+
+  it('defaults to any and drops the mileage limit for a new car', () => {
+    expect(buyerRequestInput.parse(base).condition).toBe('any');
+    const r = buyerRequestInput.parse({ ...base, condition: 'new', mileageMaxKm: '50000' });
+    expect(r.condition).toBe('new');
+    expect(r.mileageMaxKm).toBeUndefined();
+    expect(
+      buyerRequestInput.parse({ ...base, condition: 'used', mileageMaxKm: '50000' }).mileageMaxKm,
+    ).toBe(50000);
+    expect(buyerRequestInput.safeParse({ ...base, condition: 'broken' }).success).toBe(false);
+  });
+});

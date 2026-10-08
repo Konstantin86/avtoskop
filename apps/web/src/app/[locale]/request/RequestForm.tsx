@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useFocusFirstError } from '@/components/useFocusFirstError';
-import { FUELS, GEARBOXES, localePath, WISHES } from '@avtoskop/core';
+import { CONDITIONS, FUELS, GEARBOXES, localePath, WISHES } from '@avtoskop/core';
 import { BrandPicker } from '@/components/BrandPicker';
 import { ModelInput } from '@/components/ModelInput';
 import { CheckIcon, TelegramIcon } from '@/components/icons';
@@ -38,6 +38,24 @@ export function RequestForm({ locale, brands, regionNames, defaults, edit }: Pro
   const [brandId, setBrandId] = useState(v['brandId'] ?? '');
   const reach = useSellerReach(formRef, brandId);
   const brandName = brands.all.find((b) => String(b.id) === brandId)?.name;
+  const [condition, setCondition] = useState(v['condition'] ?? 'any');
+  // A new car usually comes from an importer or a dealer, and is from this year: preset both,
+  // but the buyer can still change them. The seller-type boxes sit outside the form element.
+  function chooseCondition(c: string) {
+    setCondition(c);
+    if (c !== 'new' || !formRef.current) return;
+    for (const box of document.querySelectorAll<HTMLInputElement>(
+      'input[name="sellerTypes"][form="request-form"]',
+    )) {
+      const want = box.value === 'importer' || box.value === 'dealer';
+      if (box.checked !== want) {
+        box.checked = want;
+        box.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+    const yearFrom = formRef.current.elements.namedItem('yearFrom') as HTMLInputElement | null;
+    if (yearFrom && !yearFrom.value) yearFrom.value = String(new Date().getFullYear());
+  }
   const bad = (name: string) => state.errors.includes(name);
   const optional = ['fuels', 'gearbox', 'mileageMaxKm', 'wishes', 'notes'];
   const moreOpen =
@@ -139,6 +157,24 @@ export function RequestForm({ locale, brands, regionNames, defaults, edit }: Pro
             {err('yearTo')}
           </label>
         </div>
+        <div className="label">
+          <span id="condition-label">{f('condition')}</span>
+          <div className="segment" role="radiogroup" aria-labelledby="condition-label">
+            {CONDITIONS.map((c) => (
+              <label key={c}>
+                <input
+                  type="radio"
+                  name="condition"
+                  value={c}
+                  checked={condition === c}
+                  onChange={() => chooseCondition(c)}
+                />
+                <span>{f(`condition_${c}`)}</span>
+              </label>
+            ))}
+          </div>
+          {condition === 'new' && <span className="hint">{t('conditionNewHint')}</span>}
+        </div>
       </fieldset>
 
       <fieldset className={styles.section}>
@@ -232,20 +268,22 @@ export function RequestForm({ locale, brands, regionNames, defaults, edit }: Pro
               ))}
             </div>
           </div>
-          <div className={styles.pair}>
-            <label className="label">
-              {f('mileageMax')}
-              <input
-                name="mileageMaxKm"
-                className="field"
-                inputMode="numeric"
-                defaultValue={v['mileageMaxKm']}
-                placeholder="100000"
-                {...invalid('mileageMaxKm')}
-              />
-              {err('mileageMaxKm')}
-            </label>
-          </div>
+          {condition !== 'new' && (
+            <div className={styles.pair}>
+              <label className="label">
+                {f('mileageMax')}
+                <input
+                  name="mileageMaxKm"
+                  className="field"
+                  inputMode="numeric"
+                  defaultValue={v['mileageMaxKm']}
+                  placeholder="100000"
+                  {...invalid('mileageMaxKm')}
+                />
+                {err('mileageMaxKm')}
+              </label>
+            </div>
+          )}
           <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
             <legend style={{ padding: 0, marginBottom: 6 }}>{f('wishes')}</legend>
             <div className="choices">

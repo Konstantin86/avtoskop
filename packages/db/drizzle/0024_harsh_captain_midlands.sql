@@ -1,0 +1,1 @@
+ALTER TABLE "buyer_requests" ADD COLUMN "condition" text DEFAULT 'any' NOT NULL;

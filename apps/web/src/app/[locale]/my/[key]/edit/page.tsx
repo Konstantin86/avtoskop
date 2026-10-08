@@ -37,6 +37,7 @@ export default async function EditRequestPage({ params }: Props) {
     importOk: String(request.importOk),
     fuels: request.fuels.join(','),
     gearbox: request.gearbox,
+    condition: request.condition,
     mileageMaxKm: request.mileageMaxKm ? String(request.mileageMaxKm) : '',
     wishes: request.wishes.join(','),
     notes: request.notes,

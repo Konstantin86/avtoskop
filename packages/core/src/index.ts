@@ -23,6 +23,7 @@ export {
   normalizeUaPhone,
   telegramPhone,
   FUELS,
+  CONDITIONS,
   GEARBOXES,
   WISHES,
   NOTIFY_CHANNELS,

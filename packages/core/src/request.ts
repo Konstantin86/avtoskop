@@ -32,6 +32,8 @@ export const REGION_CODES = [
 // A request can accept several fuels; none chosen means any fuel.
 export const FUELS = ['hybrid', 'petrol', 'diesel', 'electric'] as const;
 export const GEARBOXES = ['any', 'automatic', 'manual'] as const;
+// New, used, or either; a new car has no mileage limit.
+export const CONDITIONS = ['any', 'new', 'used'] as const;
 export const WISHES = [
   'no_accidents',
   'one_owner',
@@ -101,6 +103,7 @@ export const buyerRequestInput = z
       z.array(z.enum(FUELS)).transform((f) => [...new Set(f)]),
     ),
     gearbox: z.enum(GEARBOXES).default('any'),
+    condition: z.enum(CONDITIONS).default('any'),
     // Checkbox values arrive as an array, or as a comma-separated string when re-submitted.
     wishes: z.preprocess(
       (v) => (typeof v === 'string' ? v.split(',').filter(Boolean) : (v ?? [])),
@@ -123,7 +126,8 @@ export const buyerRequestInput = z
   .refine((r) => r.yearTo === undefined || r.yearTo >= r.yearFrom, {
     path: ['yearTo'],
     message: 'yearTo',
-  });
+  })
+  .transform((r) => (r.condition === 'new' ? { ...r, mileageMaxKm: undefined } : r));
 
 export type BuyerRequestInput = z.infer<typeof buyerRequestInput>;
 

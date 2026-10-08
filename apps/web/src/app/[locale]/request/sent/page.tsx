@@ -49,6 +49,7 @@ export default async function SentPage({
             budgetUsd: buyerRequests.budgetUsd,
             fuels: buyerRequests.fuels,
             gearbox: buyerRequests.gearbox,
+            condition: buyerRequests.condition,
             wishes: buyerRequests.wishes,
             region: buyerRequests.region,
             accessHash: buyerRequests.accessHash,
@@ -73,6 +74,9 @@ export default async function SentPage({
     `${req.brand} ${req.model}`,
     years,
     fuelsLabel(req.fuels, (x) => f(`fuel_${x}` as 'fuel_hybrid').toLowerCase()),
+    req.condition !== 'any'
+      ? f(`condition_${req.condition}` as 'condition_new').toLowerCase()
+      : null,
     req.gearbox !== 'any' ? f(`gearbox_${req.gearbox}` as 'gearbox_any').toLowerCase() : null,
     `≤ $${usd.format(req.budgetUsd)}`,
     (messages.regions as Record<string, string>)[req.region],

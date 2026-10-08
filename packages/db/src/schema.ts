@@ -111,6 +111,8 @@ export const buyerRequests = pgTable(
     // Empty means any fuel.
     fuels: text('fuels').array().notNull().default([]),
     gearbox: text('gearbox').notNull().default('any'),
+    // 'any', 'new' or 'used'.
+    condition: text('condition').notNull().default('any'),
     wishes: text('wishes').array().notNull().default([]),
     importOk: boolean('import_ok').notNull(),
     region: text('region').notNull(),

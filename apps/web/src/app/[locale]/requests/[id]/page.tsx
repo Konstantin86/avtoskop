@@ -51,6 +51,7 @@ export default async function RequestDetailPage({ params }: Props) {
   const rows: Array<[string, string]> = [
     [t('years'), yearsLabel(r)],
     [f('fuel'), fuelsLabel(r.fuels, (x) => f(`fuel_${x}` as 'fuel_hybrid')) ?? f('fuel_any')],
+    [f('condition'), f(`condition_${r.condition}` as 'condition_any')],
     [f('gearbox'), f(`gearbox_${r.gearbox}` as 'gearbox_any')],
     ...(r.mileageMaxKm
       ? ([[f('mileageMax'), formatNumber(locale, r.mileageMaxKm)]] as Array<[string, string]>)

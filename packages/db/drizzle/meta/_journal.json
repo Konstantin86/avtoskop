@@ -169,6 +169,13 @@
       "when": 1791451754268,
       "tag": "0023_giant_carnage",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791452391715,
+      "tag": "0024_harsh_captain_midlands",
+      "breakpoints": true
     }
   ]
 }
