@@ -1,7 +1,7 @@
 .footer {
   margin-top: auto;
   /* Vertical space lives here: the .container class sets its own padding shorthand. */
-  padding: 20px 0 24px;
+  padding: 18px 0 20px;
   border-top: 1px solid var(--line);
   font-size: 14px;
   color: var(--muted);
@@ -10,31 +10,23 @@
 .inner {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 14px 40px;
+  gap: 10px 32px;
 }
 
 .about {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.feedback {
-  font-weight: 600;
-  text-decoration: none;
+  margin: 0;
 }
 
 .small {
-  display: block;
-  margin-top: 4px;
   font-size: 12px;
 }
 
 .links {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
   gap: 8px 20px;
 }
 
@@ -42,13 +34,33 @@
   color: inherit;
 }
 
+.links .feedback {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 @media (max-width: 720px) {
   .footer {
-    padding: 18px 0 22px;
+    padding: 16px 0 20px;
   }
 
   .inner {
     flex-direction: column;
-    align-items: flex-start;
+  }
+
+  /* Links first, copyright last. */
+  .about {
+    order: 1;
+  }
+
+  /* On phones the feedback link gets its own line above the others. */
+  .links .feedback {
+    flex-basis: 100%;
+  }
+
+  .small {
+    display: block;
+    margin-top: 4px;
   }
 }
