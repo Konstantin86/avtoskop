@@ -63,6 +63,10 @@ function upload(blob: Blob, onProgress: (p: number) => void) {
   });
 }
 
+// Temporary ids for photos still uploading. Not crypto.randomUUID: browsers allow it only on
+// HTTPS or localhost, and the site may run on plain http on a local network.
+let nextTempId = 0;
+
 // Photos upload as soon as they're picked; the form sends only their ids, first one is main.
 export function PhotoPicker({ photos, onChange, labels }: Props) {
   const inputId = useId();
@@ -72,7 +76,7 @@ export function PhotoPicker({ photos, onChange, labels }: Props) {
 
   async function add(files: FileList) {
     const picked = [...files].slice(0, Math.max(0, free));
-    const temp = picked.map((file) => ({ file, id: `tmp-${crypto.randomUUID()}` }));
+    const temp = picked.map((file) => ({ file, id: `tmp-${(nextTempId += 1)}` }));
     onChange((list) => [
       ...list,
       ...temp.map(({ id }) => ({ id, thumb: null, progress: 0, error: null })),
@@ -84,7 +88,9 @@ export function PhotoPicker({ photos, onChange, labels }: Props) {
         set({ error: labels.errors['tooBig'] ?? '' });
         continue;
       }
-      const result = await upload(await shrink(file), (progress) => set({ progress }));
+      const result = await upload(await shrink(file), (progress) => set({ progress })).catch(
+        () => ({ error: 'failed' }) as const,
+      );
       if ('error' in result)
         set({ error: labels.errors[result.error] ?? labels.errors['failed'] ?? '' });
       else set({ id: result.id, thumb: result.thumb, progress: 1 });
