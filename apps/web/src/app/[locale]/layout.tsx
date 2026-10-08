@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ViewTransition, type ReactNode } from 'react';
+import { DigitsOnly } from '@/components/DigitsOnly';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { NavProgress } from '@/components/NavProgress';
@@ -72,6 +73,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           </main>
           <Footer />
           <PageView />
+          <DigitsOnly />
         </NextIntlClientProvider>
       </body>
     </html>
