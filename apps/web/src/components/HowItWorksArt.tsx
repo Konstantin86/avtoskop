@@ -27,7 +27,7 @@ export function DescribeArt({ minutes }: { minutes: string }) {
       <g className={styles.watch}>
         <rect className={styles.watchButton} x="182" y="20" width="12" height="8" rx="3" />
         <circle className={styles.watchFace} cx="188" cy="58" r="30" />
-        <path className={styles.watchArc} d="M188 58 L188 28 A30 30 0 0 1 214 43 Z" />
+        <path className={styles.watchArc} d="M188 58 L188 30 A28 28 0 0 1 212.25 44 Z" />
         <line className={styles.watchHand} x1="188" y1="58" x2="188" y2="36" />
         <circle className={styles.watchHub} cx="188" cy="58" r="3.5" />
         <text className={styles.watchText} x="188" y="106" textAnchor="middle">
