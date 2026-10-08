@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { REGION_CODES, SELLER_TYPES, sellerTypeAllowed, WISHES } from './request.ts';
+import { PHOTO_LIMITS } from './photos.ts';
 import { normalizeVin, vinProblem } from './vin.ts';
 
 export const SOURCE_COUNTRIES = ['us', 'eu', 'kr', 'cn', 'jp', 'ca'] as const;
@@ -76,6 +77,11 @@ export const offerInput = z
     features: z.preprocess(
       (v) => [...new Set(asArray(v) as unknown[])],
       z.array(z.enum(OFFER_FEATURES)),
+    ),
+    // Uploaded photo ids in display order; the first is the main photo.
+    photos: z.preprocess(
+      (v) => [...new Set(asArray(v) as unknown[])],
+      z.array(z.uuid()).max(PHOTO_LIMITS.perOffer),
     ),
   })
   .refine((o) => o.availability === 'in_ukraine' || o.etaWeeks !== undefined, {

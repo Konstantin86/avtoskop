@@ -1,3 +1,4 @@
+export { PHOTO_KEY, PHOTO_LIMITS, photoFileNames } from './photos.ts';
 export { autoriaSearchUrl, type AutoriaSearch } from './autoria.ts';
 export { redactContacts } from './redact.ts';
 export { slugify, transliterateUk } from './slug.ts';

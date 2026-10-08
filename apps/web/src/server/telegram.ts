@@ -19,6 +19,34 @@ export async function sendTelegram(chatId: number, text: string): Promise<boolea
   }
 }
 
+// A photo with a caption (up to 1024 characters), uploaded as a file because the
+// server may not be reachable from Telegram. Falls back to plain text on failure.
+export async function sendTelegramPhoto(
+  chatId: number,
+  photo: Buffer,
+  caption: string,
+): Promise<boolean> {
+  const token = process.env['TELEGRAM_BOT_TOKEN'];
+  if (!token || chatId <= 0) return false;
+  if (caption.length > 1024) return sendTelegram(chatId, caption);
+  try {
+    const form = new FormData();
+    form.set('chat_id', String(chatId));
+    form.set('caption', caption);
+    form.set('photo', new Blob([new Uint8Array(photo)], { type: 'image/webp' }), 'photo.webp');
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+      method: 'POST',
+      body: form,
+    });
+    const json = (await res.json()) as { ok: boolean; description?: string };
+    if (json.ok) return true;
+    console.error(`Telegram sendPhoto failed: ${json.description}`);
+  } catch (error) {
+    console.error('Telegram sendPhoto failed', error);
+  }
+  return sendTelegram(chatId, caption);
+}
+
 export function botStartLink(payload: string): string | null {
   const bot = process.env['TELEGRAM_BOT_USERNAME'];
   return bot ? `https://t.me/${bot.replace(/^@/, '')}?start=${payload}` : null;

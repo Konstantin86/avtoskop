@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useFocusFirstError } from '@/components/useFocusFirstError';
 import { AVAILABILITY, OFFER_FEATURES, SOURCE_COUNTRIES, WISHES } from '@avtoskop/core';
+import { PhotoPicker, type PickedPhoto } from '@/components/PhotoPicker';
 import type { OfferTemplate } from '@/server/offers';
 import { saveOfferAction, type FormState } from '../../../sellers/actions';
 import styles from '../../../sellers/forms.module.css';
@@ -14,9 +15,17 @@ interface Props {
   isUpdate: boolean;
   buyerWishes: string[];
   templates: OfferTemplate[];
+  initialPhotos: { id: string; thumb: string }[];
 }
 
-export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, templates }: Props) {
+export function OfferForm({
+  requestId,
+  defaults,
+  isUpdate,
+  buyerWishes,
+  templates,
+  initialPhotos,
+}: Props) {
   const t = useTranslations('offer');
   const fields = useTranslations('fields');
   const [state, action, pending] = useActionState<FormState, FormData>(saveOfferAction, {
@@ -24,6 +33,11 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
     values: defaults,
   });
   const formRef = useRef<HTMLFormElement>(null);
+  // Kept outside the form element, which is re-created after each submit.
+  const [photos, setPhotos] = useState<PickedPhoto[]>(() =>
+    initialPhotos.map((p) => ({ ...p, progress: 1, error: null })),
+  );
+  const uploading = photos.some((p) => !p.thumb && !p.error);
   useFocusFirstError(formRef, state, Boolean(state.formError) || state.errors.length > 0);
   // A copied offer fills the form until the next submit; after that the server's values win.
   const [copied, setCopied] = useState<{ values: Record<string, string>; for: FormState } | null>(
@@ -197,6 +211,26 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
         </label>
       )}
 
+      <PhotoPicker
+        photos={photos}
+        onChange={setPhotos}
+        labels={{
+          title: t('photos'),
+          hint: t('photosHint'),
+          add: t('photosAdd'),
+          main: t('photosMain'),
+          makeMain: t('photosMakeMain'),
+          remove: t('photosRemove'),
+          errors: {
+            notImage: t('photoError_notImage'),
+            tooBig: t('photoError_tooBig'),
+            tooMany: t('photoError_tooMany'),
+            failed: t('photoError_failed'),
+            auth: t('photoError_failed'),
+          },
+        }}
+      />
+
       {/* Only the fields above are required; the rest stays folded so an offer takes a minute. */}
       <details className={styles.more} open={detailsOpen}>
         <summary className={styles.moreSummary}>
@@ -301,8 +335,18 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
         </div>
       </details>
 
-      <button type="submit" className="btn btn-yellow btn-lg btn-block" disabled={pending}>
-        {pending ? t('submitting') : isUpdate ? t('update') : t('submit')}
+      <button
+        type="submit"
+        className="btn btn-yellow btn-lg btn-block"
+        disabled={pending || uploading}
+      >
+        {uploading
+          ? t('photosUploading')
+          : pending
+            ? t('submitting')
+            : isUpdate
+              ? t('update')
+              : t('submit')}
       </button>
       <span className="hint" style={{ textAlign: 'center' }}>
         {t('rules')}

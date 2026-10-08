@@ -1,0 +1,2 @@
+ALTER TABLE "buyer_requests" ADD COLUMN "closed_at" timestamp with time zone;--> statement-breakpoint
+UPDATE "buyer_requests" SET "closed_at" = LEAST(COALESCE("expires_at", "created_at"), now()) WHERE "status" = 'closed';

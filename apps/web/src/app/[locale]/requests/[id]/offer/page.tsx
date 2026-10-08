@@ -4,6 +4,7 @@ import { BrandLogo } from '@/components/BrandLogo';
 import { formatNumber, fuelsLabel, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
+import { photosForOffers, photoUrl } from '@/server/photos';
 import { getOwnOffer, listOfferTemplates, offerFormValues } from '@/server/offers';
 import { getPublicRequest } from '@/server/requests';
 import { OfferForm } from './OfferForm';
@@ -63,6 +64,12 @@ export default async function OfferPage({ params }: Props) {
 
   const existing = await getOwnOffer(id, user.seller.id);
   // Only earlier offers for the same car; with none, the "copy" field is hidden.
+  const existingPhotos = existing
+    ? ((await photosForOffers([existing.id])).get(existing.id) ?? []).map((p) => ({
+        id: p.id,
+        thumb: photoUrl(p.key, 'thumb'),
+      }))
+    : [];
   const templates = existing
     ? []
     : await listOfferTemplates(user.seller.id, { brand: request.brand, model: request.model });
@@ -106,6 +113,7 @@ export default async function OfferPage({ params }: Props) {
           isUpdate={Boolean(existing)}
           buyerWishes={request.wishes}
           templates={templates}
+          initialPhotos={existingPhotos}
         />
       </div>
     </div>

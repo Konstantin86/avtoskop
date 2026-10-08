@@ -1,12 +1,13 @@
 import 'server-only';
 import { eq } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
-import { localePath } from '@avtoskop/core';
+import { localePath, photoFileNames } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
 import { formatNumber, priceLabel, yearsLabel } from '@/components/requestFormat';
 import { decryptContact } from './contact';
 import { db } from './db';
-import { sendTelegram, siteUrl } from './telegram';
+import { photosForOffers, readPhotoFile } from './photos';
+import { sendTelegram, sendTelegramPhoto, siteUrl } from './telegram';
 
 interface OfferSummary {
   car: string;
@@ -39,18 +40,23 @@ async function buyerChat(requestId: string) {
 }
 
 // Tells a confirmed buyer about a new offer, with their private link.
-export async function notifyBuyerOfOffer(requestId: string, offer: OfferSummary): Promise<void> {
+// The message comes with the offer's main photo when it has one.
+export async function notifyBuyerOfOffer(
+  requestId: string,
+  offer: OfferSummary & { offerId: string },
+): Promise<void> {
   const b = await buyerChat(requestId);
   if (!b) return;
   const t = await getTranslations({ locale: b.locale, namespace: 'notify' });
-  await sendTelegram(
-    b.chatId,
-    t('newOffer', {
-      request: b.request,
-      offer: `${offer.car}, ${offer.year}, ${priceLabel(b.locale, offer.priceUsd, offer.priceMaxUsd)}`,
-      link: b.link,
-    }),
-  );
+  const text = t('newOffer', {
+    request: b.request,
+    offer: `${offer.car}, ${offer.year}, ${priceLabel(b.locale, offer.priceUsd, offer.priceMaxUsd)}`,
+    link: b.link,
+  });
+  const main = (await photosForOffers([offer.offerId])).get(offer.offerId)?.[0];
+  const file = main ? await readPhotoFile(photoFileNames(main.key).full) : null;
+  if (file) await sendTelegramPhoto(b.chatId, file, text);
+  else await sendTelegram(b.chatId, text);
 }
 
 export async function notifyBuyerOfPriceDrop(

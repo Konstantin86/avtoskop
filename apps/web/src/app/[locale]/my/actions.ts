@@ -102,8 +102,9 @@ export async function setRequestOpenAction(formData: FormData): Promise<void> {
             // A reopened request gets a fresh 30 days.
             expiresAt: request.phoneVerified ? requestExpiry(new Date()) : null,
             expiryRemindedAt: null,
+            closedAt: null,
           }
-        : { status: 'closed' },
+        : { status: 'closed', closedAt: new Date() },
     )
     .where(eq(buyerRequests.id, request.id));
   refresh();

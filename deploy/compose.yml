@@ -9,6 +9,10 @@ x-app: &app
   env_file: .env
   environment:
     DATABASE_URL: postgres://avtoskop:${POSTGRES_PASSWORD}@db:5432/avtoskop
+    PHOTO_DIR: /data/photos
+  # Offer photos; the website writes them and the bot removes old ones.
+  volumes:
+    - photos:/data/photos
   restart: unless-stopped
 
 services:
@@ -57,3 +61,4 @@ services:
 
 volumes:
   db-data:
+  photos:

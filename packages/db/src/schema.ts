@@ -128,6 +128,8 @@ export const buyerRequests = pgTable(
     // Confirmed requests close on their own at expiresAt (null: never, e.g. demo rows).
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     expiryRemindedAt: timestamp('expiry_reminded_at', { withTimezone: true }),
+    // When the request was last closed; offer photos are removed some time after.
+    closedAt: timestamp('closed_at', { withTimezone: true }),
     notifyVia: text('notify_via').notNull(),
     locale: text('locale').notNull(),
     status: text('status').notNull().default('new'),
@@ -235,6 +237,29 @@ export const offers = pgTable(
   (t) => [
     uniqueIndex('offers_request_seller_idx').on(t.requestId, t.sellerId),
     index('offers_seller_idx').on(t.sellerId, t.createdAt),
+  ],
+);
+
+// A photo a seller uploaded. offer_id stays empty until the offer is sent; empty rows
+// older than a day are removed together with their files.
+export const offerPhotos = pgTable(
+  'offer_photos',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sellerId: uuid('seller_id')
+      .notNull()
+      .references(() => sellers.id, { onDelete: 'cascade' }),
+    offerId: uuid('offer_id').references(() => offers.id, { onDelete: 'set null' }),
+    // Random file name in photo storage, never shown on public pages.
+    key: text('key').notNull().unique(),
+    width: integer('width').notNull(),
+    height: integer('height').notNull(),
+    position: integer('position').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('offer_photos_offer_idx').on(t.offerId, t.position),
+    index('offer_photos_seller_idx').on(t.sellerId, t.createdAt),
   ],
 );
 

@@ -23,6 +23,8 @@ import {
 } from '@/components/requestFormat';
 import { RefreshOnce } from '@/components/RefreshOnce';
 import { autoriaLinkFor } from '@/server/autoria';
+import { photosForOffers, photoUrl } from '@/server/photos';
+import { PhotoGallery } from '@/components/PhotoGallery';
 import { getRequestByKey, listRequestOffers, markOffersShown } from '@/server/buyer';
 import { botStartLink } from '@/server/telegram';
 import { wantedByVin, wantedListDate } from '@/server/vin';
@@ -69,6 +71,7 @@ export default async function MyRequestPage({ params }: Props) {
   }
 
   const offerList = await listRequestOffers(request.id);
+  const photos = await photosForOffers(offerList.map((o) => o.id));
   const autoria =
     request.status !== 'closed' && request.phoneVerified ? await autoriaLinkFor(request) : null;
   const [wanted, wantedDate] = await Promise.all([
@@ -219,6 +222,19 @@ export default async function MyRequestPage({ params }: Props) {
                     )}
                   </div>
                 </div>
+                <PhotoGallery
+                  photos={(photos.get(offer.id) ?? []).map((p) => ({
+                    full: photoUrl(p.key),
+                    thumb: photoUrl(p.key, 'thumb'),
+                  }))}
+                  alt={`${offer.car}, ${offer.year}`}
+                  labels={{
+                    open: t('photoOpen'),
+                    close: t('photoClose'),
+                    prev: t('photoPrev'),
+                    next: t('photoNext'),
+                  }}
+                />
                 {order && <p className={styles.orderNote}>{t('orderNote')}</p>}
                 {offer.vin && (
                   <div className={styles.vin}>

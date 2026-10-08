@@ -57,7 +57,7 @@ export function createExpiryJob(db: Db, tg: Telegram, { contactKey, siteUrl, log
 
     const expired = await db
       .update(buyerRequests)
-      .set({ status: 'closed' })
+      .set({ status: 'closed', closedAt: now })
       .where(and(active, lte(buyerRequests.expiresAt, now)))
       .returning({ id: buyerRequests.id });
     for (const { id } of expired) {

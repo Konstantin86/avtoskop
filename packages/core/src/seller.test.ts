@@ -271,3 +271,20 @@ describe('offerInput for orders and the short form', () => {
     expect(o.serviceFeeUsd).toBeUndefined();
   });
 });
+
+describe('offerInput photos', () => {
+  const base = { car: 'Toyota RAV4', year: '2021', priceUsd: '22000', availability: 'in_ukraine' };
+  const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+
+  it('keeps photo ids in order without repeats', () => {
+    const o = offerInput.parse({ ...base, photos: `${id(2)},${id(1)},${id(2)}` });
+    expect(o.photos).toEqual([id(2), id(1)]);
+    expect(offerInput.parse(base).photos).toEqual([]);
+  });
+
+  it('allows at most 10 photos and only real ids', () => {
+    const eleven = Array.from({ length: 11 }, (_, i) => id(i)).join(',');
+    expect(offerInput.safeParse({ ...base, photos: eleven }).success).toBe(false);
+    expect(offerInput.safeParse({ ...base, photos: '../../etc/passwd' }).success).toBe(false);
+  });
+});

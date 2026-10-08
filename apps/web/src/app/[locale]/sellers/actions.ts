@@ -17,6 +17,7 @@ import { getCurrentUser, safeReturnTo } from '@/server/auth';
 import { db } from '@/server/db';
 import { feedbackUrl } from '@/server/contactLinks';
 import { notifyBuyerOfOffer, notifyBuyerOfPriceDrop } from '@/server/notify';
+import { setOfferPhotos } from '@/server/photos';
 import { sendTelegram, siteUrl } from '@/server/telegram';
 import { decodeVin } from '@/server/vin';
 
@@ -189,8 +190,9 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
       set: { ...row, updatedAt: new Date() },
     })
     // xmax is 0 only for a freshly inserted row, so edits don't notify the buyer again.
-    .returning({ isNew: sql<boolean>`(xmax = 0)` });
-  if (saved?.isNew) await notifyBuyerOfOffer(requestId, row);
+    .returning({ id: offers.id, isNew: sql<boolean>`(xmax = 0)` });
+  if (saved) await setOfferPhotos(seller.id, saved.id, o.photos);
+  if (saved?.isNew) await notifyBuyerOfOffer(requestId, { ...row, offerId: saved.id });
 
   // A lower price than the buyer last heard about is worth a message, unless they declined.
   const lastToldPrice = existing?.notifiedPriceUsd ?? existing?.priceUsd;

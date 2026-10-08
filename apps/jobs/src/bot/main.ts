@@ -1,6 +1,7 @@
 import { contactKey } from '@avtoskop/core';
 import { createDb } from '@avtoskop/db';
 import { importWanted } from '../mvs/wanted.ts';
+import { cleanUpPhotos } from '../photos/cleanup.ts';
 import { createSellerAlerts } from './alerts.ts';
 import { createExpiryJob } from './expiry.ts';
 import { createBotHandler } from './handler.ts';
@@ -71,6 +72,12 @@ const checkExpiry = () =>
 void checkExpiry();
 const expiryTimer = setInterval(checkExpiry, 60 * 60 * 1000);
 
+// Hourly: remove photos that were never sent with an offer, or belong to long-closed requests.
+const runPhotoCleanup = () =>
+  cleanUpPhotos(db, log).catch((error: Error) => log(`Photo cleanup failed: ${error.message}`));
+void runPhotoCleanup();
+const photoTimer = setInterval(runPhotoCleanup, 60 * 60 * 1000);
+
 // Long polling needs no public URL, so the bot also runs on a laptop.
 let offset = 0;
 while (running) {
@@ -93,5 +100,6 @@ while (running) {
 }
 clearInterval(wantedTimer);
 clearInterval(expiryTimer);
+clearInterval(photoTimer);
 await close();
 log('Bot stopped');

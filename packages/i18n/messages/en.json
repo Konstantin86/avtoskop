@@ -428,7 +428,18 @@
     "featuresOrder": "What you guarantee",
     "descriptionPlaceholderOrder": "How you find cars, what the price includes, contract terms…",
     "error_priceMaxUsd": "The upper price must not be below the lower one",
-    "error_serviceFeeUsd": "Your fee must be below the price"
+    "error_serviceFeeUsd": "Your fee must be below the price",
+    "photos": "Photos",
+    "photosHint": "Up to 10 photos; the first is the main one. We remove the location data from photos.",
+    "photosAdd": "Add photos",
+    "photosMain": "Main",
+    "photosMakeMain": "Make main",
+    "photosRemove": "Remove photo",
+    "photosUploading": "Uploading photos…",
+    "photoError_notImage": "Couldn't read this photo. Try JPEG or PNG",
+    "photoError_tooBig": "Photo is over 15 MB",
+    "photoError_tooMany": "Too many unsaved photos. Send the offer or remove some",
+    "photoError_failed": "Upload failed. Try again"
   },
   "account": {
     "title": "Account",
@@ -547,7 +558,11 @@
     "orderNote": "Sourcing to order: the seller will find this car for you. The price is an estimate, and they'll show the specific car with its VIN before the deal.",
     "autoriaTitle": "Also search AUTO.RIA",
     "autoriaText": "We prepared a search with your request's filters. On AUTO.RIA you can save it and get new ads.",
-    "autoriaButton": "Similar cars on AUTO.RIA"
+    "autoriaButton": "Similar cars on AUTO.RIA",
+    "photoOpen": "Open photo",
+    "photoClose": "Close",
+    "photoPrev": "Previous photo",
+    "photoNext": "Next photo"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
@@ -599,7 +614,7 @@
         },
         {
           "title": "5. For sellers",
-          "body": "An offer must be about a real car you can sell or deliver. The price must be all-in, including delivery, customs and registration. You may not demand a deposit without a contract or send the same offer to every request. Once you receive a buyer's number, you are responsible for its use: only to contact the buyer about this deal, with no advertising and no passing it on."
+          "body": "An offer must be about a real car you can sell or deliver. The price must be all-in, including delivery, customs and registration. Photos must show this very car; don't put phone numbers or links on them. You may not demand a deposit without a contract or send the same offer to every request. Once you receive a buyer's number, you are responsible for its use: only to contact the buyer about this deal, with no advertising and no passing it on."
         },
         {
           "title": "6. Not allowed for anyone",
@@ -636,15 +651,15 @@
         },
         {
           "title": "2. What we collect",
-          "body": "Buyers: the phone number you shared in Telegram, request details (car, budget, region, wishes, comment), site language, and Telegram ID after the number is confirmed. Sellers: Telegram ID, Telegram name and username, profile details (name, type, region, countries, description) and offers. The site uses only technical cookies for sign-in; there are no advertising cookies. We count page views without cookies or IP addresses, only as daily totals."
+          "body": "Buyers: the phone number you shared in Telegram, request details (car, budget, region, wishes, comment), site language, and Telegram ID after the number is confirmed. Sellers: Telegram ID, Telegram name and username, profile details (name, type, region, countries, description) and offers with their photos. The site uses only technical cookies for sign-in; there are no advertising cookies. We count page views without cookies or IP addresses, only as daily totals."
         },
         {
           "title": "3. What others see",
-          "body": "A published request (car, years, budget, region, wishes and comment) is visible to everyone visiting the site, and we may share it on social networks. A buyer's phone number and Telegram account are never published. Buyers see a seller's profile (name, type, region, description) together with the offer."
+          "body": "A published request (car, years, budget, region, wishes and comment) is visible to everyone visiting the site, and we may share it on social networks. A buyer's phone number and Telegram account are never published. Buyers see a seller's profile (name, type, region, description) together with the offer. Offer photos are seen only by the buyer the offer was sent to and by the seller; they never appear on public pages."
         },
         {
           "title": "4. How we protect numbers",
-          "body": "A buyer's number is stored only encrypted and shown only to sellers the buyer chose. We don't store sellers' numbers, only a protected fingerprint to prevent duplicate accounts."
+          "body": "A buyer's number is stored only encrypted and shown only to sellers the buyer chose. We don't store sellers' numbers, only a protected fingerprint to prevent duplicate accounts. We remove hidden data from offer photos, including where they were taken."
         },
         {
           "title": "5. Why",
@@ -656,7 +671,7 @@
         },
         {
           "title": "7. How long",
-          "body": "We keep data while a request or account is active, and as long as needed to handle complaints. You can ask us to delete your data at any time by writing to {email}."
+          "body": "We keep data while a request or account is active, and as long as needed to handle complaints. Photos never sent with an offer are deleted after a day, and photos of offers on closed requests 90 days after closing. You can ask us to delete your data at any time by writing to {email}."
         },
         {
           "title": "8. Your rights",
