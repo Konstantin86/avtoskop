@@ -259,7 +259,7 @@
     "rule3": "Buyer contacts only with the buyer's consent",
     "rule4": "Phone check for everyone, plus registration details for companies",
     "priceTitle": "What it costs",
-    "priceText": "Free until 1 April 2027. After that you'll pay a small amount only for a buyer who chose to share their number with you. Getting requests and sending offers is always free. We'll announce the price at least 30 days ahead, and it won't apply to buyers who shared their number before that.",
+    "priceText": "Free until 1 April 2027. After that you'll pay a small fixed fee only for a buyer who chose to share their number with you. Getting requests and sending offers is always free. We'll announce the amount at least 30 days ahead, and it won't apply to buyers who shared their number before that.",
     "telegramTitle": "New requests in Telegram",
     "telegramText": "The bot sends new requests for your brands and regions. Set them up in your profile.",
     "signInLink": "Sign in or create a seller profile",
@@ -268,7 +268,7 @@
     "whyBefore": "The usual ads",
     "whyAfter": "With Avtoskop",
     "why1Before": "You pay for views, even when nobody calls",
-    "why1After": "Free until 1 April 2027. Then you pay a small amount only for a buyer who chose to share their number with you",
+    "why1After": "Free until 1 April 2027. Then you pay a small fixed fee only for a buyer who chose to share their number with you",
     "why2Before": "People call \"just to ask\"",
     "why2After": "The buyer named the model, years, budget and region, and confirmed their number in Telegram",
     "why3Before": "You hunt for who wants to buy what",
@@ -640,7 +640,7 @@
       "sections": [
         {
           "title": "1. Who we are",
-          "body": "Avtoskop (avtoskop.com.ua) is an online service where buyers describe the car they want and sellers send them offers. The service is provided by {operator}. Contact: {email}. The service is free for buyers. For sellers it is free until 1 April 2027; after that a fee applies only for buyers who chose to share their number with the seller, and we will announce the amount at least 30 days ahead."
+          "body": "Avtoskop (avtoskop.com.ua) is an online service where buyers describe the car they want and sellers send them offers. The service is provided by {operator}. Contact: {email}. The service is free for buyers. For sellers it is free until 1 April 2027; after that a small fixed fee applies only for buyers who chose to share their number with the seller, and we will announce the amount at least 30 days ahead."
         },
         {
           "title": "2. Who can use it",
@@ -825,7 +825,7 @@
       {
         "id": "seller-cost",
         "q": "What does it cost sellers?",
-        "a": "Free until 1 April 2027. After that you'll pay a small amount only for a buyer who chose to share their number with you. Getting requests and sending offers is always free. We'll announce the price at least 30 days ahead, and it won't apply to buyers who shared their number before that."
+        "a": "Free until 1 April 2027. After that you'll pay a small fixed fee only for a buyer who chose to share their number with you. Getting requests and sending offers is always free. We'll announce the amount at least 30 days ahead, and it won't apply to buyers who shared their number before that."
       },
       {
         "id": "seller-number",
