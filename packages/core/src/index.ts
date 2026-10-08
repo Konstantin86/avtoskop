@@ -1,3 +1,11 @@
+export {
+  changesWorthAMessage,
+  diffOffer,
+  mergeChanges,
+  type OfferChange,
+  type OfferSnapshot,
+  UPDATE_NOTE_MINUTES,
+} from './offer-changes.ts';
 export { PHOTO_KEY, PHOTO_LIMITS, photoFileNames } from './photos.ts';
 export { autoriaSearchUrl, type AutoriaSearch } from './autoria.ts';
 export { redactContacts } from './redact.ts';

@@ -1,8 +1,17 @@
 import 'server-only';
 import { eq } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
-import { localePath, photoFileNames } from '@avtoskop/core';
-import { brands, buyerRequests } from '@avtoskop/db';
+import {
+  changesWorthAMessage,
+  diffOffer,
+  localePath,
+  mergeChanges,
+  photoFileNames,
+  type OfferChange,
+  type OfferSnapshot,
+  UPDATE_NOTE_MINUTES,
+} from '@avtoskop/core';
+import { brands, buyerRequests, offers } from '@avtoskop/db';
 import { formatNumber, priceLabel, yearsLabel } from '@/components/requestFormat';
 import { decryptContact } from './contact';
 import { db } from './db';
@@ -59,21 +68,103 @@ export async function notifyBuyerOfOffer(
   else await sendTelegram(b.chatId, text);
 }
 
-export async function notifyBuyerOfPriceDrop(
+type OfferRow = typeof offers.$inferSelect;
+type SavedOffer = Pick<
+  OfferRow,
+  | 'car'
+  | 'year'
+  | 'mileageKm'
+  | 'priceUsd'
+  | 'priceMaxUsd'
+  | 'serviceFeeUsd'
+  | 'availability'
+  | 'etaWeeks'
+  | 'originCountry'
+  | 'link'
+  | 'description'
+  | 'features'
+  | 'vin'
+> & { photoIds: string[] };
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function snapshot(o: Omit<SavedOffer, 'photoIds'>, photoIds: string[]): OfferSnapshot {
+  return {
+    priceUsd: o.priceUsd,
+    availability: o.availability,
+    etaWeeks: o.etaWeeks,
+    photoIds,
+    details: [
+      o.car,
+      o.year,
+      o.mileageKm,
+      o.priceMaxUsd,
+      o.serviceFeeUsd,
+      o.originCountry,
+      o.link,
+      o.description,
+      o.features,
+      o.vin,
+    ],
+  };
+}
+
+// After a seller edits an offer: notes what changed for the buyer's page, and tells the
+// buyer in Telegram about a new lowest price, an arrival in Ukraine or the first photos.
+// Arrivals and photos send at most one message a day per offer; declined offers stay quiet.
+export async function recordOfferUpdate(
   requestId: string,
-  offer: OfferSummary & { oldPriceUsd: number },
+  before: OfferRow,
+  after: SavedOffer,
+  photosBefore: string[],
 ): Promise<void> {
+  const changes = diffOffer(snapshot(before, photosBefore), snapshot(after, after.photoIds));
+  if (changes.length === 0) return;
+  const seenLongAgo =
+    before.changesSeenAt !== null &&
+    Date.now() - before.changesSeenAt.getTime() > UPDATE_NOTE_MINUTES * 60_000;
+  const unseen = mergeChanges(seenLongAgo ? [] : (before.changes as OfferChange[]), changes);
+
+  const quiet = before.status === 'declined';
+  const lastToldPrice = before.notifiedPriceUsd ?? before.priceUsd;
+  const newLow = !quiet && after.priceUsd < lastToldPrice;
+  const recentlyTold =
+    before.updateNotifiedAt !== null && Date.now() - before.updateNotifiedAt.getTime() < DAY_MS;
+  const extras = quiet || recentlyTold ? [] : changesWorthAMessage(changes, photosBefore.length);
+
+  await db
+    .update(offers)
+    .set({
+      changes: unseen,
+      changesSeenAt: null,
+      ...(newLow && { notifiedPriceUsd: after.priceUsd }),
+      ...(extras.length > 0 && { updateNotifiedAt: new Date() }),
+    })
+    .where(eq(offers.id, before.id));
+  if (!newLow && extras.length === 0) return;
+
   const b = await buyerChat(requestId);
   if (!b) return;
   const t = await getTranslations({ locale: b.locale, namespace: 'notify' });
-  await sendTelegram(
-    b.chatId,
-    t('priceDrop', {
-      request: b.request,
-      car: `${offer.car}, ${offer.year}`,
-      oldPrice: `$${formatNumber(b.locale, offer.oldPriceUsd)}`,
-      newPrice: `$${formatNumber(b.locale, offer.priceUsd)}`,
-      link: b.link,
-    }),
-  );
+  const lines = [
+    newLow &&
+      t('updatePrice', {
+        oldPrice: `$${formatNumber(b.locale, lastToldPrice)}`,
+        newPrice: priceLabel(b.locale, after.priceUsd, after.priceMaxUsd),
+      }),
+    extras.includes('arrived') && t('updateArrived'),
+    extras.includes('firstPhotos') && t('updatePhotos', { count: after.photoIds.length }),
+  ].filter(Boolean);
+  const text = t('offerUpdate', {
+    request: b.request,
+    car: `${after.car}, ${after.year}`,
+    changes: lines.join('\n'),
+    link: b.link,
+  });
+  const main = extras.includes('firstPhotos')
+    ? (await photosForOffers([before.id])).get(before.id)?.[0]
+    : undefined;
+  const file = main ? await readPhotoFile(photoFileNames(main.key).full) : null;
+  if (file) await sendTelegramPhoto(b.chatId, file, text);
+  else await sendTelegram(b.chatId, text);
 }

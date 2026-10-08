@@ -336,6 +336,7 @@ export function OfferForm({
         </div>
       </details>
 
+      {isUpdate && <p className={styles.updateNote}>{t('updateNote')}</p>}
       <button
         type="submit"
         className="btn btn-yellow btn-lg btn-block"

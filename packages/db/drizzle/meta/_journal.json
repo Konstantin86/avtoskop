@@ -148,6 +148,20 @@
       "when": 1791449203443,
       "tag": "0020_neat_kree",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1791450876303,
+      "tag": "0021_condemned_northstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1791451110770,
+      "tag": "0022_purple_serpent_society",
+      "breakpoints": true
     }
   ]
 }

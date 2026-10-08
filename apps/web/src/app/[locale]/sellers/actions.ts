@@ -16,8 +16,8 @@ import { redirect } from '@/i18n/navigation';
 import { getCurrentUser, safeReturnTo } from '@/server/auth';
 import { db } from '@/server/db';
 import { feedbackUrl } from '@/server/contactLinks';
-import { notifyBuyerOfOffer, notifyBuyerOfPriceDrop } from '@/server/notify';
-import { setOfferPhotos } from '@/server/photos';
+import { notifyBuyerOfOffer, recordOfferUpdate } from '@/server/notify';
+import { offerPhotoIds, setOfferPhotos } from '@/server/photos';
 import { sendTelegram, siteUrl } from '@/server/telegram';
 import { decodeVin } from '@/server/vin';
 
@@ -114,14 +114,7 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
   const seller = user.seller;
   if (seller.status === 'banned') return { errors: [], formError: 'banned', values };
   const [existing] = await db
-    .select({
-      id: offers.id,
-      status: offers.status,
-      priceUsd: offers.priceUsd,
-      notifiedPriceUsd: offers.notifiedPriceUsd,
-      vin: offers.vin,
-      vinDecoded: offers.vinDecoded,
-    })
+    .select()
     .from(offers)
     .where(and(eq(offers.requestId, requestId), eq(offers.sellerId, seller.id)));
   if (!existing) {
@@ -191,17 +184,11 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     })
     // xmax is 0 only for a freshly inserted row, so edits don't notify the buyer again.
     .returning({ id: offers.id, isNew: sql<boolean>`(xmax = 0)` });
-  if (saved) await setOfferPhotos(seller.id, saved.id, o.photos);
+  const photosBefore = existing ? await offerPhotoIds(existing.id) : [];
+  const photos = saved ? await setOfferPhotos(seller.id, saved.id, o.photos) : [];
   if (saved?.isNew) await notifyBuyerOfOffer(requestId, { ...row, offerId: saved.id });
-
-  // A lower price than the buyer last heard about is worth a message, unless they declined.
-  const lastToldPrice = existing?.notifiedPriceUsd ?? existing?.priceUsd;
-  if (existing && existing.status !== 'declined' && lastToldPrice && row.priceUsd < lastToldPrice) {
-    await db
-      .update(offers)
-      .set({ notifiedPriceUsd: row.priceUsd })
-      .where(eq(offers.id, existing.id));
-    await notifyBuyerOfPriceDrop(requestId, { ...row, oldPriceUsd: lastToldPrice });
+  if (existing) {
+    await recordOfferUpdate(requestId, existing, { ...row, photoIds: photos }, photosBefore);
   }
 
   redirect({

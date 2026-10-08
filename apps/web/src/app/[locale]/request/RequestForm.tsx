@@ -89,7 +89,11 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
             <ModelInput
               brandId={brandId}
               defaultValue={v['model']}
-              placeholder={f('modelPlaceholder')}
+              placeholders={{
+                none: f('modelPlaceholder'),
+                pick: f('modelPick'),
+                type: f('modelType'),
+              }}
               invalid={bad('model') || bad('modelUnknown')}
               unknownLabel={t('error_modelUnknown')}
               noMatchesLabel={f('modelNoMatches')}

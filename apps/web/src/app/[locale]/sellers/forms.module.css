@@ -269,3 +269,13 @@
   gap: 18px;
   padding: 4px 16px 18px;
 }
+
+.updateNote {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--yellow-soft);
+  color: var(--yellow-ink);
+  font-size: 14px;
+  line-height: 1.5;
+}

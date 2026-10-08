@@ -230,6 +230,13 @@ export const offers = pgTable(
     status: text('status').notNull().default('sent'),
     // Lowest price the buyer was told about; a price-drop message needs a new low.
     notifiedPriceUsd: integer('notified_price_usd'),
+    // Edits the buyer hasn't seen yet (OfferChange[]), cleared when they open their offers.
+    changes: jsonb('changes').$type<Array<{ kind: string }>>().notNull().default([]),
+    // When the buyer first saw these changes; the note stays a few minutes, then a new
+    // edit starts a fresh list.
+    changesSeenAt: timestamp('changes_seen_at', { withTimezone: true }),
+    // Last "offer updated" Telegram message, so the buyer gets at most one a day per offer.
+    updateNotifiedAt: timestamp('update_notified_at', { withTimezone: true }),
     contactSharedAt: timestamp('contact_shared_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

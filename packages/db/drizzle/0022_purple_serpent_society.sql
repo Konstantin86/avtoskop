@@ -1,0 +1,1 @@
+ALTER TABLE "offers" ADD COLUMN "changes_seen_at" timestamp with time zone;

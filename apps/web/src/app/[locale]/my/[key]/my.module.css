@@ -322,3 +322,12 @@
     align-items: stretch;
   }
 }
+
+.updated {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 14px;
+  color: var(--yellow-ink);
+}

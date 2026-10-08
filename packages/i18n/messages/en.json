@@ -73,6 +73,8 @@
     "allBrands": "All makes",
     "model": "Model",
     "modelPlaceholder": "For example, RAV4",
+    "modelPick": "Choose a model",
+    "modelType": "Type the model",
     "yearFrom": "Year from",
     "yearTo": "Year to",
     "any": "Any",
@@ -440,7 +442,8 @@
     "photoError_tooBig": "Photo is over 15 MB",
     "photoError_tooMany": "Too many unsaved photos. Send the offer or remove some",
     "photoError_failed": "Upload failed. Try again",
-    "photosDrop": "or drop them here"
+    "photosDrop": "or drop them here",
+    "updateNote": "The buyer will see an \"Updated\" note listing the changes. If you lower the price, the car arrives in Ukraine or you add the first photos, they'll also get a Telegram message. So update only what really matters."
   },
   "account": {
     "title": "Account",
@@ -484,10 +487,13 @@
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call or message the buyer soon.",
     "newOffer": "🚗 New offer for your request {request}:\n{offer}\n\nView it and decide who gets your number: {link}",
-    "priceDrop": "💰 A seller lowered the price on an offer for your request {request}:\n{car}: {oldPrice} → {newPrice}\n\nView offers: {link}",
     "sellerWelcome": "👋 Welcome to Avtoskop, {name}!\n\nHow it works:\n• The bot sends you new requests for your brands and regions. You can change them in your profile.\n• All requests that fit you are in your account: {link}\n\nThree tips for offers that get replies:\n1. An all-in price, no \"plus customs\".\n2. A link to the car or its VIN: the buyer will see the check.\n3. Reply fast: the first offers get noticed first.",
     "sellerWelcomeVerify": "To get the \"Verified seller\" badge, write to us: {link}",
-    "sellerVerified": "✅ Your profile is verified. Buyers now see the \"Verified seller\" badge, and your limit is up to 50 offers a day."
+    "sellerVerified": "✅ Your profile is verified. Buyers now see the \"Verified seller\" badge, and your limit is up to 50 offers a day.",
+    "offerUpdate": "🔔 An offer for your request {request} was updated:\n{car}\n{changes}\n\nView offers: {link}",
+    "updatePrice": "💰 Price: {oldPrice} → {newPrice}",
+    "updateArrived": "🇺🇦 The car is now in Ukraine",
+    "updatePhotos": "📷 Photos added: {count}"
   },
   "my": {
     "title": "Your request",
@@ -563,7 +569,12 @@
     "photoOpen": "Open photo",
     "photoClose": "Close",
     "photoPrev": "Previous photo",
-    "photoNext": "Next photo"
+    "photoNext": "Next photo",
+    "updated": "Updated",
+    "change_price": "price {from} → {to}",
+    "change_photos": "photos added: {count}",
+    "change_arrived": "the car is now in Ukraine",
+    "change_details": "details changed"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",

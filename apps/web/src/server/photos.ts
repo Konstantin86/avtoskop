@@ -121,7 +121,7 @@ export async function setOfferPhotos(
   sellerId: string,
   offerId: string,
   photoIds: string[],
-): Promise<void> {
+): Promise<string[]> {
   const owned = photoIds.length
     ? await db
         .select({ id: offerPhotos.id, offerId: offerPhotos.offerId })
@@ -150,6 +150,16 @@ export async function setOfferPhotos(
   for (const [position, id] of keep.entries()) {
     await db.update(offerPhotos).set({ offerId, position }).where(eq(offerPhotos.id, id));
   }
+  return keep;
+}
+
+export async function offerPhotoIds(offerId: string): Promise<string[]> {
+  const rows = await db
+    .select({ id: offerPhotos.id })
+    .from(offerPhotos)
+    .where(eq(offerPhotos.offerId, offerId))
+    .orderBy(asc(offerPhotos.position));
+  return rows.map((r) => r.id);
 }
 
 export function photoUrl(key: string, size: 'full' | 'thumb' = 'full'): string {

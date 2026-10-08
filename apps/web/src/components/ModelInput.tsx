@@ -7,7 +7,8 @@ import styles from './ModelInput.module.css';
 interface Props {
   brandId: string;
   defaultValue?: string | undefined;
-  placeholder: string;
+  // Example while no brand is chosen, then "choose" or "type" depending on the brand's list.
+  placeholders: { none: string; pick: string; type: string };
   invalid?: boolean;
   // Shown under the field when the typed model isn't on the brand's list.
   unknownLabel?: string;
@@ -31,7 +32,7 @@ function filterModels(options: string[], query: string): string[] {
 export function ModelInput({
   brandId,
   defaultValue,
-  placeholder,
+  placeholders,
   invalid,
   unknownLabel,
   noMatchesLabel,
@@ -108,7 +109,7 @@ export function ModelInput({
         aria-activedescendant={expanded && active >= 0 ? `${listId}-${active}` : undefined}
         autoComplete="off"
         value={text}
-        placeholder={placeholder}
+        placeholder={!brandId ? placeholders.none : strict ? placeholders.pick : placeholders.type}
         maxLength={60}
         aria-invalid={invalid || unknown || undefined}
         onChange={(e) => {

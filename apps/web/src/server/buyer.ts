@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, asc, count, desc, eq, isNotNull, ne, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNotNull, isNull, ne, sql } from 'drizzle-orm';
 import { hashSecret } from '@avtoskop/core';
 import { brands, buyerRequests, offers, reports, sellers } from '@avtoskop/db';
 import { decryptContact } from './contact';
@@ -58,6 +58,8 @@ export async function listRequestOffers(requestId: string) {
         vin: offers.vin,
         vinDecoded: offers.vinDecoded,
         status: offers.status,
+        changes: offers.changes,
+        changesSeenAt: offers.changesSeenAt,
         createdAt: offers.createdAt,
         reported: isNotNull(reports.id).mapWith(Boolean),
         seller: {
@@ -83,6 +85,17 @@ export async function markOffersShown(requestId: string): Promise<void> {
     .update(offers)
     .set({ status: 'shown' })
     .where(and(eq(offers.requestId, requestId), eq(offers.status, 'sent')));
+  // The buyer has now seen the "updated" notes; they fade a few minutes later.
+  await db
+    .update(offers)
+    .set({ changesSeenAt: new Date() })
+    .where(
+      and(
+        eq(offers.requestId, requestId),
+        isNull(offers.changesSeenAt),
+        sql`${offers.changes} <> '[]'::jsonb`,
+      ),
+    );
 }
 
 // Requests the person confirmed in Telegram, which is how they are tied to an account.

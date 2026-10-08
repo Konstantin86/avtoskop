@@ -13,6 +13,8 @@ interface Props {
     model: string;
     brandPlaceholder: string;
     modelPlaceholder: string;
+    modelPick: string;
+    modelType: string;
     noMatches: string;
     brandNoMatches: string;
     popular: string;
@@ -43,7 +45,11 @@ export function BrandModelFields({ idPrefix, brands, labels }: Props) {
         {labels.model}
         <ModelInput
           brandId={brandId}
-          placeholder={labels.modelPlaceholder}
+          placeholders={{
+            none: labels.modelPlaceholder,
+            pick: labels.modelPick,
+            type: labels.modelType,
+          }}
           noMatchesLabel={labels.noMatches}
         />
       </label>

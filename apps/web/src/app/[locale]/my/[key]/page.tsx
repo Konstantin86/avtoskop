@@ -10,6 +10,8 @@ import {
   matchedWishes,
   REPORT_REASONS,
   vinMismatches,
+  type OfferChange,
+  UPDATE_NOTE_MINUTES,
   WISHES,
 } from '@avtoskop/core';
 import { FlagEU, FlagUS, ShieldIcon } from '@/components/icons';
@@ -71,6 +73,7 @@ export default async function MyRequestPage({ params }: Props) {
   }
 
   const offerList = await listRequestOffers(request.id);
+  const loadedAt = Date.now();
   const photos = await photosForOffers(offerList.map((o) => o.id));
   const autoria =
     request.status !== 'closed' && request.phoneVerified ? await autoriaLinkFor(request) : null;
@@ -222,6 +225,27 @@ export default async function MyRequestPage({ params }: Props) {
                     )}
                   </div>
                 </div>
+                {offer.changes.length > 0 &&
+                  (offer.changesSeenAt === null ||
+                    loadedAt - offer.changesSeenAt.getTime() < UPDATE_NOTE_MINUTES * 60_000) && (
+                    <div className={styles.updated}>
+                      <span className="chip chip-yellow">{t('updated')}</span>
+                      <span>
+                        {(offer.changes as OfferChange[])
+                          .map((c) =>
+                            c.kind === 'price'
+                              ? t('change_price', {
+                                  from: `$${formatNumber(locale, c.from)}`,
+                                  to: `$${formatNumber(locale, c.to)}`,
+                                })
+                              : c.kind === 'photos'
+                                ? t('change_photos', { count: c.added })
+                                : t(`change_${c.kind}`),
+                          )
+                          .join(' · ')}
+                      </span>
+                    </div>
+                  )}
                 <PhotoGallery
                   photos={(photos.get(offer.id) ?? []).map((p) => ({
                     full: photoUrl(p.key),
