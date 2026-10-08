@@ -1,5 +1,4 @@
-.bar,
-.spacer {
+.bar {
   display: none;
 }
 
@@ -17,11 +16,6 @@
     border-top: 1px solid var(--line);
     transform: translateY(110%);
     transition: transform 200ms ease;
-  }
-
-  .spacer {
-    display: block;
-    height: 72px;
   }
 
   .shown {
