@@ -693,6 +693,7 @@
     "compareSeller": "Seller",
     "compareRating": "Rating",
     "compareYes": "Yes",
+    "compareNone": "none",
     "compareVinOk": "✓ not wanted",
     "compareVinWanted": "⚠ wanted",
     "askLabel": "Ask for:",

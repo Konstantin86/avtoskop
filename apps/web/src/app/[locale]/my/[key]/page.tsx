@@ -170,7 +170,7 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
     return `/my/${key}${qs ? `?${qs}` : ''}`;
   };
   const vinState = (x: (typeof offerList)[number]) =>
-    !x.vin ? '—' : wanted.has(x.vin) ? t('compareVinWanted') : t('compareVinOk');
+    !x.vin ? t('compareNone') : wanted.has(x.vin) ? t('compareVinWanted') : t('compareVinOk');
 
   return (
     <div className={`container ${forms.page}`}>
@@ -342,17 +342,21 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                   cells: [
                     `${x.car}, ${x.year}`,
                     priceLabel(locale, x.priceUsd, x.priceMaxUsd),
-                    x.mileageKm === null ? '—' : `${formatNumber(locale, x.mileageKm)} ${t('km')}`,
+                    x.mileageKm === null
+                      ? t('compareNone')
+                      : `${formatNumber(locale, x.mileageKm)} ${t('km')}`,
                     x.availability === 'in_ukraine'
                       ? o('availability_in_ukraine')
                       : `${o(`availability_${x.availability}` as 'availability_in_transit')}, ${t('eta', { weeks: x.etaWeeks ?? 0 })}`,
                     vinState(x),
-                    request.wishes.length > 0 ? `${wishCount(x)} / ${request.wishes.length}` : '—',
-                    breakdownTotal(x) > 0 ? t('compareYes') : '—',
+                    request.wishes.length > 0
+                      ? `${wishCount(x)} / ${request.wishes.length}`
+                      : t('compareNone'),
+                    breakdownTotal(x) > 0 ? t('compareYes') : t('compareNone'),
                     `${x.seller.name}${x.seller.status === 'verified' ? ' ✓' : ''}`,
                     ratings.get(x.seller.id)
                       ? `★ ${ratings.get(x.seller.id)!.average.toFixed(1)} (${ratings.get(x.seller.id)!.count})`
-                      : '—',
+                      : t('compareNone'),
                   ],
                 }))}
             />

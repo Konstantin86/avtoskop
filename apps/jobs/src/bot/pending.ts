@@ -4,7 +4,7 @@ import type { Telegram } from './telegram.ts';
 import { botText } from './texts.ts';
 
 const TELEGRAM_LIMIT = 4000;
-const SEPARATOR = '\n\n— — —\n\n';
+const SEPARATOR = '\n\n· · ·\n\n';
 
 // Splits joined messages into parts Telegram accepts, never cutting one message in half.
 export function packMessages(texts: string[], header: string): string[] {

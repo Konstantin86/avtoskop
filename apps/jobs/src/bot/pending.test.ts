@@ -3,7 +3,7 @@ import { packMessages } from './pending.ts';
 
 describe('packMessages', () => {
   it('joins short messages under one header', () => {
-    expect(packMessages(['one', 'two'], 'Header')).toEqual(['Header\n\none\n\n— — —\n\ntwo']);
+    expect(packMessages(['one', 'two'], 'Header')).toEqual(['Header\n\none\n\n· · ·\n\ntwo']);
   });
 
   it('starts a new part instead of going over the Telegram limit', () => {
