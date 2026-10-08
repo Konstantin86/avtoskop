@@ -257,7 +257,8 @@
     "rule1": "Only real cars with a real all-in price",
     "rule2": "One offer per request, no spam or duplicates",
     "rule3": "Buyer contacts only with the buyer's consent",
-    "rule4": "Phone check for everyone, plus registration details for companies",
+    "rule4": "Phone check for everyone; for the \"verified\" badge, also registration details or a page with your cars",
+    "rule5": "A complaint doesn't mean a block: we'll tell you first and hear your side",
     "priceTitle": "What it costs",
     "priceText": "Free until 1 April 2027. After that you'll pay a small fixed fee only for a buyer who chose to share their number with you. Getting requests and sending offers is always free. We'll announce the amount at least 30 days ahead, and it won't apply to buyers who shared their number before that.",
     "telegramTitle": "New requests in Telegram",
@@ -281,9 +282,9 @@
     "why6After": "An offer in a few minutes, only to a buyer looking for exactly this car. Nothing is published",
     "telegramSetup": "Set up",
     "verifyTitle": "How to become a verified seller",
-    "verify1": "Fill in your profile with your company or sole-proprietor name and region.",
-    "verify2": "Write to us with your company code (EDRPOU) or a link to your website or company page.",
-    "verify3": "We check the state register and usually add the badge the same day.",
+    "verify1": "Fill in your profile: company, sole-proprietor or your own name, and region.",
+    "verify2": "Write to us with one of two: your company code (EDRPOU, for companies and sole proprietors) or a link to your website, Instagram or another page that shows you sell cars.",
+    "verify3": "We check the register or your page and usually add the badge the same day.",
     "verifyNote": "Verified sellers get a badge next to their offers and can send up to 50 offers a day."
   },
   "board": {
@@ -387,7 +388,7 @@
     "year": "Year",
     "mileage": "Mileage, km",
     "price": "All-in price, $",
-    "priceHint": "Full price for the buyer: delivery, customs and registration included",
+    "priceHint": "Full price for the buyer: with delivery, customs and registration. Other sellers don't see your price",
     "availability": "Where the car is",
     "availability_in_ukraine": "In Ukraine",
     "availability_in_transit": "On the way",
@@ -441,19 +442,16 @@
     "priceFrom": "All-in price from, $",
     "priceTo": "to, $",
     "optional": "optional",
-    "priceHintOrder": "Estimated full price for the buyer: car, delivery, customs, paperwork and your fee",
+    "priceHintOrder": "Estimated full price for the buyer: car, delivery, customs, paperwork and your fee. Other sellers don't see your price",
     "etaOrder": "Time to Ukraine, weeks",
     "more": "More details",
     "moreHint": "Mileage, origin, VIN, features, photos. Optional, but such offers get picked more often",
     "moreHintOrder": "Mileage, your fee, origin, guarantees. Optional",
     "mileageMax": "Mileage up to, km",
-    "serviceFee": "Of which your fee, $",
-    "serviceFeeHint": "Buyers trust a price more when they see what it is made of",
     "linkHintOrder": "Your website, cars you have imported, or an auction lot (optional).",
     "featuresOrder": "What you guarantee",
     "descriptionPlaceholderOrder": "How you find cars, what the price includes, contract terms…",
     "error_priceMaxUsd": "The upper price must not be below the lower one",
-    "error_serviceFeeUsd": "Your fee must be below the price",
     "photos": "Photos",
     "photosHint": "Up to 10 photos; the first is the main one. We remove the location data from photos.",
     "photosAdd": "Add photos",
@@ -466,7 +464,16 @@
     "photoError_tooMany": "Too many unsaved photos. Send the offer or remove some",
     "photoError_failed": "Upload failed. Try again",
     "photosDrop": "or drop them here",
-    "updateNote": "The buyer will see an \"Updated\" note listing the changes. If you lower the price, the car arrives in Ukraine or you add the first photos, they'll also get a Telegram message. So update only what really matters."
+    "updateNote": "The buyer will see an \"Updated\" note listing the changes. If you lower the price, the car arrives in Ukraine or you add the first photos, they'll also get a Telegram message. So update only what really matters.",
+    "splitAdd": "Split the price into parts",
+    "splitTitle": "What the price is made of (optional)",
+    "split_priceCarUsd": "Car, $",
+    "split_priceDeliveryUsd": "Delivery, $",
+    "split_priceCustomsUsd": "Customs, $",
+    "split_serviceFeeUsd": "Your fee, $",
+    "splitHint": "Fill in what you like. The buyer sees the rest as \"other\": paperwork, servicing and so on.",
+    "error_breakdown": "The parts add up to more than the price",
+    "split_priceRepairUsd": "Repairs, $"
   },
   "account": {
     "title": "Account",
@@ -504,8 +511,12 @@
     "forYouEmpty": "No new requests for your brands and regions yet. We'll send them to Telegram as soon as they appear.",
     "forYouOffer": "Make an offer",
     "forYouHint": "Matched to the brands, regions and seller type in your profile.",
-    "verifyHint": "Want the \"Verified seller\" badge? Send us your company code (EDRPOU) or website link, and we'll check your profile, usually the same day.",
-    "verifyWrite": "Write to us"
+    "verifyHint": "Want the \"Verified seller\" badge? Send us your company code (EDRPOU) or a link to your website or social page that shows your cars, and we'll check your profile, usually the same day.",
+    "verifyWrite": "Write to us",
+    "requestClosed": "Request closed",
+    "closedBecause_found_here": "The buyer found a car through Avtoskop",
+    "closedBecause_found_elsewhere": "The buyer found a car elsewhere",
+    "closedBecause_not_looking": "The buyer is no longer looking"
   },
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call or message the buyer soon.",
@@ -521,7 +532,8 @@
     "changeBudget": "Budget: up to ${from} → up to ${to}",
     "changeYears": "Years: {from} → {to}",
     "changeRegion": "Region: {from} → {to}",
-    "changeImport": "Import: {to, select, yes {now fine} other {cars in Ukraine only}}"
+    "changeImport": "Import: {to, select, yes {now fine} other {cars in Ukraine only}}",
+    "requestClosed": "🔒 The buyer closed the request {request}.{reason, select, found_here {\nThey found a car through Avtoskop.} found_elsewhere {\nThey found a car elsewhere.} not_looking {\nThey are no longer looking.} other {}}\n\nYour offer: {offer}\nThanks for replying. New requests for your brands will keep coming here."
   },
   "my": {
     "title": "Your request",
@@ -589,7 +601,6 @@
     "statusWaiting": "Waiting for Telegram confirmation",
     "statusClosed": "Closed",
     "mileageUpTo": "mileage up to {km} km",
-    "serviceFee": "incl. ${amount} fee",
     "orderNote": "Sourcing to order: the seller will find this car for you. The price is an estimate, and they'll show the specific car with its VIN before the deal.",
     "autoriaTitle": "Also search AUTO.RIA",
     "autoriaText": "We prepared a search with your request's filters. On AUTO.RIA you can save it and get new ads.",
@@ -604,7 +615,18 @@
     "change_arrived": "the car is now in Ukraine",
     "change_details": "details changed",
     "edit": "Edit request",
-    "edited": "Request updated. Sellers who already sent offers will be told about important changes."
+    "edited": "Request updated. Sellers who already sent offers will be told about important changes.",
+    "closeReason": "Why are you closing it? It's optional, but sellers who sent offers will see the answer.",
+    "closeReason_found_here": "Found one through Avtoskop",
+    "closeReason_found_elsewhere": "Found one elsewhere",
+    "closeReason_not_looking": "No longer looking",
+    "splitLabel": "Price breakdown:",
+    "part_priceCarUsd": "car",
+    "part_priceDeliveryUsd": "delivery",
+    "part_priceCustomsUsd": "customs",
+    "part_serviceFeeUsd": "seller fee",
+    "part_other": "other",
+    "part_priceRepairUsd": "repairs"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
@@ -631,7 +653,8 @@
     "requestExpiring": "⏳ Your request \"{request}\" closes on {date}. If you are still looking, extend it by 30 days: {link}",
     "requestExpired": "Your request \"{request}\" closed after 30 days. If you are still looking, open it again: {link}",
     "requestLimit": "You have already published 3 requests today. This one is saved: open the bot from its page tomorrow and it will be published.",
-    "requestAutoria": "While you wait for offers, here are similar cars on AUTO.RIA with your filters: {link}"
+    "requestAutoria": "While you wait for offers, here are similar cars on AUTO.RIA with your filters: {link}",
+    "sellerRequestExpired": "🔒 The request {request} has closed: the buyer did not extend it after 30 days.\n\nYour offer: {offer}\nNew requests for your brands will keep coming here."
   },
   "legal": {
     "updated": "Updated: {date}",
@@ -664,7 +687,7 @@
         },
         {
           "title": "7. Moderation",
-          "body": "We may review sellers, limit the number of offers, hide offers and block accounts that break these terms, including after buyer complaints. The \"Verified seller\" badge only means we reviewed the seller's profile and contacts; it doesn't guarantee a deal."
+          "body": "We may review sellers, limit the number of offers, hide offers and block accounts that break these terms, including after buyer complaints. One complaint doesn't mean a block: we first tell the seller about the complaint and let them respond. We block without warning only for obvious fraud. The \"Verified seller\" badge only means we reviewed the seller's profile and contacts; it doesn't guarantee a deal."
         },
         {
           "title": "8. Reports",
@@ -803,7 +826,7 @@
       {
         "id": "checked",
         "q": "How are sellers checked?",
-        "a": "We check companies against the state register and their contacts; then they get the \"Verified seller\" badge. New sellers can send only 5 offers a day. Scammers can be reported in one click, and we block them."
+        "a": "We check companies against the state register, and sellers without a company by their website or social page that shows they sell cars. Then they get the \"Verified seller\" badge. New sellers can send only 5 offers a day. Scammers can be reported in one click, and we block them."
       },
       {
         "id": "scam",
@@ -820,7 +843,7 @@
       {
         "id": "verified",
         "q": "How do I become a verified seller?",
-        "a": "Fill in your profile with your company or sole-proprietor name and write to us with your company code (EDRPOU) or a link to your website or company page. We check the state register and usually add the badge the same day. Verified sellers can send up to 50 offers a day."
+        "a": "Fill in your profile and write to us with one of two: your company code (EDRPOU, for companies and sole proprietors) or a link to your website, Instagram or another page that shows you sell cars. We check the register or your page and usually add the badge the same day. Verified sellers can send up to 50 offers a day."
       },
       {
         "id": "seller-cost",

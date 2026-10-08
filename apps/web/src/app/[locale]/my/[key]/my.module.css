@@ -116,6 +116,25 @@
   font-size: 18px;
 }
 
+.closeBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reasons {
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.reasonsLabel {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .keep {
   font-size: 13px;
   color: var(--muted);
@@ -336,4 +355,16 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.split {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.splitLabel {
+  font-weight: 600;
+  color: var(--ink);
 }

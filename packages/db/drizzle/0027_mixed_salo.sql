@@ -1,0 +1,1 @@
+ALTER TABLE "offers" ADD COLUMN "price_repair_usd" integer;

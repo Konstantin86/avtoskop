@@ -1,8 +1,10 @@
-import { and, eq, isNotNull, isNull, lte } from 'drizzle-orm';
+import { and, eq, isNotNull, isNull, lte, ne } from 'drizzle-orm';
 import { decryptContact, EXPIRY_REMINDER_DAYS, localePath } from '@avtoskop/core';
-import { brands, buyerRequests, type Db } from '@avtoskop/db';
+import { brands, buyerRequests, offers, sellers, users, type Db } from '@avtoskop/db';
 import type { Telegram } from './telegram.ts';
 import { botText, requestLabel } from './texts.ts';
+
+const SELLER_LOCALE = 'uk';
 
 interface Options {
   contactKey: Buffer;
@@ -50,6 +52,34 @@ export function createExpiryJob(db: Db, tg: Telegram, { contactKey, siteUrl, log
       .catch((error: Error) => log(`Expiry message failed: ${error.message}`));
   }
 
+  // Sellers who sent an offer (and weren't declined) learn the request closed on its own.
+  async function tellSellers(r: Row & { id: string }) {
+    const recipients = await db
+      .select({
+        telegramId: users.telegramId,
+        car: offers.car,
+        year: offers.year,
+        priceUsd: offers.priceUsd,
+      })
+      .from(offers)
+      .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+      .innerJoin(users, eq(sellers.userId, users.id))
+      .where(and(eq(offers.requestId, r.id), ne(offers.status, 'declined')));
+    for (const s of recipients) {
+      if (s.telegramId <= 0) continue;
+      const price = new Intl.NumberFormat('uk-UA').format(s.priceUsd);
+      await tg
+        .sendMessage(
+          s.telegramId,
+          botText(SELLER_LOCALE, 'sellerRequestExpired', {
+            request: `${r.brand} ${r.model}`,
+            offer: `${s.car}, ${s.year}, $${price}`,
+          }),
+        )
+        .catch((error: Error) => log(`Close message to seller failed: ${error.message}`));
+    }
+  }
+
   return async function runExpiry(): Promise<void> {
     const now = new Date();
     const soon = new Date(now.getTime() + EXPIRY_REMINDER_DAYS * 86_400_000);
@@ -66,7 +96,10 @@ export function createExpiryJob(db: Db, tg: Telegram, { contactKey, siteUrl, log
         .from(buyerRequests)
         .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
         .where(eq(buyerRequests.id, id));
-      if (r) await tell(r, 'requestExpired');
+      if (r) {
+        await tell(r, 'requestExpired');
+        await tellSellers(r);
+      }
     }
 
     const reminded = await db

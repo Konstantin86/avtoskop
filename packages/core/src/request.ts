@@ -32,6 +32,9 @@ export const REGION_CODES = [
 // A request can accept several fuels; none chosen means any fuel.
 export const FUELS = ['hybrid', 'petrol', 'diesel', 'electric'] as const;
 export const GEARBOXES = ['any', 'automatic', 'manual'] as const;
+// Why a buyer closed a request; optional, and passed on to sellers who sent offers.
+export const CLOSE_REASONS = ['found_here', 'found_elsewhere', 'not_looking'] as const;
+
 // New, used, or either; a new car has no mileage limit.
 export const CONDITIONS = ['any', 'new', 'used'] as const;
 export const WISHES = [

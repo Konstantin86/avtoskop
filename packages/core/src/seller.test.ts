@@ -252,15 +252,15 @@ describe('offerInput for orders and the short form', () => {
     expect(o.vin).toBeUndefined();
   });
 
-  it('rejects a range that goes down and a fee above the price', () => {
+  it('rejects a range that goes down and parts adding up to more than the price', () => {
     const order = { ...base, availability: 'to_order', etaWeeks: '8' };
     const low = offerInput.safeParse({ ...order, priceMaxUsd: '20000' });
     expect(low.error!.issues[0]!.path).toEqual(['priceMaxUsd']);
     const fee = offerInput.safeParse({ ...order, serviceFeeUsd: '30000' });
-    expect(fee.error!.issues[0]!.path).toEqual(['serviceFeeUsd']);
+    expect(fee.error!.issues[0]!.path).toEqual(['breakdown']);
   });
 
-  it('ignores a range and fee on a car that already exists', () => {
+  it('ignores a range on a car that already exists, but keeps its price split', () => {
     const o = offerInput.parse({
       ...base,
       availability: 'in_ukraine',
@@ -268,7 +268,24 @@ describe('offerInput for orders and the short form', () => {
       serviceFeeUsd: '1000',
     });
     expect(o.priceMaxUsd).toBeUndefined();
-    expect(o.serviceFeeUsd).toBeUndefined();
+    expect(o.serviceFeeUsd).toBe(1000);
+  });
+
+  it('accepts a split up to the price, measured against the top of a range', () => {
+    const split = { priceCarUsd: '16500', priceDeliveryUsd: '2000', priceCustomsUsd: '3500' };
+    expect(offerInput.safeParse({ ...base, availability: 'in_ukraine', ...split }).success).toBe(
+      true,
+    );
+    expect(
+      offerInput.safeParse({ ...base, availability: 'in_ukraine', ...split, serviceFeeUsd: '1000' })
+        .success,
+    ).toBe(false);
+    const order = { ...base, availability: 'to_order', etaWeeks: '8', priceMaxUsd: '26000' };
+    expect(offerInput.safeParse({ ...order, ...split, serviceFeeUsd: '1000' }).success).toBe(true);
+    expect(
+      offerInput.safeParse({ ...base, availability: 'in_ukraine', ...split, priceRepairUsd: '500' })
+        .success,
+    ).toBe(false);
   });
 });
 

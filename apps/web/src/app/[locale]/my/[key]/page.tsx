@@ -5,6 +5,8 @@ import { OfferCard, OfferDeclineActions } from '@/components/OfferCard';
 import { ShareNumberButton } from '@/components/ShareNumberButton';
 import { SubmitButton } from '@/components/SubmitButton';
 import {
+  breakdownTotal,
+  CLOSE_REASONS,
   makeMatchesBrand,
   MIN_SELLERS_TO_SHOW,
   matchedWishes,
@@ -49,6 +51,14 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
   referrer: 'no-referrer',
 };
+
+const PRICE_PARTS = [
+  'priceCarUsd',
+  'priceDeliveryUsd',
+  'priceCustomsUsd',
+  'priceRepairUsd',
+  'serviceFeeUsd',
+] as const;
 
 type Props = {
   params: Promise<{ locale: string; key: string }>;
@@ -235,11 +245,6 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                   <div className={styles.price}>
                     {priceLabel(locale, offer.priceUsd, offer.priceMaxUsd)}
                     <span>{t('turnkey')}</span>
-                    {offer.serviceFeeUsd !== null && (
-                      <span>
-                        {t('serviceFee', { amount: formatNumber(locale, offer.serviceFeeUsd) })}
-                      </span>
-                    )}
                   </div>
                 </div>
                 {offer.changes.length > 0 &&
@@ -276,6 +281,24 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                     next: t('photoNext'),
                   }}
                 />
+                {breakdownTotal(offer) > 0 && (
+                  <p className={styles.split}>
+                    <span className={styles.splitLabel}>{t('splitLabel')}</span>{' '}
+                    {[
+                      ...PRICE_PARTS.flatMap((part) =>
+                        offer[part] === null
+                          ? []
+                          : [`${t(`part_${part}`)} $${formatNumber(locale, offer[part])}`],
+                      ),
+                      // A range has no single total, so "other" is only shown for one price.
+                      ...(offer.priceMaxUsd === null && offer.priceUsd > breakdownTotal(offer)
+                        ? [
+                            `${t('part_other')} $${formatNumber(locale, offer.priceUsd - breakdownTotal(offer))}`,
+                          ]
+                        : []),
+                    ].join(' · ')}
+                  </p>
+                )}
                 {order && <p className={styles.orderNote}>{t('orderNote')}</p>}
                 {offer.vin && (
                   <div className={styles.vin}>
@@ -455,19 +478,31 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
           </div>
         )}
 
-        <section className={`card ${styles.closeCard}`}>
-          <div>
+        <form action={setRequestOpenAction} className={`card ${styles.closeCard}`}>
+          <input type="hidden" name="key" value={key} />
+          <input type="hidden" name="open" value={closed ? '1' : '0'} />
+          <div className={styles.closeBody}>
             <h2 className={styles.closeTitle}>{closed ? t('reopenTitle') : t('closeTitle')}</h2>
             <p className={styles.facts}>{closed ? t('reopenText') : t('closeText')}</p>
+            {/* Optional: sellers who sent offers are told why, so they don't wait in vain. */}
+            {!closed && (
+              <fieldset className={styles.reasons}>
+                <legend className={styles.reasonsLabel}>{t('closeReason')}</legend>
+                <div className="choices">
+                  {CLOSE_REASONS.map((r) => (
+                    <label key={r}>
+                      <input type="radio" name="reason" value={r} />
+                      <span>{t(`closeReason_${r}`)}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
           </div>
-          <form action={setRequestOpenAction}>
-            <input type="hidden" name="key" value={key} />
-            <input type="hidden" name="open" value={closed ? '1' : '0'} />
-            <SubmitButton className="btn btn-secondary">
-              {closed ? t('reopen') : t('close')}
-            </SubmitButton>
-          </form>
-        </section>
+          <SubmitButton className="btn btn-secondary">
+            {closed ? t('reopen') : t('close')}
+          </SubmitButton>
+        </form>
         <p className={styles.keep}>{t('keepLink')}</p>
       </div>
     </div>

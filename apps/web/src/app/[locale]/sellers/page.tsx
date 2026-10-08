@@ -52,7 +52,7 @@ export default async function SellersPage({ params }: Props) {
     [<KeyIcon key="key" />, 'whoBuyout'],
     [<PersonIcon key="person" />, 'whoOwners'],
   ] as const;
-  const rules = ['rule1', 'rule2', 'rule3', 'rule4'] as const;
+  const rules = ['rule1', 'rule2', 'rule3', 'rule4', 'rule5'] as const;
 
   return (
     <div className="container">

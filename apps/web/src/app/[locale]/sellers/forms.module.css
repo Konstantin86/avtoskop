@@ -279,3 +279,50 @@
   font-size: 14px;
   line-height: 1.5;
 }
+
+.splitToggle {
+  align-self: flex-start;
+  margin-top: -8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--blue);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.split {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.splitLegend {
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.splitGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 720px) {
+  .splitGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .splitGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

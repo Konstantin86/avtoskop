@@ -9,6 +9,14 @@ import type { OfferTemplate } from '@/server/offers';
 import { saveOfferAction, type FormState } from '../../../sellers/actions';
 import styles from '../../../sellers/forms.module.css';
 
+const PRICE_PARTS = [
+  'priceCarUsd',
+  'priceDeliveryUsd',
+  'priceCustomsUsd',
+  'priceRepairUsd',
+  'serviceFeeUsd',
+] as const;
+
 interface Props {
   requestId: string;
   defaults: Record<string, string>;
@@ -47,16 +55,11 @@ export function OfferForm({
   const [availability, setAvailability] = useState(v['availability'] ?? 'in_ukraine');
   const order = availability === 'to_order';
   const bad = (name: string) => state.errors.includes(name);
-  const details = [
-    'mileageKm',
-    'serviceFeeUsd',
-    'originCountry',
-    'link',
-    'features',
-    'vin',
-    'description',
-  ];
+  const details = ['mileageKm', 'originCountry', 'link', 'features', 'vin', 'description'];
   const detailsOpen = details.some((name) => bad(name) || Boolean(v[name]));
+  // The price split stays a single link until the seller asks for it or already filled it in.
+  const [splitAsked, setSplitAsked] = useState(false);
+  const splitOpen = splitAsked || bad('breakdown') || PRICE_PARTS.some((name) => Boolean(v[name]));
   const err = (name: string) =>
     bad(name) ? <span className="error-text">{t(`error_${name}` as 'error_car')}</span> : null;
   const invalid = (name: string) => (bad(name) ? { 'aria-invalid': true as const } : {});
@@ -177,6 +180,30 @@ export function OfferForm({
         )}
       </div>
       <span className="hint">{order ? t('priceHintOrder') : t('priceHint')}</span>
+      {splitOpen ? (
+        <fieldset className={styles.split}>
+          <legend className={styles.splitLegend}>{t('splitTitle')}</legend>
+          <div className={styles.splitGrid}>
+            {PRICE_PARTS.map((name) => (
+              <label key={name} className="label">
+                {t(`split_${name}`)}
+                <input
+                  name={name}
+                  className="field"
+                  inputMode="numeric"
+                  defaultValue={v[name]}
+                  {...invalid('breakdown')}
+                />
+              </label>
+            ))}
+          </div>
+          {err('breakdown') ?? <span className="hint">{t('splitHint')}</span>}
+        </fieldset>
+      ) : (
+        <button type="button" className={styles.splitToggle} onClick={() => setSplitAsked(true)}>
+          + {t('splitAdd')}
+        </button>
+      )}
 
       {!order && (
         <div className="label">
@@ -251,23 +278,8 @@ export function OfferForm({
               />
               {err('mileageKm')}
             </label>
-            {order ? (
-              <label className="label">
-                {t('serviceFee')}
-                <input
-                  name="serviceFeeUsd"
-                  className="field"
-                  inputMode="numeric"
-                  defaultValue={v['serviceFeeUsd']}
-                  {...invalid('serviceFeeUsd')}
-                />
-                {err('serviceFeeUsd') ?? <span className="hint">{t('serviceFeeHint')}</span>}
-              </label>
-            ) : (
-              <OriginSelect value={v['originCountry']} />
-            )}
+            <OriginSelect value={v['originCountry']} />
           </div>
-          {order && <OriginSelect value={v['originCountry']} />}
           <label className="label">
             {t('link')}
             <input

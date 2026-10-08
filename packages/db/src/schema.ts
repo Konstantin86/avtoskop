@@ -132,6 +132,8 @@ export const buyerRequests = pgTable(
     expiryRemindedAt: timestamp('expiry_reminded_at', { withTimezone: true }),
     // When the request was last closed; offer photos are removed some time after.
     closedAt: timestamp('closed_at', { withTimezone: true }),
+    // Optional reason the buyer gave when closing (CLOSE_REASONS); empty after reopening.
+    closeReason: text('close_reason'),
     // Buyer edits: the last one (shown to sellers), and recent ones for the daily limit.
     editedAt: timestamp('edited_at', { withTimezone: true }),
     recentEdits: timestamp('recent_edits', { withTimezone: true }).array().notNull().default([]),
@@ -231,6 +233,11 @@ export const offers = pgTable(
     priceUsd: integer('price_usd').notNull(),
     // Orders ('to_order') may quote a range (price_usd is the low end) and the seller's fee.
     priceMaxUsd: integer('price_max_usd'),
+    // Optional split of the all-in price (any offer); the rest is "other costs".
+    priceCarUsd: integer('price_car_usd'),
+    priceDeliveryUsd: integer('price_delivery_usd'),
+    priceCustomsUsd: integer('price_customs_usd'),
+    priceRepairUsd: integer('price_repair_usd'),
     serviceFeeUsd: integer('service_fee_usd'),
     availability: text('availability').notNull(),
     etaWeeks: integer('eta_weeks'),

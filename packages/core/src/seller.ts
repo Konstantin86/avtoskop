@@ -50,8 +50,13 @@ export const offerInput = z
     // Optional on the short form; for an order it means "up to this mileage".
     mileageKm: optionalInt(0, 1_000_000),
     priceUsd: z.coerce.number().int().min(500).max(1_000_000),
-    // Orders ('to_order') can quote a price range and the seller's service fee within it.
+    // Orders ('to_order') can quote a price range; price_usd is then the low end.
     priceMaxUsd: optionalInt(500, 1_000_000),
+    // Optional split of the all-in price; any parts left out count as "other costs".
+    priceCarUsd: optionalInt(0, 1_000_000),
+    priceDeliveryUsd: optionalInt(0, 100_000),
+    priceCustomsUsd: optionalInt(0, 500_000),
+    priceRepairUsd: optionalInt(0, 500_000),
     serviceFeeUsd: optionalInt(0, 100_000),
     availability: z.enum(AVAILABILITY),
     etaWeeks: optionalInt(1, 52),
@@ -92,16 +97,33 @@ export const offerInput = z
     path: ['priceMaxUsd'],
     message: 'priceMaxUsd',
   })
-  .refine((o) => o.serviceFeeUsd === undefined || o.serviceFeeUsd < o.priceUsd, {
-    path: ['serviceFeeUsd'],
-    message: 'serviceFeeUsd',
+  .refine((o) => breakdownTotal(o) <= (o.priceMaxUsd ?? o.priceUsd), {
+    path: ['breakdown'],
+    message: 'breakdown',
   })
-  // A car still to be found has no VIN, and a range or a fee only makes sense for an order.
+  // A car still to be found has no VIN, and a price range only makes sense for an order.
   .transform((o) =>
-    o.availability === 'to_order'
-      ? { ...o, vin: undefined }
-      : { ...o, priceMaxUsd: undefined, serviceFeeUsd: undefined },
+    o.availability === 'to_order' ? { ...o, vin: undefined } : { ...o, priceMaxUsd: undefined },
   );
+
+interface PriceParts {
+  priceCarUsd?: number | null | undefined;
+  priceDeliveryUsd?: number | null | undefined;
+  priceCustomsUsd?: number | null | undefined;
+  priceRepairUsd?: number | null | undefined;
+  serviceFeeUsd?: number | null | undefined;
+}
+
+// Sum of the parts the seller filled in.
+export function breakdownTotal(o: PriceParts): number {
+  return (
+    (o.priceCarUsd ?? 0) +
+    (o.priceDeliveryUsd ?? 0) +
+    (o.priceCustomsUsd ?? 0) +
+    (o.priceRepairUsd ?? 0) +
+    (o.serviceFeeUsd ?? 0)
+  );
+}
 
 export type OfferInput = z.infer<typeof offerInput>;
 

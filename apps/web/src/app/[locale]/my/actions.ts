@@ -3,12 +3,13 @@
 import { and, eq, inArray, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { getTranslations } from 'next-intl/server';
-import { reportInput, requestExpiry } from '@avtoskop/core';
+import { CLOSE_REASONS, reportInput, requestExpiry } from '@avtoskop/core';
 import { buyerRequests, offers, reports, sellers, users } from '@avtoskop/db';
 import { formatNumber, yearsLabel } from '@/components/requestFormat';
 import { getRequestByKey } from '@/server/buyer';
 import { decryptContact } from '@/server/contact';
 import { db } from '@/server/db';
+import { notifySellersOfClose } from '@/server/notify';
 import { sendTelegram } from '@/server/telegram';
 
 function field(formData: FormData, name: string): string {
@@ -93,6 +94,8 @@ export async function setRequestOpenAction(formData: FormData): Promise<void> {
   const request = await getRequestByKey(field(formData, 'key'));
   if (!request) return;
   const open = field(formData, 'open') === '1';
+  const given = field(formData, 'reason');
+  const reason = (CLOSE_REASONS as readonly string[]).includes(given) ? given : null;
   await db
     .update(buyerRequests)
     .set(
@@ -103,10 +106,12 @@ export async function setRequestOpenAction(formData: FormData): Promise<void> {
             expiresAt: request.phoneVerified ? requestExpiry(new Date()) : null,
             expiryRemindedAt: null,
             closedAt: null,
+            closeReason: null,
           }
-        : { status: 'closed', closedAt: new Date() },
+        : { status: 'closed', closedAt: new Date(), closeReason: reason },
     )
     .where(eq(buyerRequests.id, request.id));
+  if (!open && request.status !== 'closed') await notifySellersOfClose(request.id, reason);
   refresh();
 }
 

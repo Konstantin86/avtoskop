@@ -77,6 +77,10 @@ type SavedOffer = Pick<
   | 'mileageKm'
   | 'priceUsd'
   | 'priceMaxUsd'
+  | 'priceCarUsd'
+  | 'priceDeliveryUsd'
+  | 'priceCustomsUsd'
+  | 'priceRepairUsd'
   | 'serviceFeeUsd'
   | 'availability'
   | 'etaWeeks'
@@ -100,6 +104,10 @@ function snapshot(o: Omit<SavedOffer, 'photoIds'>, photoIds: string[]): OfferSna
       o.year,
       o.mileageKm,
       o.priceMaxUsd,
+      o.priceCarUsd,
+      o.priceDeliveryUsd,
+      o.priceCustomsUsd,
+      o.priceRepairUsd,
       o.serviceFeeUsd,
       o.originCountry,
       o.link,
@@ -234,6 +242,43 @@ export async function notifySellersOfRequestChange(
         changes: lines.join('\n'),
         offer: `${s.car}, ${s.year}, ${priceLabel('uk', s.priceUsd, s.priceMaxUsd)}`,
         link: siteUrl() + localePath('uk', `/requests/${requestId}/offer`),
+      }),
+    );
+  }
+}
+
+// Tells sellers who sent an offer (and weren't declined) that the buyer closed the request,
+// with the reason if the buyer gave one, so nobody waits on a request that's gone.
+export async function notifySellersOfClose(
+  requestId: string,
+  reason: string | null,
+): Promise<void> {
+  const [r] = await db
+    .select({ brand: brands.name, model: buyerRequests.model })
+    .from(buyerRequests)
+    .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
+    .where(eq(buyerRequests.id, requestId));
+  if (!r) return;
+  const recipients = await db
+    .select({
+      telegramId: users.telegramId,
+      car: offers.car,
+      year: offers.year,
+      priceUsd: offers.priceUsd,
+      priceMaxUsd: offers.priceMaxUsd,
+    })
+    .from(offers)
+    .innerJoin(sellers, eq(offers.sellerId, sellers.id))
+    .innerJoin(users, eq(sellers.userId, users.id))
+    .where(and(eq(offers.requestId, requestId), ne(offers.status, 'declined')));
+  const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
+  for (const s of recipients) {
+    await sendTelegram(
+      s.telegramId,
+      t('requestClosed', {
+        request: `${r.brand} ${r.model}`,
+        reason: reason ?? 'none',
+        offer: `${s.car}, ${s.year}, ${priceLabel('uk', s.priceUsd, s.priceMaxUsd)}`,
       }),
     );
   }

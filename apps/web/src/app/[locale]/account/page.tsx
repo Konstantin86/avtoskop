@@ -194,6 +194,11 @@ export default async function AccountPage({ params, searchParams }: Props) {
                   <div className={me.meta}>
                     {o.car}, {o.year} · {priceLabel(locale, o.priceUsd, o.priceMaxUsd)}
                   </div>
+                  {o.requestStatus === 'closed' && o.closeReason && (
+                    <div className={me.meta}>
+                      {t(`closedBecause_${o.closeReason}` as 'closedBecause_found_here')}
+                    </div>
+                  )}
                   {o.buyerPhone && (
                     <div className={me.phone}>
                       {t('buyerPhone')} <a href={`tel:${o.buyerPhone}`}>{o.buyerPhone}</a>
@@ -201,14 +206,20 @@ export default async function AccountPage({ params, searchParams }: Props) {
                   )}
                 </div>
                 <div className={me.itemRight}>
-                  <span
-                    className={`chip ${o.status === 'contact_shared' ? 'chip-yellow' : 'chip-blue'}`}
-                  >
-                    {t(`offerStatus_${o.status}` as 'offerStatus_sent')}
-                  </span>
-                  <Link href={`/requests/${o.requestId}/offer`} className={me.editLink}>
-                    {t('edit')}
-                  </Link>
+                  {o.requestStatus === 'closed' ? (
+                    <span className="chip">{t('requestClosed')}</span>
+                  ) : (
+                    <>
+                      <span
+                        className={`chip ${o.status === 'contact_shared' ? 'chip-yellow' : 'chip-blue'}`}
+                      >
+                        {t(`offerStatus_${o.status}` as 'offerStatus_sent')}
+                      </span>
+                      <Link href={`/requests/${o.requestId}/offer`} className={me.editLink}>
+                        {t('edit')}
+                      </Link>
+                    </>
+                  )}
                 </div>
               </li>
             ))}
