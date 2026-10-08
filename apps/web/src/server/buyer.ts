@@ -13,11 +13,13 @@ export async function getRequestByKey(key: string) {
   const [row] = await db
     .select({
       id: buyerRequests.id,
+      brandId: buyerRequests.brandId,
       brand: brands.name,
       model: buyerRequests.model,
       yearFrom: buyerRequests.yearFrom,
       yearTo: buyerRequests.yearTo,
       budgetUsd: buyerRequests.budgetUsd,
+      mileageMaxKm: buyerRequests.mileageMaxKm,
       fuels: buyerRequests.fuels,
       gearbox: buyerRequests.gearbox,
       wishes: buyerRequests.wishes,

@@ -22,6 +22,7 @@ import {
   yearsLabel,
 } from '@/components/requestFormat';
 import { RefreshOnce } from '@/components/RefreshOnce';
+import { autoriaLinkFor } from '@/server/autoria';
 import { getRequestByKey, listRequestOffers, markOffersShown } from '@/server/buyer';
 import { botStartLink } from '@/server/telegram';
 import { wantedByVin, wantedListDate } from '@/server/vin';
@@ -68,6 +69,8 @@ export default async function MyRequestPage({ params }: Props) {
   }
 
   const offerList = await listRequestOffers(request.id);
+  const autoria =
+    request.status !== 'closed' && request.phoneVerified ? await autoriaLinkFor(request) : null;
   const [wanted, wantedDate] = await Promise.all([
     wantedByVin(offerList.flatMap((o) => (o.vin ? [o.vin] : []))),
     wantedListDate(),
@@ -378,6 +381,22 @@ export default async function MyRequestPage({ params }: Props) {
             );
           })}
         </section>
+        {autoria && (
+          <div className={`card ${styles.autoria}`}>
+            <div>
+              <div className={styles.autoriaTitle}>{t('autoriaTitle')}</div>
+              <p className={styles.autoriaText}>{t('autoriaText')}</p>
+            </div>
+            <a
+              href={autoria}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="btn btn-secondary btn-sm"
+            >
+              {t('autoriaButton')} ↗
+            </a>
+          </div>
+        )}
 
         <section className={`card ${styles.closeCard}`}>
           <div>

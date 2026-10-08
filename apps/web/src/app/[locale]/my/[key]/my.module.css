@@ -296,3 +296,29 @@
   font-size: 14px;
   line-height: 1.5;
 }
+
+.autoria {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.autoriaTitle {
+  font-weight: 700;
+}
+
+.autoriaText {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+@media (max-width: 520px) {
+  .autoria {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

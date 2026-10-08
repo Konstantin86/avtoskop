@@ -544,7 +544,10 @@
     "statusClosed": "Closed",
     "mileageUpTo": "mileage up to {km} km",
     "serviceFee": "incl. ${amount} fee",
-    "orderNote": "Sourcing to order: the seller will find this car for you. The price is an estimate, and they'll show the specific car with its VIN before the deal."
+    "orderNote": "Sourcing to order: the seller will find this car for you. The price is an estimate, and they'll show the specific car with its VIN before the deal.",
+    "autoriaTitle": "Also search AUTO.RIA",
+    "autoriaText": "We prepared a search with your request's filters. On AUTO.RIA you can save it and get new ads.",
+    "autoriaButton": "Similar cars on AUTO.RIA"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
@@ -570,7 +573,8 @@
     "requestReached": "📣 Your request reached {sellers}. As soon as someone sends an offer, we'll tell you here.",
     "requestExpiring": "⏳ Your request \"{request}\" closes on {date}. If you are still looking, extend it by 30 days: {link}",
     "requestExpired": "Your request \"{request}\" closed after 30 days. If you are still looking, open it again: {link}",
-    "requestLimit": "You have already published 3 requests today. This one is saved: open the bot from its page tomorrow and it will be published."
+    "requestLimit": "You have already published 3 requests today. This one is saved: open the bot from its page tomorrow and it will be published.",
+    "requestAutoria": "While you wait for offers, here are similar cars on AUTO.RIA with your filters: {link}"
   },
   "legal": {
     "updated": "Updated: {date}",

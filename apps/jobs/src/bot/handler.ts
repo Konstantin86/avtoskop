@@ -1,14 +1,16 @@
 import { and, desc, eq, gt, inArray, ne, sql } from 'drizzle-orm';
 import {
+  autoriaSearchUrl,
   decryptContact,
   encryptContact,
   hashContact,
   hashSecret,
   localePath,
   requestExpiry,
+  slugify,
   telegramPhone,
 } from '@avtoskop/core';
-import { brands, buyerRequests, loginTokens, users, type Db } from '@avtoskop/db';
+import { brands, buyerRequests, findAutoriaIds, loginTokens, users, type Db } from '@avtoskop/db';
 import type { ReplyMarkup, Telegram, TelegramMessage } from './telegram.ts';
 import { botText, requestLabel } from './texts.ts';
 
@@ -33,10 +35,16 @@ function askPhoneKeyboard(locale: string): ReplyMarkup {
 
 interface BuyerRequest {
   id: string;
+  brandId: number;
   brand: string;
   model: string;
   yearFrom: number;
   yearTo: number | null;
+  budgetUsd: number;
+  region: string;
+  fuels: string[];
+  gearbox: string;
+  mileageMaxKm: number | null;
   locale: string;
   status: string;
   phoneVerified: boolean;
@@ -60,10 +68,16 @@ export function createBotHandler(
 ) {
   const requestColumns = {
     id: buyerRequests.id,
+    brandId: buyerRequests.brandId,
     brand: brands.name,
     model: buyerRequests.model,
     yearFrom: buyerRequests.yearFrom,
     yearTo: buyerRequests.yearTo,
+    budgetUsd: buyerRequests.budgetUsd,
+    region: buyerRequests.region,
+    fuels: buyerRequests.fuels,
+    gearbox: buyerRequests.gearbox,
+    mileageMaxKm: buyerRequests.mileageMaxKm,
     locale: buyerRequests.locale,
     status: buyerRequests.status,
     phoneVerified: buyerRequests.phoneVerified,
@@ -76,6 +90,14 @@ export function createBotHandler(
     const link =
       siteUrl + localePath(r.locale, `/my/${decryptContact(r.accessKeyEncrypted, contactKey)}`);
     await tg.sendMessage(chatId, botText(r.locale, 'requestLink', { link }));
+  }
+
+  // While offers are on their way, a ready AUTO.RIA search with the same filters.
+  async function sendAutoriaLink(chatId: number, r: BuyerRequest): Promise<void> {
+    const ids = await findAutoriaIds(db, r.brandId, slugify(r.model));
+    if (!ids) return;
+    const link = autoriaSearchUrl({ ...r, brandAutoriaId: ids.brand, modelAutoriaId: ids.model });
+    await tg.sendMessage(chatId, botText(r.locale, 'requestAutoria', { link }));
   }
 
   interface Phone {
@@ -146,6 +168,7 @@ export function createBotHandler(
         removeKeyboard,
       );
       await sendLink(chatId, r);
+      await sendAutoriaLink(chatId, r);
     }
     const published = rows.filter((r) => r.status === 'active').map((r) => r.id);
     // Seller alerts run in the background so the buyer's chat isn't held up.
