@@ -212,3 +212,24 @@
   gap: 18px;
   padding: 4px 16px 18px;
 }
+
+.reach {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--good);
+}
+
+.reach svg {
+  flex-shrink: 0;
+}
+
+.publicNote {
+  margin: -6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}

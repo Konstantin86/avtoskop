@@ -27,6 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
 export default async function RequestDetailPage({ params }: Props) {
   const { locale, id } = await params;
   setRequestLocale(locale);
@@ -58,7 +60,7 @@ export default async function RequestDetailPage({ params }: Props) {
     [
       t('replies'),
       r.sellerTypes.length > 0
-        ? r.sellerTypes.map((type) => t(`typeOf_${type}` as 'typeOf_owner')).join(', ')
+        ? capitalize(r.sellerTypes.map((type) => t(`typeOf_${type}` as 'typeOf_owner')).join(', '))
         : t('repliesAll'),
     ],
   ];

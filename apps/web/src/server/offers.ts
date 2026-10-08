@@ -34,7 +34,8 @@ export async function listOwnOffers(sellerId: string) {
     .orderBy(desc(offers.updatedAt));
   return rows.map(({ phoneEncrypted, ...row }) => ({
     ...row,
-    buyerPhone: row.status === 'contact_shared' ? decryptContact(phoneEncrypted) : null,
+    buyerPhone:
+      row.status === 'contact_shared' && phoneEncrypted ? decryptContact(phoneEncrypted) : null,
   }));
 }
 

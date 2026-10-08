@@ -1,13 +1,12 @@
 'use client';
 
-import { useActionState, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useFocusFirstError } from '@/components/useFocusFirstError';
 import { FUELS, GEARBOXES, localePath, WISHES } from '@avtoskop/core';
 import { BrandPicker } from '@/components/BrandPicker';
 import { ModelInput } from '@/components/ModelInput';
-import { PhoneInput } from '@/components/PhoneInput';
-import { TelegramIcon } from '@/components/icons';
+import { CheckIcon, TelegramIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import type { BrandOption } from '@/server/brands';
 import { submitRequest, type RequestFormState } from './actions';
@@ -32,6 +31,8 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
 
   const v = state.values;
   const [brandId, setBrandId] = useState(v['brandId'] ?? '');
+  const reach = useSellerReach(formRef, brandId);
+  const brandName = brands.all.find((b) => String(b.id) === brandId)?.name;
   const bad = (name: string) => state.errors.includes(name);
   const optional = ['fuels', 'gearbox', 'mileageMaxKm', 'wishes', 'notes'];
   const moreOpen =
@@ -41,7 +42,7 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
   const err = (name: string) =>
     bad(name) ? (
       <span className="error-text" id={`${name}-error`}>
-        {t(`error_${name}` as 'error_phone')}
+        {t(`error_${name}` as 'error_brandId')}
       </span>
     ) : null;
   const invalid = (name: string) =>
@@ -259,11 +260,6 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
 
       <fieldset className={styles.section}>
         <legend className="section-label">{t('sectionContact')}</legend>
-        <label className="label">
-          {f('phone')}
-          <PhoneInput defaultValue={v['phone']} invalid={bad('phone')} />
-          {err('phone') ?? <span className="hint">{f('phoneHint')}</span>}
-        </label>
         {/* Telegram is the only channel for now: the buyer confirms the phone through our bot. */}
         <input type="hidden" name="notifyVia" value="telegram" />
         <p className={styles.notifyNote}>
@@ -300,9 +296,64 @@ export function RequestForm({ locale, brands, regionNames, defaults }: Props) {
         {err('consent')}
       </fieldset>
 
+      {reach.count > 0 && brandName && (
+        <p className={styles.reach} role="status">
+          <CheckIcon />
+          {t('reach', {
+            count: reach.count,
+            brand: brandName,
+            all: reach.allRegions ? 'yes' : 'no',
+          })}
+        </p>
+      )}
       <button type="submit" className="btn btn-yellow btn-lg btn-block" disabled={pending}>
         {pending ? t('submitting') : t('submit')}
       </button>
+      <p className={styles.publicNote}>{t('publicNote')}</p>
     </form>
   );
+}
+
+// Asks how many sellers this request would reach, whenever a field that matters changes.
+function useSellerReach(form: React.RefObject<HTMLFormElement | null>, brandId: string) {
+  const [reach, setReach] = useState({ count: 0, allRegions: false });
+
+  useEffect(() => {
+    let controller: AbortController | null = null;
+    function update() {
+      controller?.abort();
+      const el = form.current;
+      if (!el || !brandId) return setReach({ count: 0, allRegions: false });
+      const data = new FormData(el);
+      const region = String(data.get('region') ?? 'all');
+      const query = new URLSearchParams({
+        brandId,
+        region,
+        importOk: data.get('importOk') === 'false' ? 'false' : 'true',
+        sellerTypes: data.getAll('sellerTypes').join(','),
+      });
+      controller = new AbortController();
+      fetch(`/api/reach?${query}`, { signal: controller.signal })
+        .then((res) => (res.ok ? (res.json() as Promise<{ count: number }>) : { count: 0 }))
+        .then((body) => setReach({ count: body.count, allRegions: region === 'all' }))
+        .catch(() => {});
+    }
+    // The seller-type checkboxes sit outside the form element, so listen on the whole page.
+    function onChange(e: Event) {
+      const target = e.target as HTMLInputElement;
+      if (
+        ['region', 'importOk', 'sellerTypes'].includes(target.name) &&
+        target.form === form.current
+      )
+        update();
+    }
+    update();
+    document.addEventListener('change', onChange);
+    return () => {
+      controller?.abort();
+      document.removeEventListener('change', onChange);
+    };
+  }, [form, brandId]);
+
+  return reach;
 }

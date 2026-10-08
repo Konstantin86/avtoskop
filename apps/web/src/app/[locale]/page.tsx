@@ -4,6 +4,7 @@ import { BrandModelFields } from '@/components/BrandModelFields';
 import { CarDrawing, RoadScene } from '@/components/CarScene';
 import { Compare } from '@/components/Compare';
 import { Faq, type FaqItem } from '@/components/Faq';
+import { SampleOffer } from '@/components/SampleOffer';
 import { StickyCta } from '@/components/StickyCta';
 import {
   CarIcon,
@@ -140,6 +141,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           ))}
         </div>
       </section>
+
+      <SampleOffer locale={locale} />
 
       <Compare
         title={t('whyTitle')}

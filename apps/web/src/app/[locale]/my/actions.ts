@@ -43,6 +43,12 @@ export async function shareContactAction(formData: FormData): Promise<void> {
   if (!found || found.offer.status === 'contact_shared') return;
   const { request, offer } = found;
 
+  const [row] = await db
+    .select({ phone: buyerRequests.phoneEncrypted })
+    .from(buyerRequests)
+    .where(eq(buyerRequests.id, request.id));
+  if (!row?.phone) return;
+
   const [updated] = await db
     .update(offers)
     .set({ status: 'contact_shared', contactSharedAt: new Date() })
@@ -50,16 +56,12 @@ export async function shareContactAction(formData: FormData): Promise<void> {
     .returning({ id: offers.id });
   if (!updated) return;
 
-  const [row] = await db
-    .select({ phone: buyerRequests.phoneEncrypted })
-    .from(buyerRequests)
-    .where(eq(buyerRequests.id, request.id));
   const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
   const regions = await getTranslations({ locale: 'uk', namespace: 'regions' });
   await sendTelegram(
     offer.telegramId,
     t('contactShared', {
-      phone: decryptContact(row!.phone),
+      phone: decryptContact(row.phone),
       request: `${request.brand} ${request.model} ${yearsLabel(request)}, до $${formatNumber('uk', request.budgetUsd)}, ${regions(request.region as 'kyiv')}`,
       offer: `${offer.car}, ${offer.year}, $${formatNumber('uk', offer.priceUsd)}`,
     }),

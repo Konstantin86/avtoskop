@@ -75,6 +75,12 @@ export function normalizeUaPhone(raw: string): string | null {
   return /^[3-9]\d{8}$/.test(national) ? `+380${national}` : null;
 }
 
+// The phone from a contact shared in Telegram, as +digits. Telegram sends it with or without "+".
+export function telegramPhone(raw: string): string | null {
+  const digits = raw.replace(/\D/g, '');
+  return digits.length >= 10 && digits.length <= 15 ? `+${digits}` : null;
+}
+
 const currentYear = new Date().getUTCFullYear();
 const optionalInt = (min: number, max: number) =>
   z.preprocess(
@@ -111,11 +117,6 @@ export const buyerRequestInput = z
     importOk: z.preprocess((v) => v === true || v === 'on' || v === 'true', z.boolean()),
     region: z.enum(REGION_CODES),
     notes: z.string().trim().max(500).optional().default(''),
-    phone: z.string().transform((v, ctx) => {
-      const phone = normalizeUaPhone(v);
-      if (!phone) ctx.addIssue({ code: 'custom', message: 'phone' });
-      return phone ?? '';
-    }),
     notifyVia: z.enum(NOTIFY_CHANNELS),
     consent: z.preprocess((v) => v === true || v === 'on', z.literal(true)),
   })

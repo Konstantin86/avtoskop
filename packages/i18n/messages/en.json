@@ -20,6 +20,10 @@
     "theme_dark": "Theme: dark. Click to change"
   },
   "home": {
+    "sampleTitle": "What an offer looks like",
+    "sampleLead": "The all-in price, the VIN check and your wishes on one card. You show your number only to the seller you like.",
+    "sampleBadge": "Example",
+    "sampleSeller": "Oleksandr K.",
     "eyebrow": "For car buyers in Ukraine",
     "title": "Describe the car, and sellers will offer options",
     "lead": "Importers, dealers and owners send offers for your request. You compare them and decide who gets your number.",
@@ -96,14 +100,12 @@
     "wish_awd": "All-wheel drive",
     "notes": "Wishes",
     "notesPlaceholder": "Color, trim, anything else…",
-    "phone": "Phone",
-    "phoneHint": "Sellers don't see your number. You'll confirm it in Telegram",
     "notify": "Offer notifications",
     "notify_telegram": "Telegram",
     "notify_sms": "SMS",
     "notify_email": "Email",
     "consent": "I agree to the <terms>terms</terms> and <privacy>privacy policy</privacy>",
-    "notifyNote": "After posting, confirm your number in our Telegram bot: offers will arrive there too. Sellers don't see your number.",
+    "notifyNote": "After posting, our Telegram bot asks you to share your number with one tap. Offers arrive there too. Sellers don't see your number.",
     "modelNoMatches": "No such model in the list",
     "fuelsHint": "You can choose several. If none is chosen, any fuel is fine.",
     "brandNoMatches": "No such brand in the list"
@@ -117,6 +119,8 @@
     "sectionContact": "How to reach you",
     "submit": "Post request",
     "submitting": "Posting…",
+    "reach": "{count, plural, one {# seller will get} other {# sellers will get}} your {brand} request {all, select, yes {across Ukraine} other {in this region}}",
+    "publicNote": "Everyone visiting the site will see the request, without your name or number.",
     "summaryTitle": "Your request",
     "privacy": "Your number is hidden. You share it only with sellers you choose.",
     "error_generic": "Please check the highlighted fields.",
@@ -127,9 +131,7 @@
     "error_budgetUsd": "Enter a budget from $1,000",
     "error_mileageMaxKm": "Check the mileage",
     "error_region": "Choose a region",
-    "error_phone": "Enter a Ukrainian mobile number",
     "error_consent": "Your consent is required",
-    "error_limit": "This number already has several requests today. Please try tomorrow.",
     "error_server": "Could not save the request. Please try again.",
     "error_gearbox": "Choose a gearbox",
     "error_wishes": "Check the selected wishes",
@@ -148,14 +150,14 @@
   "sent": {
     "title": "Request published",
     "step1": "Request created",
-    "step2": "Confirm your number in Telegram",
+    "step2": "Share your number in Telegram",
     "step2Text": "Sellers won't see the request until you do",
     "step3": "Waiting for offers",
     "step3Text": "We'll send them to Telegram",
     "step4": "You choose who gets your number",
     "step4Text": "No calls from sellers you didn't choose",
-    "telegramTitle": "Confirm your number in Telegram",
-    "telegramText": "The bot asks you to share your number; it must match the one in the request",
+    "telegramTitle": "Share your number in Telegram",
+    "telegramText": "The bot asks you to share your number. It is one tap, with nothing to type",
     "telegramButton": "Confirm in Telegram",
     "browse": "To the home page",
     "notFound": "Request not found.",
@@ -165,7 +167,7 @@
     "copied": "Copied",
     "openOffers": "Go to offers",
     "titlePending": "One step left",
-    "telegramDoneTitle": "Number confirmed",
+    "telegramDoneTitle": "Request published",
     "telegramDoneText": "Offers will arrive in Telegram",
     "telegramQr": "Telegram on your phone? Point the camera at the code to open the bot there. This page updates by itself."
   },
@@ -291,7 +293,7 @@
     "notFound": "Request not found or already closed.",
     "years": "Years",
     "sellerRules": "Rules for sellers",
-    "repliesOnly": "Replies only from: {types}",
+    "repliesOnly": "Only {types} can reply",
     "replies": "Who can reply",
     "repliesAll": "All sellers",
     "typeOf_importer": "importers",
@@ -399,7 +401,7 @@
     "vinHint": "17 characters. Only the buyer sees it: we check the car against the wanted list and compare the make and year.",
     "error_vin": "Check the VIN: 17 characters, no letters I, O, Q",
     "error_vinMismatch": "By VIN this is {car}, which doesn't match the offer or the brand the buyer wants. Check the VIN and the car name. If everything is right, send the offer again.",
-    "notAllowed": "This buyer accepts offers only from: {types}. Your profile type doesn't match, so you can't send an offer.",
+    "notAllowed": "Only {types} can reply to this request. Your profile type doesn't match, so you can't send an offer.",
     "error_notAllowed": "This buyer accepts offers only from certain seller types.",
     "copyFrom": "Copy from a previous offer",
     "copyPick": "Choose an offer…",
@@ -479,9 +481,9 @@
     "notFoundTitle": "Link not valid",
     "notFound": "Check that you copied the whole link.",
     "confirmTitle": "Request not published yet",
-    "confirmText": "Confirm your number in Telegram so sellers can see the request",
+    "confirmText": "Share your number in Telegram so sellers can see the request",
     "confirmButton": "Confirm in Telegram",
-    "emptyPending": "Offers will appear after you confirm your number.",
+    "emptyPending": "Offers will appear after you share your number in Telegram.",
     "safetyTitle": "How to avoid scams",
     "safety1": "Don't pay a deposit before you have seen the car and documents and signed a contract.",
     "safety2": "The offer price must be all-in. New extra charges are a warning sign.",
@@ -522,14 +524,14 @@
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
     "sharePhone": "Share my number",
     "ownPhoneOnly": "Please share your own number with the button below.",
-    "noMatch": "We found no sign-in or request with this number. If you posted a request, check that you entered this exact number.",
+    "noMatch": "We found no sign-in or request waiting to be published. If you posted a request, open the bot with the button on the request page.",
     "loginExpired": "The sign-in link has expired. Go back to the site and press \"Sign in with Telegram\" again.",
     "loginAskPhone": "To sign in, share your phone number with the button below. We don't store the number itself, only a protected fingerprint.\n\nIf you didn't try to sign in to Avtoskop, ignore this message.",
     "loginDone": "Done! Your number is confirmed. Go back to the site: sign-in finishes on its own.",
     "loginDoneKnown": "Done! Go back to the site: sign-in finishes on its own.",
     "requestNotFound": "Request not found or closed. Post a new request on the site.",
-    "requestAskPhone": "To publish your request \"{request}\", share your number with the button below. It must match the number in the request.\n\nSellers won't see the number until you decide to share it.",
-    "requestConfirmed": "✅ Number confirmed. Your request \"{request}\" is published, and sellers can see it now.\n\nNew offers will arrive here.",
+    "requestAskPhone": "To publish your request \"{request}\", share your number with the button below. There is nothing to type.\n\nSellers won't see the number until you decide to share it.",
+    "requestConfirmed": "✅ Done. Your request \"{request}\" is published, and sellers can see it now.\n\nNew offers will arrive here.",
     "requestAlready": "Your request \"{request}\" is already confirmed. New offers will arrive here.",
     "requestLink": "Your private link to the offers (don't forward it): {link}",
     "myRequests": "Your requests:",
@@ -541,7 +543,8 @@
     "alertImportNo": "only cars in Ukraine",
     "requestReached": "📣 Your request reached {sellers}. As soon as someone sends an offer, we'll tell you here.",
     "requestExpiring": "⏳ Your request \"{request}\" closes on {date}. If you are still looking, extend it by 30 days: {link}",
-    "requestExpired": "Your request \"{request}\" closed after 30 days. If you are still looking, open it again: {link}"
+    "requestExpired": "Your request \"{request}\" closed after 30 days. If you are still looking, open it again: {link}",
+    "requestLimit": "You have already published 3 requests today. This one is saved: open the bot from its page tomorrow and it will be published."
   },
   "legal": {
     "updated": "Updated: {date}",
@@ -562,7 +565,7 @@
         },
         {
           "title": "4. For buyers",
-          "body": "Enter only your own phone number. A request is published after you confirm the number in Telegram. Everyone visiting the site can see published requests, and we may share them on social networks to find sellers. Your number is never published. Don't put your name, address or other personal details in the request comment; we hide phones, links and usernames automatically. You decide which sellers get your number, and this can't be undone. Don't pay a deposit before you have seen the car and documents and signed a contract."
+          "body": "A request is published after you share your number in Telegram. Everyone visiting the site can see published requests, and we may share them on social networks to find sellers. Your number is never published. Don't put your name, address or other personal details in the request comment; we hide phones, links and usernames automatically. You decide which sellers get your number, and this can't be undone. Don't pay a deposit before you have seen the car and documents and signed a contract."
         },
         {
           "title": "5. For sellers",
@@ -603,7 +606,7 @@
         },
         {
           "title": "2. What we collect",
-          "body": "Buyers: phone number, request details (car, budget, region, wishes, comment), site language, and Telegram ID after the number is confirmed. Sellers: Telegram ID, Telegram name and username, profile details (name, type, region, countries, description) and offers. The site uses only technical cookies for sign-in; there are no advertising cookies. We count page views without cookies or IP addresses, only as daily totals."
+          "body": "Buyers: the phone number you shared in Telegram, request details (car, budget, region, wishes, comment), site language, and Telegram ID after the number is confirmed. Sellers: Telegram ID, Telegram name and username, profile details (name, type, region, countries, description) and offers. The site uses only technical cookies for sign-in; there are no advertising cookies. We count page views without cookies or IP addresses, only as daily totals."
         },
         {
           "title": "3. What others see",

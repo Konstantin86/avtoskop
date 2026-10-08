@@ -90,7 +90,8 @@ export const listingSnapshots = pgTable(
   (t) => [index('listing_snapshots_listing_idx').on(t.listingId, t.seenAt)],
 );
 
-// The phone is stored only encrypted; phone_hash lets us apply limits without decrypting.
+// The phone comes from the contact the buyer shares in Telegram, so it is empty until then.
+// It is stored only encrypted; phone_hash lets us apply limits without decrypting.
 export const buyerRequests = pgTable(
   'buyer_requests',
   {
@@ -114,8 +115,8 @@ export const buyerRequests = pgTable(
     importOk: boolean('import_ok').notNull(),
     region: text('region').notNull(),
     notes: text('notes').notNull().default(''),
-    phoneEncrypted: text('phone_encrypted').notNull(),
-    phoneHash: text('phone_hash').notNull(),
+    phoneEncrypted: text('phone_encrypted'),
+    phoneHash: text('phone_hash'),
     phoneVerified: boolean('phone_verified').notNull().default(false),
     // The private link's secret: hashed for lookup, encrypted so the bot can resend the link.
     // Both are null for demo rows.

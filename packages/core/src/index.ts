@@ -3,6 +3,7 @@ export { slugify, transliterateUk } from './slug.ts';
 export {
   buyerRequestInput,
   normalizeUaPhone,
+  telegramPhone,
   FUELS,
   GEARBOXES,
   WISHES,

@@ -5,6 +5,7 @@ import {
   formatUaNational,
   localePath,
   normalizeUaPhone,
+  telegramPhone,
   pageKind,
   pluralUk,
   sellerTypeAllowed,
@@ -56,7 +57,6 @@ describe('buyerRequestInput', () => {
     importOk: 'on',
     region: 'kyiv',
     notes: '',
-    phone: '050 123 45 67',
     notifyVia: 'telegram',
     consent: 'on',
   };
@@ -71,21 +71,19 @@ describe('buyerRequestInput', () => {
       importOk: true,
     });
     expect(r.yearTo).toBeUndefined();
-    expect(r.phone).toBe('+380501234567');
     expect(r.gearbox).toBe('automatic');
     expect(r.wishes).toEqual(['no_accidents', 'one_owner']);
   });
 
-  it('rejects a bad phone, missing consent and reversed years', () => {
+  it('rejects missing consent', () => {
     const r = buyerRequestInput.safeParse({
       ...valid,
-      phone: '123',
       consent: undefined,
       yearTo: '2015',
     });
     expect(r.success).toBe(false);
     const paths = r.error!.issues.map((i) => i.path.join('.'));
-    expect(paths).toEqual(expect.arrayContaining(['phone', 'consent']));
+    expect(paths).toContain('consent');
   });
 
   it('accepts wishes as a comma-separated string and defaults gearbox', () => {
@@ -153,7 +151,6 @@ describe('buyerRequestInput fuels', () => {
       budgetUsd: '28000',
       region: 'kyiv',
       importOk: 'on',
-      phone: '0501234567',
       notifyVia: 'telegram',
       consent: 'on',
     };
@@ -174,7 +171,6 @@ describe('buyerRequestInput seller types', () => {
     budgetUsd: '28000',
     region: 'kyiv',
     importOk: 'on',
-    phone: '0501234567',
     notifyVia: 'telegram',
     consent: 'on',
   };
@@ -227,5 +223,17 @@ describe('pageKind', () => {
 
   it('ignores odd addresses', () => {
     expect(pageKind('/ua/<script>')).toBeNull();
+  });
+});
+
+describe('telegramPhone', () => {
+  it('adds the plus and keeps foreign numbers', () => {
+    expect(telegramPhone('380501234567')).toBe('+380501234567');
+    expect(telegramPhone('+48 512 345 678')).toBe('+48512345678');
+  });
+
+  it('rejects anything too short or too long', () => {
+    expect(telegramPhone('12345')).toBeNull();
+    expect(telegramPhone('1234567890123456')).toBeNull();
   });
 });

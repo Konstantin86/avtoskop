@@ -1,11 +1,20 @@
 import { and, desc, eq, gt, inArray, ne, sql } from 'drizzle-orm';
-import { decryptContact, hashContact, hashSecret, localePath, requestExpiry } from '@avtoskop/core';
+import {
+  decryptContact,
+  encryptContact,
+  hashContact,
+  hashSecret,
+  localePath,
+  requestExpiry,
+  telegramPhone,
+} from '@avtoskop/core';
 import { brands, buyerRequests, loginTokens, users, type Db } from '@avtoskop/db';
 import type { ReplyMarkup, Telegram, TelegramMessage } from './telegram.ts';
 import { botText, requestLabel } from './texts.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SELLER_LOCALE = 'uk';
+const MAX_REQUESTS_PER_DAY = 3;
 
 interface Options {
   contactKey: Buffer;
@@ -30,7 +39,6 @@ interface BuyerRequest {
   yearTo: number | null;
   locale: string;
   status: string;
-  phoneHash: string;
   phoneVerified: boolean;
   telegramChatId: number | null;
   accessKeyEncrypted: string | null;
@@ -58,7 +66,6 @@ export function createBotHandler(
     yearTo: buyerRequests.yearTo,
     locale: buyerRequests.locale,
     status: buyerRequests.status,
-    phoneHash: buyerRequests.phoneHash,
     phoneVerified: buyerRequests.phoneVerified,
     telegramChatId: buyerRequests.telegramChatId,
     accessKeyEncrypted: buyerRequests.accessKeyEncrypted,
@@ -71,11 +78,40 @@ export function createBotHandler(
     await tg.sendMessage(chatId, botText(r.locale, 'requestLink', { link }));
   }
 
-  // Confirms every unconfirmed request posted with this phone and links it to the chat.
-  async function confirmRequests(chatId: number, phoneHash: string): Promise<BuyerRequest[]> {
+  interface Phone {
+    hash: string;
+    encrypted: string;
+  }
+
+  // Publishes the requests this chat opened in the bot, with the phone it shared.
+  // Returns null when the chat already published too many requests today.
+  async function confirmRequests(chatId: number, phone: Phone): Promise<BuyerRequest[] | null> {
+    const [recent] = await db
+      .select({ n: sql<number>`count(*)`.mapWith(Number) })
+      .from(buyerRequests)
+      .where(
+        and(
+          eq(buyerRequests.telegramChatId, chatId),
+          eq(buyerRequests.phoneVerified, true),
+          gt(buyerRequests.confirmedAt, new Date(Date.now() - 86_400_000)),
+        ),
+      );
+    if ((recent?.n ?? 0) >= MAX_REQUESTS_PER_DAY) {
+      const [pending] = await db
+        .select({ id: buyerRequests.id })
+        .from(buyerRequests)
+        .where(
+          and(eq(buyerRequests.telegramChatId, chatId), eq(buyerRequests.phoneVerified, false)),
+        )
+        .limit(1);
+      return pending ? null : [];
+    }
+
     const confirmed = await db
       .update(buyerRequests)
       .set({
+        phoneEncrypted: phone.encrypted,
+        phoneHash: phone.hash,
         phoneVerified: true,
         telegramChatId: chatId,
         confirmedAt: new Date(),
@@ -83,7 +119,7 @@ export function createBotHandler(
         expiryRemindedAt: null,
         status: sql`case when ${buyerRequests.status} = 'new' then 'active' else ${buyerRequests.status} end`,
       })
-      .where(and(eq(buyerRequests.phoneHash, phoneHash), eq(buyerRequests.phoneVerified, false)))
+      .where(and(eq(buyerRequests.telegramChatId, chatId), eq(buyerRequests.phoneVerified, false)))
       .returning({ id: buyerRequests.id });
     if (confirmed.length === 0) return [];
     return db
@@ -98,7 +134,11 @@ export function createBotHandler(
       );
   }
 
-  async function announceConfirmed(chatId: number, rows: BuyerRequest[]): Promise<void> {
+  async function announceConfirmed(chatId: number, rows: BuyerRequest[] | null): Promise<void> {
+    if (rows === null) {
+      await tg.sendMessage(chatId, botText('uk', 'requestLimit'), removeKeyboard);
+      return;
+    }
     for (const r of rows) {
       await tg.sendMessage(
         chatId,
@@ -110,6 +150,19 @@ export function createBotHandler(
     const published = rows.filter((r) => r.status === 'active').map((r) => r.id);
     // Seller alerts run in the background so the buyer's chat isn't held up.
     if (onPublished && published.length > 0) void onPublished(published).catch(() => {});
+  }
+
+  // The phone this Telegram account shared for an earlier request, so it needn't share it again.
+  async function knownBuyerPhone(telegramId: number): Promise<Phone | null> {
+    const [row] = await db
+      .select({ hash: buyerRequests.phoneHash, encrypted: buyerRequests.phoneEncrypted })
+      .from(buyerRequests)
+      .where(
+        and(eq(buyerRequests.telegramChatId, telegramId), eq(buyerRequests.phoneVerified, true)),
+      )
+      .orderBy(desc(buyerRequests.confirmedAt))
+      .limit(1);
+    return row?.hash && row.encrypted ? { hash: row.hash, encrypted: row.encrypted } : null;
   }
 
   // A phone this Telegram account has already proven, as a seller or on an earlier request.
@@ -198,8 +251,15 @@ export function createBotHandler(
       return;
     }
 
-    if ((await knownPhoneHashes(m.from!.id)).includes(r.phoneHash)) {
-      await announceConfirmed(chatId, await confirmRequests(m.from!.id, r.phoneHash));
+    // Whoever opens the bot from the request page owns the request; the id is only on that page.
+    await db
+      .update(buyerRequests)
+      .set({ telegramChatId: m.from!.id })
+      .where(and(eq(buyerRequests.id, r.id), eq(buyerRequests.phoneVerified, false)));
+
+    const known = await knownBuyerPhone(m.from!.id);
+    if (known) {
+      await announceConfirmed(chatId, await confirmRequests(m.from!.id, known));
       return;
     }
 
@@ -286,15 +346,23 @@ export function createBotHandler(
       await tg.sendMessage(chatId, botText('uk', 'ownPhoneOnly'), askPhoneKeyboard('uk'));
       return;
     }
-    const phoneHash = hashContact(`+${m.contact!.phone_number.replace(/\D/g, '')}`, contactKey);
+    const phone = telegramPhone(m.contact!.phone_number);
+    if (!phone) {
+      await tg.sendMessage(chatId, botText('uk', 'noMatch'), removeKeyboard);
+      return;
+    }
+    const phoneHash = hashContact(phone, contactKey);
 
     const loggedIn = await completeLogin(m, phoneHash);
-    const confirmed = await confirmRequests(m.from!.id, phoneHash);
+    const confirmed = await confirmRequests(m.from!.id, {
+      hash: phoneHash,
+      encrypted: encryptContact(phone, contactKey),
+    });
     await announceConfirmed(chatId, confirmed);
     if (loggedIn) {
       await tg.sendMessage(chatId, botText(SELLER_LOCALE, 'loginDone'), removeKeyboard);
     }
-    if (!loggedIn && confirmed.length === 0) {
+    if (!loggedIn && confirmed?.length === 0) {
       await tg.sendMessage(chatId, botText('uk', 'noMatch'), removeKeyboard);
     }
   }
