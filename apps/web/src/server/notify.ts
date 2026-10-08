@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
 import { localePath } from '@avtoskop/core';
 import { brands, buyerRequests } from '@avtoskop/db';
-import { formatNumber, yearsLabel } from '@/components/requestFormat';
+import { formatNumber, priceLabel, yearsLabel } from '@/components/requestFormat';
 import { decryptContact } from './contact';
 import { db } from './db';
 import { sendTelegram, siteUrl } from './telegram';
@@ -12,6 +12,7 @@ interface OfferSummary {
   car: string;
   year: number;
   priceUsd: number;
+  priceMaxUsd?: number | null;
 }
 
 async function buyerChat(requestId: string) {
@@ -46,7 +47,7 @@ export async function notifyBuyerOfOffer(requestId: string, offer: OfferSummary)
     b.chatId,
     t('newOffer', {
       request: b.request,
-      offer: `${offer.car}, ${offer.year}, $${formatNumber(b.locale, offer.priceUsd)}`,
+      offer: `${offer.car}, ${offer.year}, ${priceLabel(b.locale, offer.priceUsd, offer.priceMaxUsd)}`,
       link: b.link,
     }),
   );

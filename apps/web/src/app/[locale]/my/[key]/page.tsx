@@ -14,7 +14,13 @@ import {
 } from '@avtoskop/core';
 import { FlagEU, FlagUS, ShieldIcon } from '@/components/icons';
 import { TelegramConfirm } from '@/components/TelegramConfirm';
-import { formatNumber, fuelsLabel, timeAgo, yearsLabel } from '@/components/requestFormat';
+import {
+  formatNumber,
+  fuelsLabel,
+  priceLabel,
+  timeAgo,
+  yearsLabel,
+} from '@/components/requestFormat';
 import { RefreshOnce } from '@/components/RefreshOnce';
 import { getRequestByKey, listRequestOffers, markOffersShown } from '@/server/buyer';
 import { botStartLink } from '@/server/telegram';
@@ -168,8 +174,13 @@ export default async function MyRequestPage({ params }: Props) {
           {offerList.map((offer) => {
             const declined = offer.status === 'declined';
             const shared = offer.status === 'contact_shared';
+            const order = offer.availability === 'to_order';
             const facts = [
-              `${formatNumber(locale, offer.mileageKm)} ${t('km')}`,
+              offer.mileageKm === null
+                ? null
+                : order
+                  ? t('mileageUpTo', { km: formatNumber(locale, offer.mileageKm) })
+                  : `${formatNumber(locale, offer.mileageKm)} ${t('km')}`,
               offer.availability === 'in_ukraine'
                 ? o('availability_in_ukraine')
                 : `${o(`availability_${offer.availability}` as 'availability_in_transit')}, ${t('eta', { weeks: offer.etaWeeks ?? 0 })}`,
@@ -196,10 +207,16 @@ export default async function MyRequestPage({ params }: Props) {
                     </div>
                   </div>
                   <div className={styles.price}>
-                    ${formatNumber(locale, offer.priceUsd)}
+                    {priceLabel(locale, offer.priceUsd, offer.priceMaxUsd)}
                     <span>{t('turnkey')}</span>
+                    {offer.serviceFeeUsd !== null && (
+                      <span>
+                        {t('serviceFee', { amount: formatNumber(locale, offer.serviceFeeUsd) })}
+                      </span>
+                    )}
                   </div>
                 </div>
+                {order && <p className={styles.orderNote}>{t('orderNote')}</p>}
                 {offer.vin && (
                   <div className={styles.vin}>
                     <div>

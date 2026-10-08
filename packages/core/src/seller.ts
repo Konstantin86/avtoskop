@@ -46,8 +46,12 @@ export const offerInput = z
       .int()
       .min(1990)
       .max(currentYear + 1),
-    mileageKm: z.coerce.number().int().min(0).max(1_000_000),
+    // Optional on the short form; for an order it means "up to this mileage".
+    mileageKm: optionalInt(0, 1_000_000),
     priceUsd: z.coerce.number().int().min(500).max(1_000_000),
+    // Orders ('to_order') can quote a price range and the seller's service fee within it.
+    priceMaxUsd: optionalInt(500, 1_000_000),
+    serviceFeeUsd: optionalInt(0, 100_000),
     availability: z.enum(AVAILABILITY),
     etaWeeks: optionalInt(1, 52),
     originCountry: z.preprocess(
@@ -77,7 +81,21 @@ export const offerInput = z
   .refine((o) => o.availability === 'in_ukraine' || o.etaWeeks !== undefined, {
     path: ['etaWeeks'],
     message: 'etaWeeks',
-  });
+  })
+  .refine((o) => o.priceMaxUsd === undefined || o.priceMaxUsd >= o.priceUsd, {
+    path: ['priceMaxUsd'],
+    message: 'priceMaxUsd',
+  })
+  .refine((o) => o.serviceFeeUsd === undefined || o.serviceFeeUsd < o.priceUsd, {
+    path: ['serviceFeeUsd'],
+    message: 'serviceFeeUsd',
+  })
+  // A car still to be found has no VIN, and a range or a fee only makes sense for an order.
+  .transform((o) =>
+    o.availability === 'to_order'
+      ? { ...o, vin: undefined }
+      : { ...o, priceMaxUsd: undefined, serviceFeeUsd: undefined },
+  );
 
 export type OfferInput = z.infer<typeof offerInput>;
 

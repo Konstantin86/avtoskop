@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getLocale, getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { BrandLogo } from '@/components/BrandLogo';
-import { formatNumber, timeAgo, yearsLabel } from '@/components/requestFormat';
+import { formatNumber, priceLabel, timeAgo, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
 import { listUserRequests } from '@/server/buyer';
@@ -192,7 +192,7 @@ export default async function AccountPage({ params, searchParams }: Props) {
                     {o.requestBrand} {o.requestModel}
                   </Link>
                   <div className={me.meta}>
-                    {o.car}, {o.year} · ${formatNumber(locale, o.priceUsd)}
+                    {o.car}, {o.year} · {priceLabel(locale, o.priceUsd, o.priceMaxUsd)}
                   </div>
                   {o.buyerPhone && (
                     <div className={me.phone}>

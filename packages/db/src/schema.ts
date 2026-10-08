@@ -210,8 +210,11 @@ export const offers = pgTable(
       .references(() => sellers.id, { onDelete: 'cascade' }),
     car: text('car').notNull(),
     year: integer('year').notNull(),
-    mileageKm: integer('mileage_km').notNull(),
+    mileageKm: integer('mileage_km'),
     priceUsd: integer('price_usd').notNull(),
+    // Orders ('to_order') may quote a range (price_usd is the low end) and the seller's fee.
+    priceMaxUsd: integer('price_max_usd'),
+    serviceFeeUsd: integer('service_fee_usd'),
     availability: text('availability').notNull(),
     etaWeeks: integer('eta_weeks'),
     originCountry: text('origin_country'),

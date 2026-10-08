@@ -168,8 +168,10 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
   const row = {
     car: o.car,
     year: o.year,
-    mileageKm: o.mileageKm,
+    mileageKm: o.mileageKm ?? null,
     priceUsd: o.priceUsd,
+    priceMaxUsd: o.priceMaxUsd ?? null,
+    serviceFeeUsd: o.serviceFeeUsd ?? null,
     availability: o.availability,
     etaWeeks: o.availability === 'in_ukraine' ? null : (o.etaWeeks ?? null),
     originCountry: o.originCountry ?? null,

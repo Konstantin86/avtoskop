@@ -1,6 +1,7 @@
 import 'server-only';
 import { and, desc, eq } from 'drizzle-orm';
 import { brands, buyerRequests, offers } from '@avtoskop/db';
+import { priceLabel } from '@/components/requestFormat';
 import { decryptContact } from './contact';
 import { db } from './db';
 
@@ -21,6 +22,7 @@ export async function listOwnOffers(sellerId: string) {
       car: offers.car,
       year: offers.year,
       priceUsd: offers.priceUsd,
+      priceMaxUsd: offers.priceMaxUsd,
       status: offers.status,
       updatedAt: offers.updatedAt,
       requestBrand: brands.name,
@@ -37,6 +39,28 @@ export async function listOwnOffers(sellerId: string) {
     buyerPhone:
       row.status === 'contact_shared' && phoneEncrypted ? decryptContact(phoneEncrypted) : null,
   }));
+}
+
+type OfferRow = typeof offers.$inferSelect;
+const optional = (n: number | null) => (n === null ? '' : String(n));
+
+// An offer as offer-form values, for editing it or copying it into a new offer.
+export function offerFormValues(o: OfferRow): Record<string, string> {
+  return {
+    car: o.car,
+    year: String(o.year),
+    mileageKm: optional(o.mileageKm),
+    priceUsd: String(o.priceUsd),
+    priceMaxUsd: optional(o.priceMaxUsd),
+    serviceFeeUsd: optional(o.serviceFeeUsd),
+    availability: o.availability,
+    etaWeeks: optional(o.etaWeeks),
+    originCountry: o.originCountry ?? '',
+    link: o.link ?? '',
+    description: o.description,
+    features: o.features.join(','),
+    vin: o.vin ?? '',
+  };
 }
 
 export interface OfferTemplate {
@@ -87,20 +111,8 @@ export async function listOfferTemplates(
     if (seen.has(id)) continue;
     seen.add(id);
     templates.push({
-      label: `${o.car}, ${o.year} · $${o.priceUsd.toLocaleString('uk-UA')}`,
-      values: {
-        car: o.car,
-        year: String(o.year),
-        mileageKm: String(o.mileageKm),
-        priceUsd: String(o.priceUsd),
-        availability: o.availability,
-        etaWeeks: o.etaWeeks ? String(o.etaWeeks) : '',
-        originCountry: o.originCountry ?? '',
-        link: o.link ?? '',
-        description: o.description,
-        features: o.features.join(','),
-        vin: o.vin ?? '',
-      },
+      label: `${o.car}, ${o.year} · ${priceLabel('uk', o.priceUsd, o.priceMaxUsd)}`,
+      values: offerFormValues(o),
     });
     if (templates.length === limit) break;
   }

@@ -18,7 +18,6 @@ interface Props {
 
 export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, templates }: Props) {
   const t = useTranslations('offer');
-  const p = useTranslations('profile');
   const fields = useTranslations('fields');
   const [state, action, pending] = useActionState<FormState, FormData>(saveOfferAction, {
     errors: [],
@@ -32,7 +31,18 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
   );
   const v = copied && copied.for === state ? copied.values : state.values;
   const [availability, setAvailability] = useState(v['availability'] ?? 'in_ukraine');
+  const order = availability === 'to_order';
   const bad = (name: string) => state.errors.includes(name);
+  const details = [
+    'mileageKm',
+    'serviceFeeUsd',
+    'originCountry',
+    'link',
+    'features',
+    'vin',
+    'description',
+  ];
+  const detailsOpen = details.some((name) => bad(name) || Boolean(v[name]));
   const err = (name: string) =>
     bad(name) ? <span className="error-text">{t(`error_${name}` as 'error_car')}</span> : null;
   const invalid = (name: string) => (bad(name) ? { 'aria-invalid': true as const } : {});
@@ -77,8 +87,34 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
             : t(`error_${state.formError}` as 'error_generic')}
         </div>
       )}
+      <div className="label">
+        <span id="kind-label">{t('kind')}</span>
+        <div className="segment" role="radiogroup" aria-labelledby="kind-label">
+          <label>
+            <input
+              type="radio"
+              name="kind"
+              checked={!order}
+              onChange={() => setAvailability('in_ukraine')}
+            />
+            <span>{t('kind_car')}</span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="kind"
+              checked={order}
+              onChange={() => setAvailability('to_order')}
+            />
+            <span>{t('kind_order')}</span>
+          </label>
+        </div>
+        <span className="hint">{order ? t('kindHint_order') : t('kindHint_car')}</span>
+      </div>
+      {order && <input type="hidden" name="availability" value="to_order" />}
+
       <label className="label">
-        {t('car')}
+        {order ? t('carOrder') : t('car')}
         <input
           name="car"
           className="field"
@@ -88,9 +124,9 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
         />
         {err('car') ?? <span className="hint">{t('carHint')}</span>}
       </label>
-      <div className={styles.triple}>
+      <div className={order ? styles.triple : styles.pair}>
         <label className="label">
-          {t('year')}
+          {order ? t('yearOrder') : t('year')}
           <input
             name="year"
             className="field"
@@ -101,18 +137,7 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
           {err('year')}
         </label>
         <label className="label">
-          {t('mileage')}
-          <input
-            name="mileageKm"
-            className="field"
-            inputMode="numeric"
-            defaultValue={v['mileageKm']}
-            {...invalid('mileageKm')}
-          />
-          {err('mileageKm')}
-        </label>
-        <label className="label">
-          {t('price')}
+          {order ? t('priceFrom') : t('price')}
           <input
             name="priceUsd"
             className="field"
@@ -122,114 +147,160 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
           />
           {err('priceUsd')}
         </label>
-      </div>
-      <span className="hint">{t('priceHint')}</span>
-
-      <div className="label">
-        <span id="availability-label">{t('availability')}</span>
-        <div className="segment" role="radiogroup" aria-labelledby="availability-label">
-          {AVAILABILITY.map((a) => (
-            <label key={a}>
-              <input
-                type="radio"
-                name="availability"
-                value={a}
-                defaultChecked={availability === a}
-                onChange={() => setAvailability(a)}
-              />
-              <span>{t(`availability_${a}`)}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.pair}>
-        {availability !== 'in_ukraine' && (
+        {order && (
           <label className="label">
-            {t('eta')}
+            {t('priceTo')}
             <input
-              name="etaWeeks"
+              name="priceMaxUsd"
               className="field"
               inputMode="numeric"
-              defaultValue={v['etaWeeks']}
-              {...invalid('etaWeeks')}
+              defaultValue={v['priceMaxUsd']}
+              placeholder={t('optional')}
+              {...invalid('priceMaxUsd')}
             />
-            {err('etaWeeks')}
+            {err('priceMaxUsd')}
           </label>
         )}
-        <label className="label">
-          {t('origin')}
-          <select name="originCountry" className="field" defaultValue={v['originCountry'] ?? ''}>
-            <option value="">{t('originNone')}</option>
-            <option value="ua">{t('origin_ua')}</option>
-            {SOURCE_COUNTRIES.map((c) => (
-              <option key={c} value={c}>
-                {p(`country_${c}`)}
-              </option>
-            ))}
-          </select>
-        </label>
       </div>
+      <span className="hint">{order ? t('priceHintOrder') : t('priceHint')}</span>
 
-      <label className="label">
-        {t('link')}
-        <input
-          name="link"
-          type="url"
-          className="field"
-          defaultValue={v['link']}
-          placeholder="https://"
-          {...invalid('link')}
-        />
-        {err('link') ?? <span className="hint">{t('linkHint')}</span>}
-      </label>
-      <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
-        <legend style={{ padding: 0, marginBottom: 6 }}>{t('features')}</legend>
-        <div className="choices">
-          {OFFER_FEATURES.map((feature) => (
-            <label key={feature}>
-              <input
-                type="checkbox"
-                name="features"
-                value={feature}
-                defaultChecked={(v['features'] ?? '').split(',').includes(feature)}
-              />
-              <span>
-                {(WISHES as readonly string[]).includes(feature)
-                  ? fields(`wish_${feature}` as 'wish_awd')
-                  : t(`feature_${feature}` as 'feature_warranty')}
-                {buyerWishes.includes(feature) && (
-                  <small className={styles.asked}>{t('buyerAsked')}</small>
-                )}
-              </span>
-            </label>
-          ))}
+      {!order && (
+        <div className="label">
+          <span id="availability-label">{t('availability')}</span>
+          <div className="segment" role="radiogroup" aria-labelledby="availability-label">
+            {AVAILABILITY.filter((a) => a !== 'to_order').map((a) => (
+              <label key={a}>
+                <input
+                  type="radio"
+                  name="availability"
+                  value={a}
+                  checked={availability === a}
+                  onChange={() => setAvailability(a)}
+                />
+                <span>{t(`availability_${a}`)}</span>
+              </label>
+            ))}
+          </div>
         </div>
-        <span className="hint">{t('featuresHint')}</span>
-      </fieldset>
-      <label className="label">
-        {t('vin')}
-        <input
-          name="vin"
-          className="field"
-          defaultValue={v['vin']}
-          maxLength={25}
-          autoCapitalize="characters"
-          spellCheck={false}
-          {...invalid('vin')}
-        />
-        {err('vin') ?? <span className="hint">{t('vinHint')}</span>}
-      </label>
-      <label className="label">
-        {t('description')}
-        <textarea
-          name="description"
-          className="field"
-          defaultValue={v['description']}
-          placeholder={t('descriptionPlaceholder')}
-          maxLength={1000}
-        />
-      </label>
+      )}
+      {availability !== 'in_ukraine' && (
+        <label className="label">
+          {order ? t('etaOrder') : t('eta')}
+          <input
+            name="etaWeeks"
+            className="field"
+            inputMode="numeric"
+            defaultValue={v['etaWeeks']}
+            {...invalid('etaWeeks')}
+          />
+          {err('etaWeeks')}
+        </label>
+      )}
+
+      {/* Only the fields above are required; the rest stays folded so an offer takes a minute. */}
+      <details className={styles.more} open={detailsOpen}>
+        <summary className={styles.moreSummary}>
+          <span>{t('more')}</span>
+          <span className="hint">{order ? t('moreHintOrder') : t('moreHint')}</span>
+        </summary>
+        <div className={styles.moreBody}>
+          <div className={styles.pair}>
+            <label className="label">
+              {order ? t('mileageMax') : t('mileage')}
+              <input
+                name="mileageKm"
+                className="field"
+                inputMode="numeric"
+                defaultValue={v['mileageKm']}
+                {...invalid('mileageKm')}
+              />
+              {err('mileageKm')}
+            </label>
+            {order ? (
+              <label className="label">
+                {t('serviceFee')}
+                <input
+                  name="serviceFeeUsd"
+                  className="field"
+                  inputMode="numeric"
+                  defaultValue={v['serviceFeeUsd']}
+                  {...invalid('serviceFeeUsd')}
+                />
+                {err('serviceFeeUsd') ?? <span className="hint">{t('serviceFeeHint')}</span>}
+              </label>
+            ) : (
+              <OriginSelect value={v['originCountry']} />
+            )}
+          </div>
+          {order && <OriginSelect value={v['originCountry']} />}
+          <label className="label">
+            {t('link')}
+            <input
+              name="link"
+              type="url"
+              className="field"
+              defaultValue={v['link']}
+              placeholder="https://"
+              {...invalid('link')}
+            />
+            {err('link') ?? (
+              <span className="hint">{order ? t('linkHintOrder') : t('linkHint')}</span>
+            )}
+          </label>
+          <fieldset className="label" style={{ border: 0, margin: 0, padding: 0 }}>
+            <legend style={{ padding: 0, marginBottom: 6 }}>
+              {order ? t('featuresOrder') : t('features')}
+            </legend>
+            <div className="choices">
+              {OFFER_FEATURES.map((feature) => (
+                <label key={feature}>
+                  <input
+                    type="checkbox"
+                    name="features"
+                    value={feature}
+                    defaultChecked={(v['features'] ?? '').split(',').includes(feature)}
+                  />
+                  <span>
+                    {(WISHES as readonly string[]).includes(feature)
+                      ? fields(`wish_${feature}` as 'wish_awd')
+                      : t(`feature_${feature}` as 'feature_warranty')}
+                    {buyerWishes.includes(feature) && (
+                      <small className={styles.asked}>{t('buyerAsked')}</small>
+                    )}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <span className="hint">{t('featuresHint')}</span>
+          </fieldset>
+          {!order && (
+            <label className="label">
+              {t('vin')}
+              <input
+                name="vin"
+                className="field"
+                defaultValue={v['vin']}
+                maxLength={25}
+                autoCapitalize="characters"
+                spellCheck={false}
+                {...invalid('vin')}
+              />
+              {err('vin') ?? <span className="hint">{t('vinHint')}</span>}
+            </label>
+          )}
+          <label className="label">
+            {t('description')}
+            <textarea
+              name="description"
+              className="field"
+              defaultValue={v['description']}
+              placeholder={order ? t('descriptionPlaceholderOrder') : t('descriptionPlaceholder')}
+              maxLength={1000}
+            />
+          </label>
+        </div>
+      </details>
+
       <button type="submit" className="btn btn-yellow btn-lg btn-block" disabled={pending}>
         {pending ? t('submitting') : isUpdate ? t('update') : t('submit')}
       </button>
@@ -237,5 +308,24 @@ export function OfferForm({ requestId, defaults, isUpdate, buyerWishes, template
         {t('rules')}
       </span>
     </form>
+  );
+}
+
+function OriginSelect({ value }: { value: string | undefined }) {
+  const t = useTranslations('offer');
+  const p = useTranslations('profile');
+  return (
+    <label className="label">
+      {t('origin')}
+      <select name="originCountry" className="field" defaultValue={value ?? ''}>
+        <option value="">{t('originNone')}</option>
+        <option value="ua">{t('origin_ua')}</option>
+        {SOURCE_COUNTRIES.map((c) => (
+          <option key={c} value={c}>
+            {p(`country_${c}`)}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }

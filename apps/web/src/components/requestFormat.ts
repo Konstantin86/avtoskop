@@ -16,6 +16,14 @@ export function formatNumber(locale: string, amount: number): string {
   return new Intl.NumberFormat(locale === 'uk' ? 'uk-UA' : 'en-US').format(amount);
 }
 
+// "$22 000" or, for an order quoted as a range, "$22 000–25 000".
+export function priceLabel(locale: string, priceUsd: number, priceMaxUsd?: number | null): string {
+  const from = formatNumber(locale, priceUsd);
+  return priceMaxUsd && priceMaxUsd > priceUsd
+    ? `$${from}–${formatNumber(locale, priceMaxUsd)}`
+    : `$${from}`;
+}
+
 export function timeAgo(locale: string, date: Date): string {
   const rtf = new Intl.RelativeTimeFormat(locale === 'uk' ? 'uk' : 'en', { numeric: 'auto' });
   const minutes = Math.round((date.getTime() - Date.now()) / 60_000);

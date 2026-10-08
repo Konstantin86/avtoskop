@@ -4,7 +4,7 @@ import { BrandLogo } from '@/components/BrandLogo';
 import { formatNumber, fuelsLabel, yearsLabel } from '@/components/requestFormat';
 import { Link, redirect } from '@/i18n/navigation';
 import { getCurrentUser } from '@/server/auth';
-import { getOwnOffer, listOfferTemplates } from '@/server/offers';
+import { getOwnOffer, listOfferTemplates, offerFormValues } from '@/server/offers';
 import { getPublicRequest } from '@/server/requests';
 import { OfferForm } from './OfferForm';
 import styles from '../../../sellers/forms.module.css';
@@ -67,19 +67,7 @@ export default async function OfferPage({ params }: Props) {
     ? []
     : await listOfferTemplates(user.seller.id, { brand: request.brand, model: request.model });
   const defaults: Record<string, string> = existing
-    ? {
-        car: existing.car,
-        year: String(existing.year),
-        mileageKm: String(existing.mileageKm),
-        priceUsd: String(existing.priceUsd),
-        availability: existing.availability,
-        etaWeeks: existing.etaWeeks ? String(existing.etaWeeks) : '',
-        originCountry: existing.originCountry ?? '',
-        link: existing.link ?? '',
-        description: existing.description,
-        features: existing.features.join(','),
-        vin: existing.vin ?? '',
-      }
+    ? offerFormValues(existing)
     : { car: `${request.brand} ${request.model}`, availability: 'in_ukraine' };
 
   const regions = (await getMessages()).regions as Record<string, string>;

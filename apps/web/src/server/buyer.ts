@@ -45,6 +45,8 @@ export async function listRequestOffers(requestId: string) {
         year: offers.year,
         mileageKm: offers.mileageKm,
         priceUsd: offers.priceUsd,
+        priceMaxUsd: offers.priceMaxUsd,
+        serviceFeeUsd: offers.serviceFeeUsd,
         availability: offers.availability,
         etaWeeks: offers.etaWeeks,
         originCountry: offers.originCountry,

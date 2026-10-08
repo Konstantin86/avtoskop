@@ -287,3 +287,12 @@
 .statusOff {
   color: var(--muted);
 }
+
+.orderNote {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--blue-soft);
+  font-size: 14px;
+  line-height: 1.5;
+}

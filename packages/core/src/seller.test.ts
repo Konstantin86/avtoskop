@@ -230,3 +230,44 @@ describe('offer VIN', () => {
     expect(result.error?.issues[0]?.path).toEqual(['vin']);
   });
 });
+
+describe('offerInput for orders and the short form', () => {
+  const base = { car: 'Toyota RAV4 Hybrid', year: '2021', priceUsd: '22000' };
+
+  it('needs only car, year, price and availability', () => {
+    const o = offerInput.parse({ ...base, availability: 'in_ukraine', mileageKm: '' });
+    expect(o.mileageKm).toBeUndefined();
+  });
+
+  it('keeps a price range and fee for an order, and drops the VIN', () => {
+    const o = offerInput.parse({
+      ...base,
+      availability: 'to_order',
+      etaWeeks: '8',
+      priceMaxUsd: '25000',
+      serviceFeeUsd: '1000',
+      vin: 'JTMWRREV0JD123456',
+    });
+    expect(o).toMatchObject({ priceUsd: 22000, priceMaxUsd: 25000, serviceFeeUsd: 1000 });
+    expect(o.vin).toBeUndefined();
+  });
+
+  it('rejects a range that goes down and a fee above the price', () => {
+    const order = { ...base, availability: 'to_order', etaWeeks: '8' };
+    const low = offerInput.safeParse({ ...order, priceMaxUsd: '20000' });
+    expect(low.error!.issues[0]!.path).toEqual(['priceMaxUsd']);
+    const fee = offerInput.safeParse({ ...order, serviceFeeUsd: '30000' });
+    expect(fee.error!.issues[0]!.path).toEqual(['serviceFeeUsd']);
+  });
+
+  it('ignores a range and fee on a car that already exists', () => {
+    const o = offerInput.parse({
+      ...base,
+      availability: 'in_ukraine',
+      priceMaxUsd: '25000',
+      serviceFeeUsd: '1000',
+    });
+    expect(o.priceMaxUsd).toBeUndefined();
+    expect(o.serviceFeeUsd).toBeUndefined();
+  });
+});

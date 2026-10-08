@@ -237,7 +237,7 @@
     "rule3": "Buyer contacts only with the buyer's consent",
     "rule4": "Phone check for everyone, plus registration details for companies",
     "priceTitle": "What it costs",
-    "priceText": "Free during the pilot. Later you'll pay only when a buyer has chosen to share their number with you.",
+    "priceText": "Free until 1 April 2027. After that you'll pay a small amount only for a buyer who chose to share their number with you. Getting requests and sending offers is always free. We'll announce the price at least 30 days ahead, and it won't apply to buyers who shared their number before that.",
     "telegramTitle": "New requests in Telegram",
     "telegramText": "The bot sends new requests for your brands and regions. Set them up in your profile.",
     "signInLink": "Sign in or create a seller profile",
@@ -246,7 +246,7 @@
     "whyBefore": "The usual ads",
     "whyAfter": "With Avtoskop",
     "why1Before": "You pay for views, even when nobody calls",
-    "why1After": "Free during the pilot",
+    "why1After": "Free until 1 April 2027. Then you pay only for a buyer who shared their number with you",
     "why2Before": "People call \"just to ask\"",
     "why2After": "The buyer named the model, years, budget and region, and confirmed their number in Telegram",
     "why3Before": "You hunt for who wants to buy what",
@@ -382,7 +382,7 @@
     "error_generic": "Please check the highlighted fields.",
     "error_car": "Enter the car",
     "error_year": "Enter the year",
-    "error_mileageKm": "Enter the mileage",
+    "error_mileageKm": "Check the mileage",
     "error_priceUsd": "Enter a price from $500",
     "error_etaWeeks": "Enter delivery time for a car not yet in Ukraine",
     "error_link": "The link must start with https://",
@@ -405,7 +405,30 @@
     "error_notAllowed": "This buyer accepts offers only from certain seller types.",
     "copyFrom": "Copy from a previous offer",
     "copyPick": "Choose an offer…",
-    "copyHint": "Fills the form with that offer's details. Check and change anything before sending."
+    "copyHint": "Fills the form with that offer's details. Check and change anything before sending.",
+    "kind": "What you offer",
+    "kind_car": "A specific car",
+    "kind_order": "Sourcing to order",
+    "kindHint_car": "The car exists: in Ukraine or on its way.",
+    "kindHint_order": "There's no specific car yet: you'll find one for this request, for example at an auction.",
+    "carOrder": "What you'll find",
+    "yearOrder": "Year from",
+    "priceFrom": "All-in price from, $",
+    "priceTo": "to, $",
+    "optional": "optional",
+    "priceHintOrder": "Estimated full price for the buyer: car, delivery, customs, paperwork and your fee",
+    "etaOrder": "Time to Ukraine, weeks",
+    "more": "More details",
+    "moreHint": "Mileage, origin, VIN, features, photos. Optional, but such offers get picked more often",
+    "moreHintOrder": "Mileage, your fee, origin, guarantees. Optional",
+    "mileageMax": "Mileage up to, km",
+    "serviceFee": "Of which your fee, $",
+    "serviceFeeHint": "Buyers trust a price more when they see what it is made of",
+    "linkHintOrder": "Your website, cars you have imported, or an auction lot (optional).",
+    "featuresOrder": "What you guarantee",
+    "descriptionPlaceholderOrder": "How you find cars, what the price includes, contract terms…",
+    "error_priceMaxUsd": "The upper price must not be below the lower one",
+    "error_serviceFeeUsd": "Your fee must be below the price"
   },
   "account": {
     "title": "Account",
@@ -518,7 +541,10 @@
     "extend": "Extend by 30 days",
     "statusPublished": "Published ✓",
     "statusWaiting": "Waiting for Telegram confirmation",
-    "statusClosed": "Closed"
+    "statusClosed": "Closed",
+    "mileageUpTo": "mileage up to {km} km",
+    "serviceFee": "incl. ${amount} fee",
+    "orderNote": "Sourcing to order: the seller will find this car for you. The price is an estimate, and they'll show the specific car with its VIN before the deal."
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
@@ -553,7 +579,7 @@
       "sections": [
         {
           "title": "1. Who we are",
-          "body": "Avtoskop (avtoskop.com.ua) is an online service where buyers describe the car they want and sellers send them offers. The service is provided by {operator}. Contact: {email}. The service is currently a free pilot for everyone."
+          "body": "Avtoskop (avtoskop.com.ua) is an online service where buyers describe the car they want and sellers send them offers. The service is provided by {operator}. Contact: {email}. The service is free for buyers. For sellers it is free until 1 April 2027; after that a fee applies only for buyers who chose to share their number with the seller, and we will announce the amount at least 30 days ahead."
         },
         {
           "title": "2. Who can use it",
@@ -679,7 +705,7 @@
     "homeLine": "Importers, dealers and owners. Your number stays hidden.",
     "sellersEyebrow": "For importers, dealers and sellers",
     "sellersTitle": "Buyers have already said what they want",
-    "sellersLine": "New requests in Telegram. Free during the pilot.",
+    "sellersLine": "New requests in Telegram. Free until 1 April 2027.",
     "requestEyebrow": "Looking for a car",
     "requestFooter": "Have this car? Make an offer on avtoskop.com.ua"
   },
@@ -706,7 +732,7 @@
       {
         "id": "free",
         "q": "Is it really free?",
-        "a": "Yes. Avtoskop is free for buyers. During the pilot it's free for sellers too."
+        "a": "Yes. Avtoskop is always free for buyers. For sellers it is free until 1 April 2027."
       },
       {
         "id": "after",
@@ -738,7 +764,7 @@
       {
         "id": "seller-cost",
         "q": "What does it cost sellers?",
-        "a": "Nothing during the pilot. Later you'll pay only when a buyer chooses to share their number with you."
+        "a": "Free until 1 April 2027. After that you'll pay a small amount only for a buyer who chose to share their number with you. Getting requests and sending offers is always free. We'll announce the price at least 30 days ahead, and it won't apply to buyers who shared their number before that."
       },
       {
         "id": "seller-number",
