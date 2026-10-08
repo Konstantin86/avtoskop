@@ -194,6 +194,8 @@
   stroke-width: 3;
   stroke-linecap: round;
   transform-origin: 188px 58px;
+  /* Rests at the edge of the yellow wedge, also when motion is reduced. */
+  transform: rotate(72deg);
 }
 
 .watchHub {
