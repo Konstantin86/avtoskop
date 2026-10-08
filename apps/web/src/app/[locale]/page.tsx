@@ -5,16 +5,9 @@ import { CarDrawing, RoadScene } from '@/components/CarScene';
 import { Compare } from '@/components/Compare';
 import { Faq, type FaqItem } from '@/components/Faq';
 import { SampleOffer } from '@/components/SampleOffer';
+import { HowItWorks } from '@/components/HowItWorks';
 import { StickyCta } from '@/components/StickyCta';
-import {
-  CarIcon,
-  CheckIcon,
-  LockIcon,
-  OffersIcon,
-  PersonIcon,
-  PhoneCheckIcon,
-  TelegramIcon,
-} from '@/components/icons';
+import { CheckIcon, LockIcon, PersonIcon, TelegramIcon } from '@/components/icons';
 import { RegionSelect } from '@/components/RegionSelect';
 import { Link } from '@/i18n/navigation';
 import { getBrandOptions } from '@/server/brands';
@@ -33,12 +26,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const [brands, live] = await Promise.all([getBrandOptions(), liveNumbers()]);
   const year = new Date().getFullYear();
 
-  const steps = [1, 2, 3] as const;
-  const stepIcons = {
-    1: <CarIcon size={30} />,
-    2: <OffersIcon size={30} />,
-    3: <PhoneCheckIcon size={30} />,
-  };
   const trust = [
     [CheckIcon, 'perk1'],
     [TelegramIcon, 'perk2'],
@@ -128,21 +115,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <RoadScene />
 
-      <section id="how" className={styles.how}>
-        <h2 className={styles.sectionTitle}>{t('howTitle')}</h2>
-        <div className={styles.steps}>
-          {steps.map((n) => (
-            <div key={n} className={`card ${styles.step}`}>
-              <div className={styles.stepTop}>
-                <span className={styles.stepNum}>{n}</span>
-                <span className={styles.stepIcon}>{stepIcons[n]}</span>
-              </div>
-              <h3 className={styles.stepTitle}>{t(`step${n}Title`)}</h3>
-              <p className={styles.stepText}>{t(`step${n}Text`)}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <HowItWorks
+        title={t('howTitle')}
+        steps={[
+          { title: t('step1Title'), text: t('step1Text') },
+          { title: t('step2Title'), text: t('step2Text') },
+          { title: t('step3Title'), text: t('step3Text') },
+          { title: t('step4Title'), text: t('step4Text') },
+        ]}
+        minutes={t('stepMinutes')}
+        outsideLabel={t('step4Badge')}
+      />
 
       <SampleOffer locale={locale} />
 

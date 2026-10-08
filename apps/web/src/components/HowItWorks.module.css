@@ -1,0 +1,558 @@
+.how {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-bottom: 56px;
+  scroll-margin-top: 96px;
+}
+
+.title {
+  font-size: 32px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 44px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  position: relative;
+  display: flex;
+}
+
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 20px 24px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The deal happens outside the service: a quieter, dashed card. */
+.outside {
+  background: transparent;
+  border: 1.5px dashed var(--line-strong);
+  box-shadow: none;
+}
+
+.scene {
+  margin: -4px -4px 4px;
+  border-radius: 14px;
+  background: var(--blue-soft);
+  overflow: hidden;
+}
+
+.outside .scene {
+  background: var(--surface-muted);
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.num {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--blue-solid);
+  color: var(--on-blue);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.outside .num {
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stepTitle {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.stepText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* Arrow in the gap to the right of each card but the last. */
+.arrow {
+  position: absolute;
+  top: 34%;
+  right: -46px;
+  width: 48px;
+  height: 24px;
+  overflow: visible;
+}
+
+.arrowLine,
+.arrowHead {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arrowLine {
+  stroke-dasharray: 4 6;
+}
+
+/* Scene colours */
+.paper {
+  fill: var(--surface);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+}
+
+.soft {
+  fill: var(--line);
+}
+
+.field {
+  fill: var(--surface);
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+
+.ink {
+  fill: var(--ink);
+  opacity: 0.75;
+}
+
+.price {
+  fill: var(--blue);
+}
+
+.carDot {
+  fill: var(--blue-soft);
+  stroke: var(--blue);
+  stroke-width: 2;
+}
+
+.penBody {
+  fill: var(--blue-solid);
+}
+
+.penTip {
+  fill: var(--yellow);
+}
+
+.watchFace {
+  fill: var(--surface);
+  stroke: var(--blue);
+  stroke-width: 4;
+}
+
+.watchButton {
+  fill: var(--blue);
+}
+
+.watchArc {
+  fill: var(--yellow);
+}
+
+.watchHand {
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform-origin: 188px 58px;
+}
+
+.watchHub {
+  fill: var(--ink);
+}
+
+.watchText {
+  fill: var(--blue);
+  font-size: 17px;
+  font-weight: 800;
+  font-family: inherit;
+}
+
+.planeBody {
+  fill: var(--blue);
+}
+
+.planeFold {
+  fill: var(--blue-dark);
+}
+
+.newDot {
+  fill: var(--yellow);
+  stroke: var(--surface);
+  stroke-width: 3;
+}
+
+.chosenCard {
+  fill: var(--surface);
+  stroke: var(--blue);
+  stroke-width: 3;
+}
+
+.check {
+  fill: var(--good);
+}
+
+.checkMark {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.numberPill {
+  fill: var(--yellow);
+}
+
+.numberText {
+  fill: var(--on-yellow);
+  opacity: 0.8;
+}
+
+.lockOpen {
+  fill: none;
+  stroke: var(--on-yellow);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.personA {
+  fill: var(--blue);
+}
+
+.personB {
+  fill: var(--yellow);
+}
+
+.armA,
+.armB {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.armA {
+  stroke: var(--blue);
+}
+
+.armB {
+  stroke: var(--yellow);
+}
+
+.hands {
+  fill: var(--surface);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.table {
+  fill: var(--line-strong);
+}
+
+.sign {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.keyRing {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.keyBlade {
+  fill: var(--ink);
+}
+
+/* Motion: steps appear one after another, each arrow draws towards the next step. */
+.item {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.shown .item {
+  animation: rise 0.5s ease-out both;
+  animation-delay: calc(var(--i) * 0.35s);
+}
+
+.arrowLine {
+  stroke-dashoffset: 40;
+}
+
+.shown .arrowLine {
+  animation: flow 1.2s linear infinite;
+  animation-delay: calc(var(--i) * 0.35s + 0.35s);
+}
+
+.arrowHead {
+  opacity: 0;
+}
+
+.shown .arrowHead {
+  animation: fade 0.3s ease-out both;
+  animation-delay: calc(var(--i) * 0.35s + 0.35s);
+}
+
+.shown .typing rect {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: type 0.5s ease-out both;
+}
+
+.shown .typing rect:nth-child(1) {
+  animation-delay: 0.4s;
+}
+
+.shown .typing rect:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.shown .typing rect:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.shown .pen {
+  animation: write 0.6s ease-in-out 3 alternate 0.4s;
+}
+
+.shown .watchHand {
+  animation: tick 1.6s ease-in-out both 0.4s;
+}
+
+.bubble {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.shown .bubble {
+  animation: pop 0.4s ease-out both;
+}
+
+.shown .newDot {
+  animation: pop 0.4s ease-out both 1.6s;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.shown .plane {
+  animation: fly 0.8s ease-out both 0.45s;
+}
+
+.chosen {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.shown .chosen {
+  animation: choose 0.5s ease-out both 1.2s;
+}
+
+.shown .check,
+.shown .checkMark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop 0.35s ease-out both 1.5s;
+}
+
+.shown .number {
+  animation: slideUp 0.5s ease-out both 1.7s;
+}
+
+.shown .shake {
+  animation: shake 0.5s ease-in-out 3 alternate 1.6s;
+}
+
+@keyframes rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flow {
+  from {
+    stroke-dashoffset: 20;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes type {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes write {
+  to {
+    transform: translate(-6px, 4px);
+  }
+}
+
+@keyframes tick {
+  from {
+    transform: rotate(-90deg);
+  }
+  to {
+    transform: rotate(72deg);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fly {
+  from {
+    opacity: 0;
+    transform: translate(-30px, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes choose {
+  50% {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shake {
+  to {
+    transform: translateY(4px);
+  }
+}
+
+/* Narrower screens: one column, the scene beside the text, arrows pointing down. */
+@media (max-width: 1023px) {
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 640px;
+    gap: 40px;
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    column-gap: 18px;
+    row-gap: 6px;
+    align-items: start;
+  }
+
+  .scene {
+    grid-row: 1 / 4;
+    margin: 0;
+  }
+
+  .arrow {
+    top: auto;
+    bottom: -34px;
+    left: calc(50% - 24px);
+    right: auto;
+    transform: rotate(90deg);
+  }
+
+  .title {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    grid-template-columns: 112px minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .stepTitle {
+    font-size: 17px;
+  }
+
+  .stepText {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .arrowHead {
+    opacity: 1;
+    transform: none;
+  }
+
+  .shown *,
+  .shown .item {
+    animation: none !important;
+  }
+}

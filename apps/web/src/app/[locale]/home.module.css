@@ -74,54 +74,8 @@
   color: var(--blue);
 }
 
-.how {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding-bottom: 56px;
-  scroll-margin-top: 96px;
-}
-
 .sectionTitle {
   font-size: 32px;
-}
-
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-
-.step {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border-radius: 16px;
-}
-
-.stepNum {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--blue-soft);
-  color: var(--blue-dark);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stepTitle {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.stepText {
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--muted);
 }
 
 .trust {
@@ -202,7 +156,6 @@
     padding: 20px;
   }
 
-  .steps,
   .trust {
     grid-template-columns: 1fr;
   }
@@ -221,17 +174,6 @@
   .pair {
     grid-template-columns: 1fr;
   }
-}
-
-.stepTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.stepIcon {
-  color: var(--blue);
-  display: flex;
 }
 
 .finalCar {
