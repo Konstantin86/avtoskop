@@ -101,16 +101,32 @@ export function DealArt() {
       <path className={styles.personA} d="M20 124 Q20 74 48 68 Q76 74 76 124 Z" />
       <circle className={styles.personB} cx="192" cy="40" r="15" />
       <path className={styles.personB} d="M164 124 Q164 74 192 68 Q220 74 220 124 Z" />
-      {/* Handshake in the middle */}
+      {/* Handshake in each person's colour: blue fingers wrap over the yellow palm */}
       <g className={styles.shake}>
-        <path className={styles.armA} d="M66 90 L108 74" />
-        <path className={styles.armB} d="M174 90 L132 74" />
-        <rect className={styles.handB} x="114" y="62" width="26" height="20" rx="10" />
-        <rect className={styles.handA} x="100" y="66" width="28" height="20" rx="10" />
-        <path className={styles.thumb} d="M110 66 q6 -8 12 -4" />
+        <path className={styles.armA} d="M64 96 L106 86" />
+        <path className={styles.armB} d="M176 96 L134 86" />
+        <g transform="translate(120 84) scale(0.62) translate(-120 -84)">
+          <path
+            className={styles.handYellow}
+            d="M150 76 L118 74 Q108 74 108 83 Q108 92 118 92 L150 92 Z"
+          />
+          <path className={styles.handBlue} d="M90 76 L114 73 L114 95 L90 92 Z" />
+          {/* Only fingers and thumbs get thin gaps; palms join their sleeves seamlessly. */}
+          <g className={styles.fingers}>
+            <path
+              className={styles.handYellow}
+              d="M142 77 Q136 66 124 69 Q119 70.5 122 74 L134 76"
+            />
+            <rect className={styles.handBlue} x="108" y="73" width="28" height="6" rx="3" />
+            <rect className={styles.handBlue} x="108" y="78.5" width="30" height="6" rx="3" />
+            <rect className={styles.handBlue} x="108" y="84" width="29" height="6" rx="3" />
+            <rect className={styles.handBlue} x="108" y="89.5" width="25" height="6" rx="3" />
+            <path className={styles.handBlue} d="M100 76 Q104 66 116 67 Q121 68 118 72 L106 76" />
+          </g>
+        </g>
       </g>
       <g className={styles.sparks}>
-        <path d="M120 44 v-10 M104 50 l-7 -7 M136 50 l7 -7" />
+        <path d="M120 54 v-10 M104 60 l-7 -7 M136 60 l7 -7" />
       </g>
       {/* Contract and car key on the table */}
       <rect className={styles.table} x="16" y="124" width="208" height="8" rx="4" />

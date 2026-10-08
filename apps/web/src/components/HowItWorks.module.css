@@ -263,10 +263,17 @@
   fill: var(--yellow);
 }
 
+/* Flat hands; thin gaps in the scene's background colour separate the fingers. */
+.fingers {
+  stroke: var(--surface-muted);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
 .armA,
 .armB {
   fill: none;
-  stroke-width: 14;
+  stroke-width: 11;
   stroke-linecap: round;
 }
 
@@ -278,25 +285,12 @@
   stroke: var(--yellow);
 }
 
-.handA,
-.handB {
-  stroke: var(--surface);
-  stroke-width: 2.5;
-}
-
-.handA {
+.handBlue {
   fill: var(--blue);
 }
 
-.handB {
+.handYellow {
   fill: var(--yellow);
-}
-
-.thumb {
-  fill: none;
-  stroke: var(--blue);
-  stroke-width: 6;
-  stroke-linecap: round;
 }
 
 .sparks {

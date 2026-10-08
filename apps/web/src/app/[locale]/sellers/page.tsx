@@ -99,7 +99,7 @@ export default async function SellersPage({ params }: Props) {
         lead={t('whyLead')}
         before={t('whyBefore')}
         after={t('whyAfter')}
-        rows={([1, 2, 3, 4, 5] as const).map((n) => ({
+        rows={([1, 6, 2, 3, 4, 5] as const).map((n) => ({
           before: t(`why${n}Before`),
           after: t(`why${n}After`),
         }))}
