@@ -219,6 +219,9 @@ export const sellers = pgTable('sellers', {
   // Optional alert filters: no requests below this budget, or only for cars older than this year.
   budgetMinUsd: integer('budget_min_usd'),
   yearMin: integer('year_min'),
+  // What the seller sent to get verified: a company code or a link to their site or page.
+  verifyEvidence: text('verify_evidence').notNull().default(''),
+  verifyRequestedAt: timestamp('verify_requested_at', { withTimezone: true }),
   // pending -> verified by an admin; banned sellers can't send offers and their offers are hidden.
   status: text('status').notNull().default('pending'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -338,6 +341,9 @@ export const sellerReviews = pgTable(
       .references(() => buyerRequests.id, { onDelete: 'cascade' }),
     rating: integer('rating').notNull(),
     comment: text('comment').notNull().default(''),
+    // One public reply from the seller, shown under the review.
+    sellerReply: text('seller_reply').notNull().default(''),
+    sellerRepliedAt: timestamp('seller_replied_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index('seller_reviews_seller_idx').on(t.sellerId, t.createdAt)],
@@ -354,6 +360,9 @@ export const reports = pgTable(
     reason: text('reason').notNull(),
     comment: text('comment').notNull().default(''),
     status: text('status').notNull().default('open'),
+    // The seller's side of the story, shown next to the complaint on the admin page.
+    sellerReply: text('seller_reply').notNull().default(''),
+    sellerRepliedAt: timestamp('seller_replied_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [

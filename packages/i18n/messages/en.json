@@ -518,7 +518,6 @@
     "forYouEmpty": "No new requests for your brands and regions yet. We'll send them to Telegram as soon as they appear.",
     "forYouOffer": "Make an offer",
     "forYouHint": "Matched to the brands, regions and seller type in your profile.",
-    "verifyHint": "Want the \"Verified seller\" badge? Send us your company code (EDRPOU) or a link to your website or social page that shows your cars, and we'll check your profile, usually the same day.",
     "verifyWrite": "Write to us",
     "requestClosed": "Request closed",
     "closedBecause_found_here": "The buyer found a car through Avtoskop",
@@ -531,7 +530,24 @@
     "withdrawnSold": "Withdrawn: car sold",
     "restoreOffer": "Put back",
     "yourRating": "Your rating: ★ {average} · {count, plural, one {# review} other {# reviews}}",
-    "publicPage": "How buyers see you"
+    "publicPage": "How buyers see you",
+    "stats": "Last 30 days: sent {sent} · viewed {viewed} · number shared {shared}",
+    "verifyAsk": "Get the \"Verified seller\" badge: your company code (EDRPOU) or a link to your website or a page with your cars",
+    "verifyPlaceholder": "For example, 12345678 or instagram.com/…",
+    "verifySend": "Send for review",
+    "verifySent": "Badge request sent ({evidence}). We usually check the same day.",
+    "complaintsTitle": "Complaints about your offers",
+    "complaintsHint": "Give your side. We look at both sides before any decision.",
+    "complaintPlaceholder": "What happened from your side?",
+    "complaintSend": "Send reply",
+    "complaintReplied": "Your reply was sent: «{reply}»",
+    "reviewsTitle": "Reviews of you",
+    "reviewReply": "Reply publicly",
+    "reviewReplyEdit": "Edit reply",
+    "reviewReplyPlaceholder": "All buyers will see your reply on your page",
+    "reviewReplySave": "Save reply",
+    "yourReply": "Your reply: «{reply}»",
+    "buyerAsks": "The buyer asks for: {items}"
   },
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call or message the buyer soon.",
@@ -551,7 +567,8 @@
     "requestClosed": "🔒 The buyer closed the request {request}.{reason, select, found_here {\nThey found a car through Avtoskop.} found_elsewhere {\nThey found a car elsewhere.} not_looking {\nThey are no longer looking.} other {}}\n\nYour offer: {offer}\nThanks for replying. New requests for your brands will keep coming here.",
     "offerViewed": "👀 The buyer viewed your offer for the request {request}:\n{offer}\n\nIf they share their number with you, it will arrive here.",
     "newReview": "⭐ A buyer reviewed you: {rating} out of 5 (request {request}).{comment}",
-    "buyerAsks": "❓ The buyer of {request} asks for {ask, select, vin {the car's VIN} photos {more photos} other {permission to have the car checked at a garage}} on your offer {offer}.\n\nAdd it to your offer and the buyer will get the update: {link}"
+    "buyerAsks": "❓ The buyer of {request} asks for {ask, select, vin {the car's VIN} photos {more photos} other {permission to have the car checked at a garage}} on your offer {offer}.\n\nAdd it to your offer and the buyer will get the update: {link}",
+    "reportReceived": "⚠️ A complaint was made about your offer {offer}: {reason}.{comment}\n\nGive your side in your account: we look at both sides before any decision. {link}"
   },
   "my": {
     "title": "Your request",
@@ -849,7 +866,10 @@
     "statsSources": "Traffic sources (30 days)",
     "statsPages": "Pages (30 days)",
     "statsEmpty": "No data yet.",
-    "statsNote": "Views are counted without cookies or IP addresses. To see which posts bring people, add ?utm_source=instagram (or threads, x, telegram) to your links."
+    "statsNote": "Views are counted without cookies or IP addresses. To see which posts bring people, add ?utm_source=instagram (or threads, x, telegram) to your links.",
+    "sellerReply": "Seller reply: «{reply}»",
+    "noSellerReply": "The seller has not replied yet.",
+    "verifyEvidence": "For verification: {evidence}"
   },
   "og": {
     "brand": "Avtoskop",
@@ -982,6 +1002,7 @@
     "noReviews": "No reviews yet",
     "reviews": "{count, plural, one {# review} other {# reviews}}",
     "reviewsTitle": "Buyer reviews",
-    "reviewsNote": "Only a buyer who found a car through Avtoskop and shared their number with this seller can leave a review."
+    "reviewsNote": "Only a buyer who found a car through Avtoskop and shared their number with this seller can leave a review.",
+    "sellerReply": "Seller reply:"
   }
 }

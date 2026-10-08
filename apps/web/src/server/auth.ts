@@ -40,6 +40,8 @@ export const getCurrentUser = cache(async () => {
         serviceRegions: sellers.serviceRegions,
         alerts: sellers.alerts,
         budgetMinUsd: sellers.budgetMinUsd,
+        verifyEvidence: sellers.verifyEvidence,
+        verifyRequestedAt: sellers.verifyRequestedAt,
         yearMin: sellers.yearMin,
       },
     })

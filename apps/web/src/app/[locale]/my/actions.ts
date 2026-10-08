@@ -143,10 +143,25 @@ export async function reportOfferAction(formData: FormData): Promise<void> {
     comment: field(formData, 'comment'),
   });
   if (!found || !parsed.success) return;
-  await db
+  const [saved] = await db
     .insert(reports)
     .values({ offerId: found.offer.id, ...parsed.data })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .returning({ id: reports.id });
+  // The seller hears about it and can answer in their account before any decision.
+  if (saved) {
+    const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
+    const m = await getTranslations({ locale: 'uk', namespace: 'my' });
+    await sendTelegram(
+      found.offer.telegramId,
+      t('reportReceived', {
+        offer: `${found.offer.car}, ${found.offer.year}`,
+        reason: m(`reason_${parsed.data.reason}` as 'reason_other'),
+        comment: parsed.data.comment ? `\n«${redactContacts(parsed.data.comment)}»` : '',
+        link: siteUrl() + localePath('uk', '/account'),
+      }),
+    );
+  }
   await db
     .update(offers)
     .set({ status: 'declined' })

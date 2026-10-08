@@ -156,3 +156,77 @@
   gap: 6px;
   margin-top: 8px;
 }
+
+.stats {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.verifyForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.verifyRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.complaint {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.complaintReason {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.replyForm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.replyForm textarea {
+  width: 100%;
+  min-height: 70px;
+}
+
+.stars {
+  color: #e0a800;
+  letter-spacing: 1px;
+}
+
+.starsOff {
+  color: var(--line-strong);
+}
+
+.reviewText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.replyBox summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.asks {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--yellow-ink);
+}

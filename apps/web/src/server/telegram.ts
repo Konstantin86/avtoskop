@@ -55,3 +55,12 @@ export function botStartLink(payload: string): string | null {
 export function siteUrl(): string {
   return (process.env['SITE_URL'] ?? 'http://localhost:3000').replace(/\/$/, '');
 }
+
+// Sends a note to every admin listed in ADMIN_TELEGRAM_IDS (complaint replies, badge requests).
+export async function notifyAdmins(text: string): Promise<void> {
+  const ids = (process.env['ADMIN_TELEGRAM_IDS'] ?? '')
+    .split(',')
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isInteger(n) && n > 0);
+  for (const id of ids) await sendTelegram(id, text);
+}

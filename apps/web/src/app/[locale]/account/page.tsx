@@ -8,9 +8,16 @@ import { listUserRequests } from '@/server/buyer';
 import { feedbackUrl } from '@/server/contactLinks';
 import { listOwnOffers } from '@/server/offers';
 import { sellerRatings } from '@/server/reviews';
+import { listSellerReports, listSellerReviews, sellerStats } from '@/server/sellerAccount';
+import { SubmitButton } from '@/components/SubmitButton';
 import { listRequestsForSeller } from '@/server/requests';
 import { signOutAction } from '../login/actions';
-import { setOfferWithdrawnAction } from '../sellers/actions';
+import {
+  replyToReportAction,
+  replyToReviewAction,
+  requestVerifyAction,
+  setOfferWithdrawnAction,
+} from '../sellers/actions';
 import styles from '../sellers/forms.module.css';
 import me from './account.module.css';
 
@@ -57,6 +64,14 @@ export default async function AccountPage({ params, searchParams }: Props) {
   ]);
   const feedback = feedbackUrl();
   const rating = seller ? (await sellerRatings([seller.id])).get(seller.id) : undefined;
+  const [stats, complaints, reviews] = seller
+    ? await Promise.all([
+        sellerStats(seller.id),
+        listSellerReports(seller.id),
+        listSellerReviews(seller.id),
+      ])
+    : [null, [], []];
+  const my = await getTranslations('my');
   const regions = (await getMessages()).regions as Record<string, string>;
   const sent = (await searchParams)['sent'];
 
@@ -173,15 +188,115 @@ export default async function AccountPage({ params, searchParams }: Props) {
           </Link>
         </div>
         <div className={me.meta}>{seller.alerts ? t('alertsOn') : t('alertsOff')}</div>
-        {seller.status === 'pending' && feedback && (
-          <p className={me.verify}>
-            {t('verifyHint')}{' '}
-            <a href={feedback} target="_blank" rel="noopener noreferrer">
-              {t('verifyWrite')} →
-            </a>
-          </p>
+        {stats && stats.sent > 0 && (
+          <div className={me.stats}>
+            {t('stats', { sent: stats.sent, viewed: stats.viewed, shared: stats.shared })}
+          </div>
         )}
+        {seller.status === 'pending' &&
+          (seller.verifyRequestedAt ? (
+            <p className={me.verify}>{t('verifySent', { evidence: seller.verifyEvidence })}</p>
+          ) : (
+            <form action={requestVerifyAction} className={me.verifyForm}>
+              <label className="label">
+                {t('verifyAsk')}
+                <input
+                  name="evidence"
+                  className="field"
+                  maxLength={300}
+                  placeholder={t('verifyPlaceholder')}
+                  required
+                />
+              </label>
+              <div className={me.verifyRow}>
+                <SubmitButton className="btn btn-secondary btn-sm">{t('verifySend')}</SubmitButton>
+                {feedback && (
+                  <a
+                    href={feedback}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={me.editLink}
+                  >
+                    {t('verifyWrite')} →
+                  </a>
+                )}
+              </div>
+            </form>
+          ))}
       </section>
+
+      {complaints.length > 0 && (
+        <section className={me.offers}>
+          <h2 className={me.offersTitle}>{t('complaintsTitle')}</h2>
+          <p className={me.hint}>{t('complaintsHint')}</p>
+          <ul className={me.list}>
+            {complaints.map((c) => (
+              <li key={c.id} className={`card ${me.complaint}`}>
+                <div className={me.itemTitle}>
+                  {c.requestBrand} {c.requestModel}: {c.car}, {c.year}
+                </div>
+                <div className={me.complaintReason}>
+                  {my(`reason_${c.reason}` as 'reason_other')}
+                  {c.comment && <span className={me.meta}> «{c.comment}»</span>}
+                </div>
+                {c.sellerReply ? (
+                  <p className={me.meta}>{t('complaintReplied', { reply: c.sellerReply })}</p>
+                ) : (
+                  <form action={replyToReportAction} className={me.replyForm}>
+                    <input type="hidden" name="reportId" value={c.id} />
+                    <textarea
+                      name="reply"
+                      className="field"
+                      maxLength={1000}
+                      placeholder={t('complaintPlaceholder')}
+                      required
+                    />
+                    <SubmitButton className="btn btn-secondary btn-sm">
+                      {t('complaintSend')}
+                    </SubmitButton>
+                  </form>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {reviews.length > 0 && (
+        <section className={me.offers}>
+          <h2 className={me.offersTitle}>{t('reviewsTitle')}</h2>
+          <ul className={me.list}>
+            {reviews.map((r) => (
+              <li key={r.id} className={`card ${me.complaint}`}>
+                <div className={me.stars}>
+                  {'★'.repeat(r.rating)}
+                  <span className={me.starsOff}>{'★'.repeat(5 - r.rating)}</span>
+                </div>
+                {r.comment && <p className={me.reviewText}>{r.comment}</p>}
+                <details className={me.replyBox} open={false}>
+                  <summary>{r.sellerReply ? t('reviewReplyEdit') : t('reviewReply')}</summary>
+                  <form action={replyToReviewAction} className={me.replyForm}>
+                    <input type="hidden" name="reviewId" value={r.id} />
+                    <textarea
+                      name="reply"
+                      className="field"
+                      maxLength={500}
+                      defaultValue={r.sellerReply}
+                      placeholder={t('reviewReplyPlaceholder')}
+                    />
+                    <SubmitButton className="btn btn-secondary btn-sm">
+                      {t('reviewReplySave')}
+                    </SubmitButton>
+                  </form>
+                </details>
+                {r.sellerReply && (
+                  <p className={me.meta}>{t('yourReply', { reply: r.sellerReply })}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className={me.offers}>
         <h2 className={me.offersTitle}>{t('offersTitle')}</h2>
@@ -204,6 +319,16 @@ export default async function AccountPage({ params, searchParams }: Props) {
                   <div className={me.meta}>
                     {o.car}, {o.year} · {priceLabel(locale, o.priceUsd, o.priceMaxUsd)}
                   </div>
+                  {o.asks.length > 0 &&
+                    o.requestStatus !== 'closed' &&
+                    o.status !== 'withdrawn' &&
+                    o.status !== 'declined' && (
+                      <div className={me.asks}>
+                        {t('buyerAsks', {
+                          items: o.asks.map((a) => my(`ask_${a}` as 'ask_vin')).join(', '),
+                        })}
+                      </div>
+                    )}
                   {o.requestStatus === 'closed' && o.closeReason && (
                     <div className={me.meta}>
                       {t(`closedBecause_${o.closeReason}` as 'closedBecause_found_here')}

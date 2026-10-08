@@ -26,6 +26,7 @@ export async function getSellerPage(id: string) {
     .select({
       rating: sellerReviews.rating,
       comment: sellerReviews.comment,
+      sellerReply: sellerReviews.sellerReply,
       createdAt: sellerReviews.createdAt,
     })
     .from(sellerReviews)

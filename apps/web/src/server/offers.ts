@@ -25,6 +25,7 @@ export async function listOwnOffers(sellerId: string) {
       priceMaxUsd: offers.priceMaxUsd,
       status: offers.status,
       withdrawReason: offers.withdrawReason,
+      asks: offers.asks,
       requestStatus: buyerRequests.status,
       closeReason: buyerRequests.closeReason,
       updatedAt: offers.updatedAt,

@@ -77,6 +77,11 @@ export default async function SellerPage({ params }: Props) {
                     </span>
                   </div>
                   {r.comment && <p className={styles.comment}>{r.comment}</p>}
+                  {r.sellerReply && (
+                    <p className={styles.reply}>
+                      <strong>{t('sellerReply')}</strong> {r.sellerReply}
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>

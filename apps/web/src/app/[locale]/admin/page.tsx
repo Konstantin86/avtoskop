@@ -126,6 +126,11 @@ export default async function AdminPage({ params }: Props) {
                 · {r.car}, ${formatNumber(locale, r.priceUsd)}
               </div>
               {r.description && <p className={styles.small}>{r.description}</p>}
+              {r.sellerReply ? (
+                <p className={styles.quote}>{t('sellerReply', { reply: r.sellerReply })}</p>
+              ) : (
+                <p className={styles.muted}>{t('noSellerReply')}</p>
+              )}
               <div className={styles.actions}>
                 {statusButton(r.sellerId, 'banned', t('ban'), t('banConfirm'))}
                 <form action={resolveReportAction}>
@@ -203,6 +208,11 @@ export default async function AdminPage({ params }: Props) {
                 </span>
               </div>
               {s.about && <p className={styles.small}>{s.about}</p>}
+              {s.verifyEvidence && (
+                <p className={styles.quote}>
+                  {t('verifyEvidence', { evidence: s.verifyEvidence })}
+                </p>
+              )}
               <div className={styles.row}>
                 <span className={styles.muted}>
                   {t('counts', { offers: s.offerCount, reports: s.reportCount })}

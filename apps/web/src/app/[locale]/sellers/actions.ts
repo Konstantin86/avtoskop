@@ -8,19 +8,20 @@ import {
   makeMatchesBrand,
   offerInput,
   offerLimitPerDay,
+  redactContacts,
   sellerProfileInput,
   sellerTypeAllowed,
   WITHDRAW_REASONS,
   vinMismatches,
 } from '@avtoskop/core';
-import { brands, buyerRequests, offers, sellers } from '@avtoskop/db';
+import { brands, buyerRequests, offers, reports, sellerReviews, sellers } from '@avtoskop/db';
 import { redirect } from '@/i18n/navigation';
 import { getCurrentUser, safeReturnTo } from '@/server/auth';
 import { db } from '@/server/db';
 import { feedbackUrl } from '@/server/contactLinks';
 import { notifyBuyerOfOffer, recordOfferUpdate } from '@/server/notify';
 import { offerPhotoIds, setOfferPhotos } from '@/server/photos';
-import { sendTelegram, siteUrl } from '@/server/telegram';
+import { notifyAdmins, sendTelegram, siteUrl } from '@/server/telegram';
 import { decodeVin } from '@/server/vin';
 
 export interface FormState {
@@ -203,6 +204,19 @@ export async function saveOfferAction(_prev: FormState, formData: FormData): Pro
     .returning({ id: offers.id, isNew: sql<boolean>`(xmax = 0)` });
   const photosBefore = existing ? await offerPhotoIds(existing.id) : [];
   const photos = saved ? await setOfferPhotos(seller.id, saved.id, o.photos) : [];
+  // A buyer's ask is done once the detail is there: a VIN, three photos, or the garage mark.
+  if (saved && existing && existing.asks.length > 0) {
+    const open = existing.asks.filter((ask) =>
+      ask === 'vin'
+        ? !row.vin
+        : ask === 'photos'
+          ? photos.length < 3
+          : !row.features.includes('inspection_ok'),
+    );
+    if (open.length !== existing.asks.length) {
+      await db.update(offers).set({ asks: open }).where(eq(offers.id, saved.id));
+    }
+  }
   if (saved?.isNew) await notifyBuyerOfOffer(requestId, { ...row, offerId: saved.id });
   if (existing) {
     await recordOfferUpdate(requestId, existing, { ...row, photoIds: photos }, photosBefore);
@@ -239,5 +253,61 @@ export async function setOfferWithdrawnAction(formData: FormData): Promise<void>
         withdraw ? ne(offers.status, 'withdrawn') : eq(offers.status, 'withdrawn'),
       ),
     );
+  revalidatePath('/[locale]/account', 'page');
+}
+
+const UUID_RE = /^[0-9a-f-]{36}$/i;
+
+// The seller's side of a complaint; goes to the admin page and to the admins in Telegram.
+export async function replyToReportAction(formData: FormData): Promise<void> {
+  const user = await getCurrentUser();
+  const reportId = String(formData.get('reportId') ?? '');
+  const reply = String(formData.get('reply') ?? '')
+    .trim()
+    .slice(0, 1000);
+  if (!user?.seller || !UUID_RE.test(reportId) || !reply) return;
+  const [owned] = await db
+    .select({ id: reports.id, car: offers.car })
+    .from(reports)
+    .innerJoin(offers, eq(reports.offerId, offers.id))
+    .where(and(eq(reports.id, reportId), eq(offers.sellerId, user.seller.id)));
+  if (!owned) return;
+  await db
+    .update(reports)
+    .set({ sellerReply: reply, sellerRepliedAt: new Date() })
+    .where(eq(reports.id, reportId));
+  await notifyAdmins(`💬 ${user.seller.name} відповів на скаргу (${owned.car}):\n«${reply}»`);
+  revalidatePath('/[locale]/account', 'page');
+}
+
+// A request for the verified badge: a company code or a link to a site or social page.
+export async function requestVerifyAction(formData: FormData): Promise<void> {
+  const user = await getCurrentUser();
+  const evidence = String(formData.get('evidence') ?? '')
+    .trim()
+    .slice(0, 300);
+  if (!user?.seller || user.seller.status !== 'pending' || evidence.length < 4) return;
+  await db
+    .update(sellers)
+    .set({ verifyEvidence: evidence, verifyRequestedAt: new Date() })
+    .where(eq(sellers.id, user.seller.id));
+  await notifyAdmins(`🛡 ${user.seller.name} просить позначку «Перевірений»:\n${evidence}`);
+  revalidatePath('/[locale]/account', 'page');
+}
+
+// One public reply to a review, shown under it on the seller page; it can be edited.
+export async function replyToReviewAction(formData: FormData): Promise<void> {
+  const user = await getCurrentUser();
+  const reviewId = String(formData.get('reviewId') ?? '');
+  const reply = redactContacts(
+    String(formData.get('reply') ?? '')
+      .trim()
+      .slice(0, 500),
+  );
+  if (!user?.seller || !UUID_RE.test(reviewId)) return;
+  await db
+    .update(sellerReviews)
+    .set({ sellerReply: reply, sellerRepliedAt: reply ? new Date() : null })
+    .where(and(eq(sellerReviews.id, reviewId), eq(sellerReviews.sellerId, user.seller.id)));
   revalidatePath('/[locale]/account', 'page');
 }
