@@ -1,6 +1,6 @@
 import { contactKey } from '@avtoskop/core';
 import { buyerRequests, createDb } from '@avtoskop/db';
-import { isNotNull } from 'drizzle-orm';
+import { inArray, isNotNull } from 'drizzle-orm';
 import { importWanted } from '../mvs/wanted.ts';
 import { cleanUpPhotos } from '../photos/cleanup.ts';
 import { createSellerAlerts } from './alerts.ts';
@@ -60,8 +60,10 @@ const refreshWanted = () =>
   importWanted(db, log).catch((error: Error) =>
     log(`Wanted list refresh failed: ${error.message}`),
   );
-void refreshWanted();
-const wantedTimer = setInterval(refreshWanted, DAY_MS);
+// End-to-end tests seed the list themselves and skip the large download.
+const wantedOn = process.env['WANTED_IMPORT'] !== 'off';
+if (wantedOn) void refreshWanted();
+const wantedTimer = setInterval(() => wantedOn && void refreshWanted(), DAY_MS);
 
 // Hourly: remind buyers before a request expires, and close expired ones.
 const runExpiry = createExpiryJob(db, tg, {
@@ -82,12 +84,22 @@ const pendingTimer = setInterval(checkPending, 60 * 1000);
 
 // Every minute: after a buyer edits a request, alert sellers who match only now.
 const runRealerts = async () => {
-  const pending = await db
-    .update(buyerRequests)
-    .set({ realertFrom: null })
-    .where(isNotNull(buyerRequests.realertFrom))
-    .returning({ id: buyerRequests.id, before: buyerRequests.realertFrom });
   // Taken off the queue first, so a slow send never alerts the same sellers twice.
+  // Read before clearing: an update's returning gives the new, empty value.
+  const pending = await db.transaction(async (tx) => {
+    const rows = await tx
+      .select({ id: buyerRequests.id, before: buyerRequests.realertFrom })
+      .from(buyerRequests)
+      .where(isNotNull(buyerRequests.realertFrom))
+      .for('update');
+    if (rows.length > 0) {
+      await tx
+        .update(buyerRequests)
+        .set({ realertFrom: null })
+        .where(inArray(buyerRequests.id, rows.map((r) => r.id)));
+    }
+    return rows;
+  });
   const previous = new Map(pending.flatMap((p) => (p.before ? [[p.id, p.before] as const] : [])));
   if (previous.size > 0) await alertSellers([...previous.keys()], previous);
 };
