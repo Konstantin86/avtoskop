@@ -205,3 +205,6 @@ export const reviewInput = z.object({
   rating: z.coerce.number().int().min(1).max(5),
   comment: z.string().trim().max(300).optional().default(''),
 });
+
+// Details a buyer can ask a seller for in one tap, before sharing their number.
+export const BUYER_ASKS = ['vin', 'photos', 'inspection'] as const;

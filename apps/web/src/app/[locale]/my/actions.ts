@@ -1,10 +1,12 @@
 'use server';
 
-import { and, eq, inArray, ne, notInArray } from 'drizzle-orm';
+import { and, eq, inArray, ne, notInArray, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { getTranslations } from 'next-intl/server';
 import {
+  BUYER_ASKS,
   CLOSE_REASONS,
+  localePath,
   redactContacts,
   reportInput,
   requestExpiry,
@@ -16,7 +18,7 @@ import { getRequestByKey } from '@/server/buyer';
 import { decryptContact } from '@/server/contact';
 import { db } from '@/server/db';
 import { notifySellersOfClose } from '@/server/notify';
-import { sendTelegram } from '@/server/telegram';
+import { sendTelegram, siteUrl } from '@/server/telegram';
 
 function field(formData: FormData, name: string): string {
   const value = formData.get(name);
@@ -198,5 +200,66 @@ export async function submitReviewAction(formData: FormData): Promise<void> {
       }),
     );
   }
+  refresh();
+}
+
+// The buyer's own star on an offer, for shortlisting; sellers never see it.
+export async function toggleStarAction(formData: FormData): Promise<void> {
+  const found = await ownOffer(formData);
+  if (!found) return;
+  await db
+    .update(offers)
+    .set({ buyerStarred: sql`not ${offers.buyerStarred}` })
+    .where(eq(offers.id, found.offer.id));
+  refresh();
+}
+
+// A private note on an offer, for the buyer only.
+export async function saveNoteAction(formData: FormData): Promise<void> {
+  const found = await ownOffer(formData);
+  if (!found) return;
+  await db
+    .update(offers)
+    .set({ buyerNote: field(formData, 'note').trim().slice(0, 500) })
+    .where(eq(offers.id, found.offer.id));
+  refresh();
+}
+
+// One-tap request for a missing detail; the seller gets it in Telegram, once per kind.
+export async function askSellerAction(formData: FormData): Promise<void> {
+  const found = await ownOffer(formData);
+  const kind = field(formData, 'ask');
+  if (!found || !(BUYER_ASKS as readonly string[]).includes(kind)) return;
+  if (found.offer.status === 'withdrawn' || found.offer.status === 'declined') return;
+  const [updated] = await db
+    .update(offers)
+    .set({ asks: sql`array_append(${offers.asks}, ${kind})` })
+    .where(and(eq(offers.id, found.offer.id), sql`not (${kind} = any(${offers.asks}))`))
+    .returning({ id: offers.id });
+  if (!updated) return;
+  const t = await getTranslations({ locale: 'uk', namespace: 'notify' });
+  await sendTelegram(
+    found.offer.telegramId,
+    t('buyerAsks', {
+      ask: kind,
+      request: `${found.request.brand} ${found.request.model}`,
+      offer: `${found.offer.car}, ${found.offer.year}`,
+      link: siteUrl() + localePath('uk', `/requests/${found.request.id}/offer`),
+    }),
+  );
+  refresh();
+}
+
+// How this buyer wants offer messages: right away or as one morning summary, and quiet nights.
+export async function saveNotifyAction(formData: FormData): Promise<void> {
+  const request = await getRequestByKey(field(formData, 'key'));
+  if (!request) return;
+  await db
+    .update(buyerRequests)
+    .set({
+      notifyMode: field(formData, 'mode') === 'digest' ? 'digest' : 'instant',
+      quietHours: field(formData, 'quiet') === 'on',
+    })
+    .where(eq(buyerRequests.id, request.id));
   refresh();
 }

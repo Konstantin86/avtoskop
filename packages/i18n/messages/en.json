@@ -530,7 +530,8 @@
     "withdrawn": "Withdrawn",
     "withdrawnSold": "Withdrawn: car sold",
     "restoreOffer": "Put back",
-    "yourRating": "Your rating: ★ {average} · {count, plural, one {# review} other {# reviews}}"
+    "yourRating": "Your rating: ★ {average} · {count, plural, one {# review} other {# reviews}}",
+    "publicPage": "How buyers see you"
   },
   "notify": {
     "contactShared": "📞 A buyer shared their number with you: {phone}\n\nRequest: {request}\nYour offer: {offer}\n\nPlease call or message the buyer soon.",
@@ -549,7 +550,8 @@
     "changeImport": "Import: {to, select, yes {now fine} other {cars in Ukraine only}}",
     "requestClosed": "🔒 The buyer closed the request {request}.{reason, select, found_here {\nThey found a car through Avtoskop.} found_elsewhere {\nThey found a car elsewhere.} not_looking {\nThey are no longer looking.} other {}}\n\nYour offer: {offer}\nThanks for replying. New requests for your brands will keep coming here.",
     "offerViewed": "👀 The buyer viewed your offer for the request {request}:\n{offer}\n\nIf they share their number with you, it will arrive here.",
-    "newReview": "⭐ A buyer reviewed you: {rating} out of 5 (request {request}).{comment}"
+    "newReview": "⭐ A buyer reviewed you: {rating} out of 5 (request {request}).{comment}",
+    "buyerAsks": "❓ The buyer of {request} asks for {ask, select, vin {the car's VIN} photos {more photos} other {permission to have the car checked at a garage}} on your offer {offer}.\n\nAdd it to your offer and the buyer will get the update: {link}"
   },
   "my": {
     "title": "Your request",
@@ -651,7 +653,48 @@
     "reviewSeller": "Seller",
     "reviewRating": "Rating",
     "reviewComment": "Comment (optional): how did it go?",
-    "reviewSend": "Send review"
+    "reviewSend": "Send review",
+    "sortBy": "Sort:",
+    "sort_new": "Newest",
+    "sort_price": "Cheapest",
+    "sort_wishes": "By wishes",
+    "sort_rating": "By rating",
+    "starredOnly": "Starred ({count})",
+    "starredEmpty": "You haven't starred any offers yet.",
+    "star": "Star",
+    "unstar": "Unstar",
+    "priceLowest": "lowest price of {count}",
+    "priceAbove": "${amount} more than the cheapest",
+    "compareTitle": "Compare offers ({count})",
+    "compareCar": "Car",
+    "comparePrice": "All-in price",
+    "compareMileage": "Mileage",
+    "compareWhere": "Where now",
+    "compareVin": "VIN check",
+    "compareWishes": "Your wishes",
+    "compareSplit": "Price breakdown",
+    "compareSeller": "Seller",
+    "compareRating": "Rating",
+    "compareYes": "Yes",
+    "compareVinOk": "✓ not wanted",
+    "compareVinWanted": "⚠ wanted",
+    "askLabel": "Ask for:",
+    "ask_vin": "VIN",
+    "ask_photos": "More photos",
+    "ask_inspection": "Garage check",
+    "asked_vin": "VIN",
+    "asked_photos": "Photos",
+    "asked_inspection": "Garage",
+    "noteAdd": "Add a note",
+    "notePlaceholder": "Only for you; the seller doesn't see it. For example: called, waiting for interior photos",
+    "noteSave": "Save",
+    "notifyTitle": "Telegram notifications",
+    "notifyInstant": "Right away",
+    "notifyDigest": "Once a day at 9:00",
+    "notifyQuiet": "Don't disturb at night (22:00–8:00): night messages arrive in the morning",
+    "notifyQuietShort": "quiet nights",
+    "notifySave": "Save",
+    "safetyMore": "How to buy a car safely"
   },
   "bot": {
     "welcome": "Welcome to Avtoskop! Buyers confirm requests and get offers here, and sellers sign in to the site. Start on the website: the button there opens this bot.\n\nYour requests: /requests",
@@ -680,7 +723,8 @@
     "requestLimit": "You have already published 3 requests today. This one is saved: open the bot from its page tomorrow and it will be published.",
     "requestAutoria": "While you wait for offers, here are similar cars on AUTO.RIA with your filters: {link}",
     "sellerRequestExpired": "🔒 The request {request} has closed: the buyer did not extend it after 30 days.\n\nYour offer: {offer}\nNew requests for your brands will keep coming here.",
-    "alertCopyPrevious": "⚡ Reply with your previous offer for this car: {link}"
+    "alertCopyPrevious": "⚡ Reply with your previous offer for this car: {link}",
+    "pendingDigest": "📬 Updates while you were not disturbed ({count}):"
   },
   "legal": {
     "updated": "Updated: {date}",
@@ -898,5 +942,46 @@
     "v2Text": "We check companies and block scammers.",
     "v3Title": "Free for buyers",
     "v3Text": "No subscriptions, no hidden payments."
+  },
+  "safety": {
+    "title": "How to buy a car safely",
+    "lead": "Avtoskop takes no part in the deal, so these steps are yours. They take a few hours and can save thousands of dollars.",
+    "steps": [
+      {
+        "title": "Check the VIN",
+        "body": "The VIN in the offer, the documents and on the body must match. Check that the car is not on the police wanted list on the official site."
+      },
+      {
+        "title": "Have it inspected at an independent garage",
+        "body": "Choose the garage yourself, not on the seller's advice. Ask for the body and paint, suspension, and engine and gearbox diagnostics to be checked."
+      },
+      {
+        "title": "Check the documents",
+        "body": "The name on the registration must match the seller's passport or a power of attorney. For an imported car, ask for the customs papers."
+      },
+      {
+        "title": "Sign a contract",
+        "body": "Complete the purchase at a police service centre (ТСЦ МВС) or a notary. The contract must state the VIN, price and date."
+      },
+      {
+        "title": "Don't pay up front",
+        "body": "Don't pay a deposit before you've seen the car and documents and signed a contract. For a car sourced to order, pay in stages under a contract."
+      },
+      {
+        "title": "Pay safely",
+        "body": "A bank transfer after signing is best. Hand over large amounts in cash only against a signed receipt."
+      }
+    ],
+    "wantedLink": "Check the car against the police wanted list"
+  },
+  "sellerPage": {
+    "notFound": "Seller not found",
+    "verified": "Verified seller",
+    "new": "New seller",
+    "since": "On Avtoskop since {date}",
+    "noReviews": "No reviews yet",
+    "reviews": "{count, plural, one {# review} other {# reviews}}",
+    "reviewsTitle": "Buyer reviews",
+    "reviewsNote": "Only a buyer who found a car through Avtoskop and shared their number with this seller can leave a review."
   }
 }

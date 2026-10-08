@@ -390,3 +390,175 @@
 .review :global(.btn) {
   align-self: flex-start;
 }
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar a {
+  text-decoration: none;
+}
+
+.toolbarLabel {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.compare {
+  padding: 0;
+  overflow: hidden;
+}
+
+.compareSummary {
+  padding: 16px 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.compareScroll {
+  overflow-x: auto;
+  border-top: 1px solid var(--line);
+}
+
+.compareTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.compareTable th,
+.compareTable td {
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+  min-width: 150px;
+}
+
+.compareTable tbody th {
+  color: var(--muted);
+  font-weight: 500;
+  min-width: 120px;
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+}
+
+.compareTable thead th {
+  font-weight: 700;
+}
+
+.starForm {
+  display: inline;
+}
+
+.star {
+  margin-right: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  vertical-align: -1px;
+}
+
+.starOn {
+  color: #e0a800;
+}
+
+.priceBest,
+.pricePos {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.priceBest {
+  color: var(--good);
+}
+
+.pricePos {
+  color: var(--muted);
+}
+
+.asks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.asksLabel {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.askButton {
+  border: 1px dashed var(--blue);
+  background: transparent;
+  color: var(--blue);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.note summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.noteForm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.noteForm textarea {
+  width: 100%;
+  min-height: 60px;
+}
+
+.notify {
+  padding: 0;
+}
+
+.notifySummary {
+  padding: 14px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.notifySummary span {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.notifyForm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0 20px 18px;
+}
+
+.notifyCheck {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.safetyLink {
+  display: inline-block;
+  margin-top: 6px;
+  font-weight: 600;
+}

@@ -165,11 +165,13 @@ export default async function AccountPage({ params, searchParams }: Props) {
         >
           {t('editProfile')}
         </Link>
-        {rating && (
-          <div className={me.meta}>
-            {t('yourRating', { average: rating.average.toFixed(1), count: rating.count })}
-          </div>
-        )}
+        <div className={me.meta}>
+          {rating &&
+            `${t('yourRating', { average: rating.average.toFixed(1), count: rating.count })} · `}
+          <Link href={`/s/${seller.id}`} className={me.editLink}>
+            {t('publicPage')}
+          </Link>
+        </div>
         <div className={me.meta}>{seller.alerts ? t('alertsOn') : t('alertsOff')}</div>
         {seller.status === 'pending' && feedback && (
           <p className={me.verify}>

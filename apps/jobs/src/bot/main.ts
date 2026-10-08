@@ -5,6 +5,7 @@ import { importWanted } from '../mvs/wanted.ts';
 import { cleanUpPhotos } from '../photos/cleanup.ts';
 import { createSellerAlerts } from './alerts.ts';
 import { createExpiryJob } from './expiry.ts';
+import { createPendingSender } from './pending.ts';
 import { createBotHandler } from './handler.ts';
 import { createTelegram } from './telegram.ts';
 import { botText } from './texts.ts';
@@ -73,6 +74,12 @@ const checkExpiry = () =>
 void checkExpiry();
 const expiryTimer = setInterval(checkExpiry, 60 * 60 * 1000);
 
+// Every minute: buyer messages held back by quiet hours or the daily digest.
+const sendPending = createPendingSender(db, tg, log);
+const checkPending = () =>
+  sendPending().catch((error: Error) => log(`Queued messages failed: ${error.message}`));
+const pendingTimer = setInterval(checkPending, 60 * 1000);
+
 // Every minute: after a buyer edits a request, alert sellers who match only now.
 const runRealerts = async () => {
   const pending = await db
@@ -118,5 +125,6 @@ clearInterval(wantedTimer);
 clearInterval(expiryTimer);
 clearInterval(photoTimer);
 clearInterval(realertTimer);
+clearInterval(pendingTimer);
 await close();
 log('Bot stopped');

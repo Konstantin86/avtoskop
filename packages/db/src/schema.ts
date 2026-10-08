@@ -130,6 +130,10 @@ export const buyerRequests = pgTable(
     // Confirmed requests close on their own at expiresAt (null: never, e.g. demo rows).
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     expiryRemindedAt: timestamp('expiry_reminded_at', { withTimezone: true }),
+    // How the buyer gets offer messages: 'instant' or 'digest' (one morning summary), and
+    // whether night-time messages wait until morning.
+    notifyMode: text('notify_mode').notNull().default('instant'),
+    quietHours: boolean('quiet_hours').notNull().default(true),
     // When the request was last closed; offer photos are removed some time after.
     closedAt: timestamp('closed_at', { withTimezone: true }),
     // Optional reason the buyer gave when closing (CLOSE_REASONS); empty after reopening.
@@ -258,6 +262,11 @@ export const offers = pgTable(
     status: text('status').notNull().default('sent'),
     // Why the seller withdrew it (WITHDRAW_REASONS), if they said.
     withdrawReason: text('withdraw_reason'),
+    // The buyer's own marks, never shown to the seller: a star and a private note.
+    buyerStarred: boolean('buyer_starred').notNull().default(false),
+    buyerNote: text('buyer_note').notNull().default(''),
+    // Details the buyer asked the seller for (BUYER_ASKS), each at most once.
+    asks: text('asks').array().notNull().default([]),
     // Lowest price the buyer was told about; a price-drop message needs a new low.
     notifiedPriceUsd: integer('notified_price_usd'),
     // Edits the buyer hasn't seen yet (OfferChange[]), cleared when they open their offers.
@@ -298,6 +307,20 @@ export const offerPhotos = pgTable(
     index('offer_photos_offer_idx').on(t.offerId, t.position),
     index('offer_photos_seller_idx').on(t.sellerId, t.createdAt),
   ],
+);
+
+// Buyer messages held back by quiet hours or the daily digest; the bot sends them when due,
+// several for one chat joined into a single message.
+export const pendingMessages = pgTable(
+  'pending_messages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    chatId: bigint('chat_id', { mode: 'number' }).notNull(),
+    text: text('text').notNull(),
+    sendAfter: timestamp('send_after', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('pending_messages_due_idx').on(t.sendAfter)],
 );
 
 // A buyer's rating of the seller they bought from; one per request, only for a seller

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { BrandLogo } from '@/components/BrandLogo';
+import { OfferCompare } from './OfferCompare';
 import { OfferCard, OfferDeclineActions } from '@/components/OfferCard';
 import { ShareNumberButton } from '@/components/ShareNumberButton';
 import { SubmitButton } from '@/components/SubmitButton';
 import {
   breakdownTotal,
+  BUYER_ASKS,
   CLOSE_REASONS,
   makeMatchesBrand,
   MIN_SELLERS_TO_SHOW,
@@ -43,6 +45,10 @@ import {
   restoreOfferAction,
   setRequestOpenAction,
   submitReviewAction,
+  toggleStarAction,
+  askSellerAction,
+  saveNoteAction,
+  saveNotifyAction,
   shareContactAction,
 } from '../actions';
 import forms from '../../sellers/forms.module.css';
@@ -130,6 +136,42 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
       : o(`feature_${feature}` as 'feature_warranty');
   const country = (c: string) => (c === 'ua' ? o('origin_ua') : p(`country_${c}` as 'country_us'));
 
+  // Sorting and the shortlist come from the address, so they survive a reload.
+  const query = await searchParams;
+  const sort = ['price', 'wishes', 'rating'].includes(query['sort'] ?? '') ? query['sort'] : 'new';
+  const onlyStarred = query['starred'] === '1';
+  const isOpen = (s: string) => s !== 'withdrawn' && s !== 'declined';
+  const openOffers = offerList.filter((x) => isOpen(x.status));
+  const cheapest = Math.min(...openOffers.map((x) => x.priceUsd));
+  const wishCount = (x: (typeof offerList)[number]) =>
+    matchedWishes(request.wishes, x.features).length;
+  const score = (x: (typeof offerList)[number]) =>
+    sort === 'price'
+      ? x.priceUsd
+      : sort === 'wishes'
+        ? -wishCount(x)
+        : sort === 'rating'
+          ? -(ratings.get(x.seller.id)?.average ?? 0)
+          : x.createdAt.getTime();
+  // Open offers first in the chosen order; withdrawn and declined ones sink to the end.
+  const shownOffers = [...offerList]
+    .filter((x) => !onlyStarred || x.buyerStarred)
+    .sort((a, z) => Number(!isOpen(a.status)) - Number(!isOpen(z.status)) || score(a) - score(z));
+  const starredCount = offerList.filter((x) => x.buyerStarred).length;
+  const view = (changes: Record<string, string | undefined>) => {
+    const next = new URLSearchParams();
+    const merged = {
+      sort: sort === 'new' ? undefined : sort,
+      starred: onlyStarred ? '1' : undefined,
+      ...changes,
+    };
+    for (const [k, v] of Object.entries(merged)) if (v) next.set(k, v);
+    const qs = next.toString();
+    return `/my/${key}${qs ? `?${qs}` : ''}`;
+  };
+  const vinState = (x: (typeof offerList)[number]) =>
+    !x.vin ? '—' : wanted.has(x.vin) ? t('compareVinWanted') : t('compareVinOk');
+
   return (
     <div className={`container ${forms.page}`}>
       <div className={forms.wide}>
@@ -191,6 +233,38 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
             </div>
           </div>
         )}
+        {!closed && request.phoneVerified && (
+          <details className={`card ${styles.notify}`}>
+            <summary className={styles.notifySummary}>
+              {t('notifyTitle')}:{' '}
+              <span>
+                {request.notifyMode === 'digest' ? t('notifyDigest') : t('notifyInstant')}
+                {request.quietHours ? ` · ${t('notifyQuietShort')}` : ''}
+              </span>
+            </summary>
+            <form action={saveNotifyAction} className={styles.notifyForm}>
+              <input type="hidden" name="key" value={key} />
+              <div className="segment" role="radiogroup" aria-label={t('notifyTitle')}>
+                {(['instant', 'digest'] as const).map((mode) => (
+                  <label key={mode}>
+                    <input
+                      type="radio"
+                      name="mode"
+                      value={mode}
+                      defaultChecked={request.notifyMode === mode}
+                    />
+                    <span>{t(mode === 'digest' ? 'notifyDigest' : 'notifyInstant')}</span>
+                  </label>
+                ))}
+              </div>
+              <label className={styles.notifyCheck}>
+                <input type="checkbox" name="quiet" defaultChecked={request.quietHours} />
+                <span>{t('notifyQuiet')}</span>
+              </label>
+              <SubmitButton className="btn btn-secondary btn-sm">{t('notifySave')}</SubmitButton>
+            </form>
+          </details>
+        )}
         {!closed && !request.phoneVerified && (
           <TelegramConfirm
             href={botStartLink(`req_${request.id}`)}
@@ -215,13 +289,78 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                   <li>{t('safety2')}</li>
                   <li>{t('safety3')}</li>
                 </ul>
+                <Link href="/safety" className={styles.safetyLink}>
+                  {t('safetyMore')} →
+                </Link>
               </div>
             </div>
           )}
           {offerList.length === 0 && (
             <p className={forms.lead}>{request.phoneVerified ? t('empty') : t('emptyPending')}</p>
           )}
-          {offerList.map((offer) => {
+          {offerList.length > 1 && (
+            <div className={styles.toolbar}>
+              <span className={styles.toolbarLabel}>{t('sortBy')}</span>
+              {(['new', 'price', 'wishes', 'rating'] as const).map((s) => (
+                <Link
+                  key={s}
+                  href={view({ sort: s === 'new' ? undefined : s })}
+                  className={`chip ${sort === s ? 'chip-blue' : ''}`}
+                  scroll={false}
+                >
+                  {t(`sort_${s}`)}
+                </Link>
+              ))}
+              <Link
+                href={view({ starred: onlyStarred ? undefined : '1' })}
+                className={`chip ${onlyStarred ? 'chip-yellow' : ''}`}
+                scroll={false}
+              >
+                ★ {t('starredOnly', { count: starredCount })}
+              </Link>
+            </div>
+          )}
+          {openOffers.length > 1 && (
+            <OfferCompare
+              title={t('compareTitle', { count: openOffers.length })}
+              rows={[
+                t('compareCar'),
+                t('comparePrice'),
+                t('compareMileage'),
+                t('compareWhere'),
+                t('compareVin'),
+                t('compareWishes'),
+                t('compareSplit'),
+                t('compareSeller'),
+                t('compareRating'),
+              ]}
+              columns={shownOffers
+                .filter((x) => isOpen(x.status))
+                .map((x) => ({
+                  id: x.id,
+                  title: `${x.buyerStarred ? '★ ' : ''}${x.car}`,
+                  cells: [
+                    `${x.car}, ${x.year}`,
+                    priceLabel(locale, x.priceUsd, x.priceMaxUsd),
+                    x.mileageKm === null ? '—' : `${formatNumber(locale, x.mileageKm)} ${t('km')}`,
+                    x.availability === 'in_ukraine'
+                      ? o('availability_in_ukraine')
+                      : `${o(`availability_${x.availability}` as 'availability_in_transit')}, ${t('eta', { weeks: x.etaWeeks ?? 0 })}`,
+                    vinState(x),
+                    request.wishes.length > 0 ? `${wishCount(x)} / ${request.wishes.length}` : '—',
+                    breakdownTotal(x) > 0 ? t('compareYes') : '—',
+                    `${x.seller.name}${x.seller.status === 'verified' ? ' ✓' : ''}`,
+                    ratings.get(x.seller.id)
+                      ? `★ ${ratings.get(x.seller.id)!.average.toFixed(1)} (${ratings.get(x.seller.id)!.count})`
+                      : '—',
+                  ],
+                }))}
+            />
+          )}
+          {onlyStarred && shownOffers.length === 0 && (
+            <p className={forms.lead}>{t('starredEmpty')}</p>
+          )}
+          {shownOffers.map((offer) => {
             const withdrawn = offer.status === 'withdrawn';
             // A withdrawn offer looks faded like a declined one and can't be acted on.
             const declined = offer.status === 'declined' || withdrawn;
@@ -250,6 +389,18 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                 <div className={styles.offerTop}>
                   <div>
                     <div className={styles.car}>
+                      <form action={toggleStarAction} className={styles.starForm}>
+                        <input type="hidden" name="key" value={key} />
+                        <input type="hidden" name="offerId" value={offer.id} />
+                        <button
+                          type="submit"
+                          className={`${styles.star} ${offer.buyerStarred ? styles.starOn : ''}`}
+                          aria-label={offer.buyerStarred ? t('unstar') : t('star')}
+                          aria-pressed={offer.buyerStarred}
+                        >
+                          {offer.buyerStarred ? '★' : '☆'}
+                        </button>
+                      </form>
                       {offer.car}, {offer.year}
                     </div>
                     <div className={styles.facts}>
@@ -261,6 +412,18 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                   <div className={styles.price}>
                     {priceLabel(locale, offer.priceUsd, offer.priceMaxUsd)}
                     <span>{t('turnkey')}</span>
+                    {/* Where this price stands among the open offers on the request. */}
+                    {isOpen(offer.status) && openOffers.length > 1 && (
+                      <span
+                        className={offer.priceUsd === cheapest ? styles.priceBest : styles.pricePos}
+                      >
+                        {offer.priceUsd === cheapest
+                          ? t('priceLowest', { count: openOffers.length })
+                          : t('priceAbove', {
+                              amount: formatNumber(locale, offer.priceUsd - cheapest),
+                            })}
+                      </span>
+                    )}
                   </div>
                 </div>
                 {offer.changes.length > 0 &&
@@ -400,11 +563,11 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                     <div className={styles.sellerName}>
                       {offer.seller.name}
                       {ratings.get(offer.seller.id) && (
-                        <span className={styles.rating}>
+                        <Link href={`/s/${offer.seller.id}`} className={styles.rating}>
                           {' '}
                           ★ {ratings.get(offer.seller.id)!.average.toFixed(1)} ·{' '}
                           {t('reviews', { count: ratings.get(offer.seller.id)!.count })}
-                        </span>
+                        </Link>
                       )}
                     </div>
                     <div className={styles.facts}>
@@ -422,6 +585,58 @@ export default async function MyRequestPage({ params, searchParams }: Props) {
                 </div>
                 {offer.seller.about && <p className={styles.about}>{offer.seller.about}</p>}
 
+                {isOpen(offer.status) &&
+                  (() => {
+                    // Only details that are actually missing can be asked for.
+                    const missing = BUYER_ASKS.filter((kind) =>
+                      kind === 'vin'
+                        ? !offer.vin && !order
+                        : kind === 'photos'
+                          ? (photos.get(offer.id)?.length ?? 0) < 3
+                          : !order && !offer.features.includes('inspection_ok'),
+                    );
+                    if (missing.length === 0) return null;
+                    return (
+                      <div className={styles.asks}>
+                        <span className={styles.asksLabel}>{t('askLabel')}</span>
+                        {missing.map((kind) =>
+                          offer.asks.includes(kind) ? (
+                            <span key={kind} className="chip">
+                              ✓ {t(`asked_${kind}`)}
+                            </span>
+                          ) : (
+                            <form key={kind} action={askSellerAction}>
+                              <input type="hidden" name="key" value={key} />
+                              <input type="hidden" name="offerId" value={offer.id} />
+                              <input type="hidden" name="ask" value={kind} />
+                              <button type="submit" className={`chip ${styles.askButton}`}>
+                                {t(`ask_${kind}`)}
+                              </button>
+                            </form>
+                          ),
+                        )}
+                      </div>
+                    );
+                  })()}
+                <details className={styles.note} open={false}>
+                  <summary>
+                    {offer.buyerNote ? `📝 ${offer.buyerNote}` : `📝 ${t('noteAdd')}`}
+                  </summary>
+                  <form action={saveNoteAction} className={styles.noteForm}>
+                    <input type="hidden" name="key" value={key} />
+                    <input type="hidden" name="offerId" value={offer.id} />
+                    <textarea
+                      name="note"
+                      className="field"
+                      maxLength={500}
+                      defaultValue={offer.buyerNote}
+                      placeholder={t('notePlaceholder')}
+                    />
+                    <SubmitButton className="btn btn-secondary btn-sm">
+                      {t('noteSave')}
+                    </SubmitButton>
+                  </form>
+                </details>
                 <div className={styles.actions}>
                   {withdrawn ? (
                     <div className={forms.notice}>

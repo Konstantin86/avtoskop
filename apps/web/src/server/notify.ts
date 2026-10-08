@@ -2,6 +2,7 @@ import 'server-only';
 import { and, eq, inArray, ne, notInArray } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
 import {
+  buyerMessageDelay,
   changesWorthAMessage,
   diffOffer,
   localePath,
@@ -12,7 +13,7 @@ import {
   type RequestChange,
   UPDATE_NOTE_MINUTES,
 } from '@avtoskop/core';
-import { brands, buyerRequests, offers, sellers, users } from '@avtoskop/db';
+import { brands, buyerRequests, offers, pendingMessages, sellers, users } from '@avtoskop/db';
 import { formatNumber, priceLabel, yearsLabel } from '@/components/requestFormat';
 import { decryptContact } from './contact';
 import { db } from './db';
@@ -36,6 +37,8 @@ async function buyerChat(requestId: string) {
       locale: buyerRequests.locale,
       chatId: buyerRequests.telegramChatId,
       key: buyerRequests.accessKeyEncrypted,
+      notifyMode: buyerRequests.notifyMode,
+      quietHours: buyerRequests.quietHours,
     })
     .from(buyerRequests)
     .innerJoin(brands, eq(buyerRequests.brandId, brands.id))
@@ -46,7 +49,26 @@ async function buyerChat(requestId: string) {
     locale: r.locale,
     request: `${r.brand} ${r.model} ${yearsLabel(r)}`,
     link: siteUrl() + localePath(r.locale, `/my/${decryptContact(r.key)}`),
+    notifyMode: r.notifyMode,
+    quietHours: r.quietHours,
   };
+}
+
+// Sends now, or queues the text for the bot when quiet hours or the daily digest apply.
+// Queued messages go without the photo; the private link shows it.
+async function deliverToBuyer(
+  b: NonNullable<Awaited<ReturnType<typeof buyerChat>>>,
+  text: string,
+  photo: Buffer | null,
+): Promise<void> {
+  const sendAfter = buyerMessageDelay(new Date(), b);
+  if (sendAfter) {
+    await db.insert(pendingMessages).values({ chatId: b.chatId, text, sendAfter });
+  } else if (photo) {
+    await sendTelegramPhoto(b.chatId, photo, text);
+  } else {
+    await sendTelegram(b.chatId, text);
+  }
 }
 
 // Tells a confirmed buyer about a new offer, with their private link.
@@ -65,8 +87,7 @@ export async function notifyBuyerOfOffer(
   });
   const main = (await photosForOffers([offer.offerId])).get(offer.offerId)?.[0];
   const file = main ? await readPhotoFile(photoFileNames(main.key).full) : null;
-  if (file) await sendTelegramPhoto(b.chatId, file, text);
-  else await sendTelegram(b.chatId, text);
+  await deliverToBuyer(b, text, file);
 }
 
 type OfferRow = typeof offers.$inferSelect;
@@ -174,8 +195,7 @@ export async function recordOfferUpdate(
     ? (await photosForOffers([before.id])).get(before.id)?.[0]
     : undefined;
   const file = main ? await readPhotoFile(photoFileNames(main.key).full) : null;
-  if (file) await sendTelegramPhoto(b.chatId, file, text);
-  else await sendTelegram(b.chatId, text);
+  await deliverToBuyer(b, text, file);
 }
 
 // Tells sellers who sent an offer that the buyer changed what matters for it (budget, years,

@@ -6,7 +6,7 @@ interface Section {
   body: string;
 }
 
-const UPDATED = new Date('2026-10-05');
+const UPDATED = new Date('2026-10-08');
 
 // Operator details come from the environment, so the text needs no edit at launch.
 function fill(text: string): string {
