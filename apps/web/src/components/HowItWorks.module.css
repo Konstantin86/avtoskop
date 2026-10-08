@@ -260,7 +260,7 @@
 .armA,
 .armB {
   fill: none;
-  stroke-width: 9;
+  stroke-width: 14;
   stroke-linecap: round;
 }
 
@@ -272,10 +272,36 @@
   stroke: var(--yellow);
 }
 
-.hands {
-  fill: var(--surface);
-  stroke: var(--ink);
-  stroke-width: 2;
+.handA,
+.handB {
+  stroke: var(--surface);
+  stroke-width: 2.5;
+}
+
+.handA {
+  fill: var(--blue);
+}
+
+.handB {
+  fill: var(--yellow);
+}
+
+.thumb {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.sparks {
+  fill: none;
+  stroke: var(--yellow);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.sideCard {
+  opacity: 0.7;
 }
 
 .table {
@@ -395,6 +421,10 @@
 
 .shown .shake {
   animation: shake 0.5s ease-in-out 3 alternate 1.6s;
+}
+
+.shown .sparks {
+  animation: fade 0.4s ease-out both 2.1s;
 }
 
 @keyframes rise {

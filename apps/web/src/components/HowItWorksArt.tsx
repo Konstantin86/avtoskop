@@ -66,16 +66,22 @@ export function OffersArt() {
 export function ChooseArt() {
   return (
     <svg viewBox="0 0 240 150" className={styles.art} aria-hidden="true" focusable="false">
-      {/* Three offers; the middle one is chosen */}
-      <rect className={styles.field} x="24" y="34" width="62" height="80" rx="10" />
-      <rect className={styles.field} x="154" y="34" width="62" height="80" rx="10" />
+      {/* Three separate offers; the middle one is chosen */}
+      {[22, 162].map((x) => (
+        <g key={x} className={styles.sideCard}>
+          <rect className={styles.field} x={x} y="40" width="56" height="74" rx="10" />
+          <circle className={styles.carDot} cx={x + 28} cy="62" r="9" />
+          <rect className={styles.ink} x={x + 12} y="80" width="32" height="5" rx="2.5" />
+          <rect className={styles.price} x={x + 16} y="90" width="24" height="5" rx="2.5" />
+        </g>
+      ))}
       <g className={styles.chosen}>
-        <rect className={styles.chosenCard} x="82" y="20" width="76" height="100" rx="12" />
+        <rect className={styles.chosenCard} x="86" y="22" width="68" height="98" rx="12" />
         <circle className={styles.carDot} cx="120" cy="50" r="12" />
-        <rect className={styles.ink} x="96" y="72" width="48" height="6" rx="3" />
-        <rect className={styles.price} x="104" y="84" width="32" height="6" rx="3" />
-        <circle className={styles.check} cx="152" cy="24" r="12" />
-        <path className={styles.checkMark} d="M146 24 L150.5 28.5 L158 20" />
+        <rect className={styles.ink} x="99" y="72" width="42" height="6" rx="3" />
+        <rect className={styles.price} x="106" y="84" width="28" height="6" rx="3" />
+        <circle className={styles.check} cx="150" cy="26" r="12" />
+        <path className={styles.checkMark} d="M144 26 L148.5 30.5 L156 22" />
       </g>
       {/* The number goes only to the chosen one */}
       <g className={styles.number}>
@@ -90,26 +96,32 @@ export function ChooseArt() {
 export function DealArt() {
   return (
     <svg viewBox="0 0 240 150" className={styles.art} aria-hidden="true" focusable="false">
-      {/* Two people */}
-      <circle className={styles.personA} cx="62" cy="40" r="16" />
-      <path className={styles.personA} d="M34 120 Q34 72 62 66 Q90 72 90 120 Z" />
-      <circle className={styles.personB} cx="178" cy="40" r="16" />
-      <path className={styles.personB} d="M150 120 Q150 72 178 66 Q206 72 206 120 Z" />
-      {/* Handshake */}
+      {/* Buyer and seller */}
+      <circle className={styles.personA} cx="48" cy="40" r="15" />
+      <path className={styles.personA} d="M20 124 Q20 74 48 68 Q76 74 76 124 Z" />
+      <circle className={styles.personB} cx="192" cy="40" r="15" />
+      <path className={styles.personB} d="M164 124 Q164 74 192 68 Q220 74 220 124 Z" />
+      {/* Handshake in the middle */}
       <g className={styles.shake}>
-        <path className={styles.armA} d="M84 92 Q104 84 118 88" />
-        <path className={styles.armB} d="M156 92 Q136 84 122 88" />
-        <circle className={styles.hands} cx="120" cy="88" r="9" />
+        <path className={styles.armA} d="M66 90 L108 74" />
+        <path className={styles.armB} d="M174 90 L132 74" />
+        <rect className={styles.handB} x="114" y="62" width="26" height="20" rx="10" />
+        <rect className={styles.handA} x="100" y="66" width="28" height="20" rx="10" />
+        <path className={styles.thumb} d="M110 66 q6 -8 12 -4" />
+      </g>
+      <g className={styles.sparks}>
+        <path d="M120 44 v-10 M104 50 l-7 -7 M136 50 l7 -7" />
       </g>
       {/* Contract and car key on the table */}
-      <rect className={styles.table} x="24" y="120" width="192" height="8" rx="4" />
+      <rect className={styles.table} x="16" y="124" width="208" height="8" rx="4" />
       <g className={styles.contract}>
-        <rect className={styles.paper} x="96" y="100" width="34" height="20" rx="3" />
-        <path className={styles.sign} d="M101 113 q4 -6 8 0 t8 0 t8 -2" />
+        <rect className={styles.paper} x="98" y="98" width="44" height="26" rx="3" />
+        <rect className={styles.soft} x="104" y="104" width="24" height="4" rx="2" />
+        <path className={styles.sign} d="M104 117 q4 -6 8 0 t8 0 t10 -2" />
       </g>
       <g className={styles.key}>
-        <circle className={styles.keyRing} cx="146" cy="112" r="5" />
-        <rect className={styles.keyBlade} x="150" y="110" width="14" height="4" rx="1.5" />
+        <circle className={styles.keyRing} cx="154" cy="117" r="5" />
+        <rect className={styles.keyBlade} x="158" y="115" width="14" height="4" rx="1.5" />
       </g>
     </svg>
   );
