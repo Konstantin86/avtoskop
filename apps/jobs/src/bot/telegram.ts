@@ -31,7 +31,9 @@ export interface ReplyMarkup {
 }
 
 export function createTelegram(token: string, fetchFn: typeof fetch = fetch) {
-  const base = `https://api.telegram.org/bot${token}`;
+  // TELEGRAM_API_URL points the bot at a stand-in server in end-to-end tests.
+  const api = (process.env['TELEGRAM_API_URL'] || 'https://api.telegram.org').replace(/\/$/, '');
+  const base = `${api}/bot${token}`;
 
   async function call<T>(
     method: string,

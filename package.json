@@ -8,6 +8,8 @@
   "scripts": {
     "dev": "pnpm --filter @avtoskop/web dev",
     "bot": "pnpm --filter @avtoskop/jobs bot",
+    "e2e": "pnpm --filter @avtoskop/e2e e2e",
+    "e2e:build": "pnpm --filter @avtoskop/e2e e2e:build",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",

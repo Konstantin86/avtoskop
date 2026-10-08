@@ -1,11 +1,16 @@
 import 'server-only';
 
 // The web app only sends messages; the bot process (apps/jobs) reads them.
+// TELEGRAM_API_URL points it at a stand-in server in end-to-end tests.
+function apiBase(token: string): string {
+  return `${(process.env['TELEGRAM_API_URL'] || 'https://api.telegram.org').replace(/\/$/, '')}/bot${token}`;
+}
+
 export async function sendTelegram(chatId: number, text: string): Promise<boolean> {
   const token = process.env['TELEGRAM_BOT_TOKEN'];
   if (!token || chatId <= 0) return false;
   try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const res = await fetch(`${apiBase(token)}/sendMessage`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text, link_preview_options: { is_disabled: true } }),
@@ -34,7 +39,7 @@ export async function sendTelegramPhoto(
     form.set('chat_id', String(chatId));
     form.set('caption', caption);
     form.set('photo', new Blob([new Uint8Array(photo)], { type: 'image/webp' }), 'photo.webp');
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+    const res = await fetch(`${apiBase(token)}/sendPhoto`, {
       method: 'POST',
       body: form,
     });

@@ -20,7 +20,8 @@ const nhtsa = z.object({
 export async function decodeVin(vin: string): Promise<DecodedVin | null> {
   try {
     const res = await fetch(
-      `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`,
+      // VIN_DECODER_URL points at a stand-in in end-to-end tests.
+      `${process.env['VIN_DECODER_URL'] || 'https://vpic.nhtsa.dot.gov'}/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`,
       { signal: AbortSignal.timeout(5000) },
     );
     if (!res.ok) return null;

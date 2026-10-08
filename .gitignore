@@ -29,3 +29,9 @@ pnpm-debug.log*
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# End-to-end test output
+test-results/
+playwright-report/
+data/e2e-photos/
+apps/e2e/screenshots/
